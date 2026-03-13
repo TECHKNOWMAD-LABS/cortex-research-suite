@@ -3,4 +3,4 @@ name = "code-review-engine-mcp"
 version = "1.0.0"
 description = "Automated code review with multi-dimensional analysis: correctness, security, performance, maintainability, and style. Produces structured findings with severity, location, and suggested fixes."
 requires-python = ">=3.12"
-dependencies = ["fastmcp>=3.1.0", "python-dotenv>=1.0.0"]
+dependencies = ["fastmcp~=3.1.0", "python-dotenv~=1.0.0"]
