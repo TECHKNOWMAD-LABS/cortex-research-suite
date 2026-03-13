@@ -1,0 +1,129 @@
+{
+  "name": "tdd-enforcer",
+  "version": "1.0.0",
+  "description": "Enforces test-driven development workflow. Validates that tests exist before implementation, checks coverage thresholds, detects test anti-patterns, and blocks commits without adequate test coverage.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/tdd-enforcer",
+  "capabilities": [
+    {
+      "name": "enforce_tdd",
+      "description": "Validate TDD compliance for a codebase — tests exist, coverage meets threshold, no anti-patterns",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Path to codebase"
+          },
+          "coverage_threshold": {
+            "type": "number",
+            "default": 80,
+            "description": "Minimum coverage percentage"
+          },
+          "check_anti_patterns": {
+            "type": "boolean",
+            "default": true
+          },
+          "block_commit": {
+            "type": "boolean",
+            "default": false,
+            "description": "Return exit code for pre-commit hook"
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "compliant": {
+            "type": "boolean"
+          },
+          "coverage": {
+            "type": "number"
+          },
+          "anti_patterns": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "missing_tests": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "report": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "enforces",
+        "test-driven",
+        "development",
+        "workflow",
+        "validates",
+        "tests",
+        "exist",
+        "implementation",
+        "checks",
+        "coverage",
+        "thresholds",
+        "detects",
+        "test",
+        "anti-patterns",
+        "blocks"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/tdd-enforcer/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/tdd-enforcer",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "TddEnforcerTool",
+      "module_path": "langchain.tdd_enforcer.tools"
+    },
+    "crewai": {
+      "tool_class": "TddEnforcerTool",
+      "module_path": "crewai.tdd_enforcer.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/tdd-enforcer/openapi.json",
+      "openapi_spec": "openai/tdd-enforcer/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/tdd-enforcer",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
