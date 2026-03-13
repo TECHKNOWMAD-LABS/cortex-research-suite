@@ -1,0 +1,123 @@
+{
+  "name": "agent-orchestrator",
+  "version": "1.0.0",
+  "description": "Multi-agent workflow orchestration with dependency resolution, parallel execution, and fault-tolerant task routing. Coordinates complex pipelines where multiple agents collaborate on compound tasks.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/agent-orchestrator",
+  "capabilities": [
+    {
+      "name": "orchestrate_workflow",
+      "description": "Execute a multi-agent workflow with dependency resolution and parallel task routing",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "workflow": {
+            "type": "object",
+            "description": "Workflow definition with tasks, dependencies, and agent assignments"
+          },
+          "config": {
+            "type": "object",
+            "description": "Execution config (parallelism, timeout, retry policy)"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "default": false,
+            "description": "Validate without executing"
+          }
+        },
+        "required": [
+          "workflow"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "partial",
+              "failed"
+            ]
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "execution_graph": {
+            "type": "object"
+          },
+          "duration_ms": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "multi-agent",
+        "workflow",
+        "orchestration",
+        "dependency",
+        "resolution",
+        "parallel",
+        "execution",
+        "fault-tolerant",
+        "task",
+        "routing",
+        "coordinates",
+        "pipelines",
+        "where",
+        "agents",
+        "collaborate"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/agent-orchestrator/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/agent-orchestrator",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "AgentOrchestratorTool",
+      "module_path": "langchain.agent_orchestrator.tools"
+    },
+    "crewai": {
+      "tool_class": "AgentOrchestratorTool",
+      "module_path": "crewai.agent_orchestrator.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/agent-orchestrator/openapi.json",
+      "openapi_spec": "openai/agent-orchestrator/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/agent-orchestrator",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
