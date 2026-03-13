@@ -1,8 +1,8 @@
 # Cortex
 
-Enterprise-grade autonomous skill suite — runs on Claude, MCP, LangChain, CrewAI, OpenAI GPTs, and any A2A-compatible agent.
+Autonomous skill suite — runs on Claude, MCP, LangChain, CrewAI, OpenAI GPTs, and any A2A-compatible agent.
 
-Cortex is a modular collection of 18 production-ready skills that extend AI agent capabilities across the full software development lifecycle — from design intelligence and test-driven development to multi-agent orchestration and self-evolving skill generation.
+Cortex is a modular collection of 18 skills that extend AI agent capabilities across the full software development lifecycle — from design intelligence and test-driven development to multi-agent orchestration and self-evolving skill generation.
 
 Built by [TechKnowmad AI](https://techknowmad.ai).
 
