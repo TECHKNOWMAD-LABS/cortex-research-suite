@@ -1,0 +1,124 @@
+{
+  "name": "pre-package-pipeline",
+  "version": "1.0.0",
+  "description": "Pre-packaging validation pipeline for Claude Code skills. Validates structure, checks references, verifies scripts, and ensures packaging readiness before .skill file creation.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/pre-package-pipeline",
+  "capabilities": [
+    {
+      "name": "validate_package",
+      "description": "Run pre-packaging validation on a skill directory",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "skill_path": {
+            "type": "string",
+            "description": "Path to skill directory"
+          },
+          "strict": {
+            "type": "boolean",
+            "default": true,
+            "description": "Fail on warnings"
+          },
+          "fix": {
+            "type": "boolean",
+            "default": false,
+            "description": "Auto-fix issues"
+          }
+        },
+        "required": [
+          "skill_path"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ]
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "fixable": {
+            "type": "integer"
+          },
+          "report_path": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "pre-packaging",
+        "validation",
+        "pipeline",
+        "claude",
+        "code",
+        "skills",
+        "validates",
+        "structure",
+        "checks",
+        "references",
+        "verifies",
+        "scripts",
+        "ensures",
+        "packaging",
+        "readiness"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/pre-package-pipeline/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/pre-package-pipeline",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "PrePackagePipelineTool",
+      "module_path": "langchain.pre_package_pipeline.tools"
+    },
+    "crewai": {
+      "tool_class": "PrePackagePipelineTool",
+      "module_path": "crewai.pre_package_pipeline.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/pre-package-pipeline/openapi.json",
+      "openapi_spec": "openai/pre-package-pipeline/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/pre-package-pipeline",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
