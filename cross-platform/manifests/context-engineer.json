@@ -1,0 +1,131 @@
+{
+  "name": "context-engineer",
+  "version": "1.0.0",
+  "description": "Builds optimal context windows for LLM interactions. Compresses, prioritizes, and structures information to maximize relevance within token limits. Implements retrieval-augmented context assembly.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/context-engineer",
+  "capabilities": [
+    {
+      "name": "build_context",
+      "description": "Assemble an optimal context window from multiple sources within token limits",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Paths or URIs to context sources"
+          },
+          "query": {
+            "type": "string",
+            "description": "Query to optimize context for"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "default": 8000,
+            "description": "Maximum token budget"
+          },
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "relevance",
+              "recency",
+              "hybrid"
+            ],
+            "default": "hybrid"
+          }
+        },
+        "required": [
+          "sources",
+          "query"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "context": {
+            "type": "string"
+          },
+          "token_count": {
+            "type": "integer"
+          },
+          "sources_used": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "compression_ratio": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "builds",
+        "optimal",
+        "context",
+        "windows",
+        "interactions",
+        "compresses",
+        "prioritizes",
+        "structures",
+        "information",
+        "maximize",
+        "relevance",
+        "within",
+        "token",
+        "limits",
+        "implements"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/context-engineer/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/context-engineer",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "ContextEngineerTool",
+      "module_path": "langchain.context_engineer.tools"
+    },
+    "crewai": {
+      "tool_class": "ContextEngineerTool",
+      "module_path": "crewai.context_engineer.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/context-engineer/openapi.json",
+      "openapi_spec": "openai/context-engineer/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/context-engineer",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
