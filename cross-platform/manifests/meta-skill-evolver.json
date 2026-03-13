@@ -1,0 +1,122 @@
+{
+  "name": "meta-skill-evolver",
+  "version": "1.0.0",
+  "description": "Analyzes, improves, and evolves Claude Code skills through automated metrics collection, A/B testing, and iterative refinement. Skills that improve themselves.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/meta-skill-evolver",
+  "capabilities": [
+    {
+      "name": "evolve_skill",
+      "description": "Analyze a skill and generate improved versions based on performance metrics",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "skill_path": {
+            "type": "string",
+            "description": "Path to skill directory"
+          },
+          "metrics": {
+            "type": "object",
+            "description": "Performance metrics from skill usage"
+          },
+          "strategy": {
+            "type": "string",
+            "enum": [
+              "optimize",
+              "extend",
+              "simplify",
+              "auto"
+            ],
+            "default": "auto"
+          }
+        },
+        "required": [
+          "skill_path"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "original_score": {
+            "type": "number"
+          },
+          "improved_score": {
+            "type": "number"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "output_path": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "analyzes",
+        "improves",
+        "evolves",
+        "claude",
+        "code",
+        "skills",
+        "through",
+        "metrics",
+        "collection",
+        "testing",
+        "iterative",
+        "refinement",
+        "improve",
+        "themselves"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/meta-skill-evolver/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/meta-skill-evolver",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "MetaSkillEvolverTool",
+      "module_path": "langchain.meta_skill_evolver.tools"
+    },
+    "crewai": {
+      "tool_class": "MetaSkillEvolverTool",
+      "module_path": "crewai.meta_skill_evolver.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/meta-skill-evolver/openapi.json",
+      "openapi_spec": "openai/meta-skill-evolver/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/meta-skill-evolver",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
