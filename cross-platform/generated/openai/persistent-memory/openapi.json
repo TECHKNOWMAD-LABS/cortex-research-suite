@@ -1,0 +1,96 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "persistent-memory API",
+    "version": "1.0.0",
+    "description": "Persistent key-value memory system for AI agents. Stores, retrieves, and manages structured knowledge across sessions with TTL, tagging, and semantic search support."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/persistent-memory"
+    }
+  ],
+  "paths": {
+    "/memory_operation": {
+      "post": {
+        "operationId": "memory_operation",
+        "summary": "Store, retrieve, search, or manage persistent memory entries",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "store",
+                      "retrieve",
+                      "search",
+                      "delete",
+                      "list"
+                    ],
+                    "description": "Memory operation"
+                  },
+                  "key": {
+                    "type": "string",
+                    "description": "Memory key"
+                  },
+                  "value": {
+                    "type": "object",
+                    "description": "Value to store"
+                  },
+                  "query": {
+                    "type": "string",
+                    "description": "Search query"
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Tags for filtering"
+                  },
+                  "ttl": {
+                    "type": "integer",
+                    "description": "Time-to-live in seconds"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "object"
+                    },
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
