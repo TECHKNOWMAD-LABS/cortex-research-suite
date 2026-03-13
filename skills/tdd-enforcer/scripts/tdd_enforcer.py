@@ -10,12 +10,18 @@ import ast
 import json
 import re
 import sys
-import xml.etree.ElementTree as ET
+import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Dict, Set, Tuple, Optional
 from collections import defaultdict
 import argparse
+
+try:
+    import defusedxml.ElementTree as ET
+except ImportError:
+    import xml.etree.ElementTree as ET
+    logging.getLogger(__name__).warning("defusedxml not installed; falling back to stdlib xml.etree — install defusedxml for XXE protection")
 
 
 @dataclass
@@ -312,7 +318,6 @@ class CoverageParser:
     def _parse_xml(self) -> Dict[str, float]:
         """Parse coverage.xml (Cobertura format)."""
         try:
-            # SECURITY: coverage_file is a local file path, not untrusted external input
             tree = ET.parse(self.coverage_file)
             root = tree.getroot()
 
