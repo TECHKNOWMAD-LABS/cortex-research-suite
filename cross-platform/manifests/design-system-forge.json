@@ -1,0 +1,130 @@
+{
+  "name": "design-system-forge",
+  "version": "1.0.0",
+  "description": "Generates complete design systems from brand parameters. Creates tokens, component specs, documentation, and theme configurations with accessibility compliance built in.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/design-system-forge",
+  "capabilities": [
+    {
+      "name": "generate_design_system",
+      "description": "Generate a complete design system from brand parameters",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "brand": {
+            "type": "object",
+            "description": "Brand parameters (colors, typography, spacing)"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Components to generate"
+          },
+          "output_dir": {
+            "type": "string",
+            "description": "Output directory for generated system"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "css",
+              "tailwind",
+              "styled-components",
+              "all"
+            ],
+            "default": "all"
+          }
+        },
+        "required": [
+          "brand"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "tokens": {
+            "type": "object"
+          },
+          "components": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "output_path": {
+            "type": "string"
+          },
+          "accessibility_score": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "generates",
+        "complete",
+        "design",
+        "systems",
+        "brand",
+        "parameters",
+        "creates",
+        "tokens",
+        "component",
+        "specs",
+        "documentation",
+        "theme",
+        "configurations",
+        "accessibility",
+        "compliance"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/design-system-forge/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/design-system-forge",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "DesignSystemForgeTool",
+      "module_path": "langchain.design_system_forge.tools"
+    },
+    "crewai": {
+      "tool_class": "DesignSystemForgeTool",
+      "module_path": "crewai.design_system_forge.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/design-system-forge/openapi.json",
+      "openapi_spec": "openai/design-system-forge/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/design-system-forge",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
