@@ -1,0 +1,123 @@
+{
+  "name": "skill-test-harness",
+  "version": "1.0.0",
+  "description": "Test framework for Claude Code skills. Runs structured test suites against skills, validates outputs, measures performance, and generates coverage reports.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/skill-test-harness",
+  "capabilities": [
+    {
+      "name": "run_skill_tests",
+      "description": "Execute test suites against a Claude Code skill",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "skill_path": {
+            "type": "string",
+            "description": "Path to skill directory"
+          },
+          "test_suite": {
+            "type": "string",
+            "description": "Path to test suite file"
+          },
+          "verbose": {
+            "type": "boolean",
+            "default": false
+          },
+          "coverage": {
+            "type": "boolean",
+            "default": true
+          }
+        },
+        "required": [
+          "skill_path"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "passed": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "skipped": {
+            "type": "integer"
+          },
+          "coverage": {
+            "type": "number"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "test",
+        "framework",
+        "claude",
+        "code",
+        "skills",
+        "runs",
+        "suites",
+        "validates",
+        "outputs",
+        "measures",
+        "performance",
+        "generates",
+        "coverage",
+        "reports"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/skill-test-harness/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/skill-test-harness",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "SkillTestHarnessTool",
+      "module_path": "langchain.skill_test_harness.tools"
+    },
+    "crewai": {
+      "tool_class": "SkillTestHarnessTool",
+      "module_path": "crewai.skill_test_harness.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/skill-test-harness/openapi.json",
+      "openapi_spec": "openai/skill-test-harness/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/skill-test-harness",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
