@@ -1,0 +1,126 @@
+{
+  "name": "agent-output-validator",
+  "version": "1.0.0",
+  "description": "Validates AI agent outputs against schema contracts, quality thresholds, and safety constraints. Catches hallucinations, schema violations, and drift before outputs reach production.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/agent-output-validator",
+  "capabilities": [
+    {
+      "name": "validate_output",
+      "description": "Validate an agent's output against schema, quality, and safety constraints",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "output": {
+            "type": "object",
+            "description": "Agent output to validate"
+          },
+          "schema": {
+            "type": "object",
+            "description": "Expected output schema"
+          },
+          "quality_threshold": {
+            "type": "number",
+            "default": 0.8,
+            "description": "Minimum quality score (0-1)"
+          },
+          "safety_checks": {
+            "type": "boolean",
+            "default": true,
+            "description": "Run safety constraint checks"
+          }
+        },
+        "required": [
+          "output"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "valid": {
+            "type": "boolean"
+          },
+          "score": {
+            "type": "number"
+          },
+          "violations": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "validates",
+        "agent",
+        "outputs",
+        "schema",
+        "contracts",
+        "quality",
+        "thresholds",
+        "safety",
+        "constraints",
+        "catches",
+        "hallucinations",
+        "violations",
+        "drift",
+        "reach",
+        "production"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/agent-output-validator/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/agent-output-validator",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "AgentOutputValidatorTool",
+      "module_path": "langchain.agent_output_validator.tools"
+    },
+    "crewai": {
+      "tool_class": "AgentOutputValidatorTool",
+      "module_path": "crewai.agent_output_validator.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/agent-output-validator/openapi.json",
+      "openapi_spec": "openai/agent-output-validator/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/agent-output-validator",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
