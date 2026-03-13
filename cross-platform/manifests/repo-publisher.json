@@ -1,0 +1,123 @@
+{
+  "name": "repo-publisher",
+  "version": "1.0.0",
+  "description": "Pre-publish pipeline for GitHub repositories. Chains security scanning, AI slop detection, structure validation, and repo metadata updates into a single workflow.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/repo-publisher",
+  "capabilities": [
+    {
+      "name": "publish_repo",
+      "description": "Run the full pre-publish pipeline on a repository",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "repo_path": {
+            "type": "string",
+            "description": "Path to repository"
+          },
+          "owner": {
+            "type": "string",
+            "description": "GitHub owner/org"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository name"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "repo_path"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ]
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "publish_url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "pre-publish",
+        "pipeline",
+        "github",
+        "repositories",
+        "chains",
+        "security",
+        "scanning",
+        "slop",
+        "detection",
+        "structure",
+        "validation",
+        "repo",
+        "metadata",
+        "updates",
+        "workflow"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/repo-publisher/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/repo-publisher",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "RepoPublisherTool",
+      "module_path": "langchain.repo_publisher.tools"
+    },
+    "crewai": {
+      "tool_class": "RepoPublisherTool",
+      "module_path": "crewai.repo_publisher.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/repo-publisher/openapi.json",
+      "openapi_spec": "openai/repo-publisher/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/repo-publisher",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
