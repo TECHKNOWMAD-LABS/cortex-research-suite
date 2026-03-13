@@ -1,0 +1,102 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "code-review-engine API",
+    "version": "1.0.0",
+    "description": "Automated code review with multi-dimensional analysis: correctness, security, performance, maintainability, and style. Produces structured findings with severity, location, and suggested fixes."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/code-review-engine"
+    }
+  ],
+  "paths": {
+    "/review_code": {
+      "post": {
+        "operationId": "review_code",
+        "summary": "Run automated code review on a file or directory with multi-dimensional analysis",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "string",
+                    "description": "File or directory path to review"
+                  },
+                  "language": {
+                    "type": "string",
+                    "description": "Programming language (auto-detected if omitted)"
+                  },
+                  "dimensions": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "correctness",
+                        "security",
+                        "performance",
+                        "maintainability",
+                        "style"
+                      ]
+                    },
+                    "description": "Review dimensions to check"
+                  },
+                  "severity_threshold": {
+                    "type": "string",
+                    "enum": [
+                      "critical",
+                      "high",
+                      "medium",
+                      "low"
+                    ],
+                    "default": "low"
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pass",
+                        "warn",
+                        "fail"
+                      ]
+                    },
+                    "findings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "summary": {
+                      "type": "object"
+                    },
+                    "score": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
