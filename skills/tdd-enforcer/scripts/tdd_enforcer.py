@@ -312,6 +312,7 @@ class CoverageParser:
     def _parse_xml(self) -> Dict[str, float]:
         """Parse coverage.xml (Cobertura format)."""
         try:
+            # SECURITY: coverage_file is a local file path, not untrusted external input
             tree = ET.parse(self.coverage_file)
             root = tree.getroot()
 
