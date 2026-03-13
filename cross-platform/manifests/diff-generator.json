@@ -1,0 +1,137 @@
+{
+  "name": "diff-generator",
+  "version": "1.0.0",
+  "description": "Creates snapshot-based diffs of file system state. Captures before/after snapshots and generates structured change reports showing additions, deletions, and modifications.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/diff-generator",
+  "capabilities": [
+    {
+      "name": "generate_diff",
+      "description": "Generate a structured diff between two file system snapshots",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Directory to snapshot/diff"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "snapshot",
+              "diff",
+              "report"
+            ],
+            "default": "diff"
+          },
+          "baseline": {
+            "type": "string",
+            "description": "Path to baseline snapshot"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "json",
+              "markdown",
+              "unified"
+            ],
+            "default": "json"
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deleted": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "modified": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "summary": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "creates",
+        "snapshot-based",
+        "diffs",
+        "file",
+        "system",
+        "state",
+        "captures",
+        "after",
+        "snapshots",
+        "generates",
+        "change",
+        "reports",
+        "showing",
+        "additions",
+        "deletions"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/diff-generator/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/diff-generator",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "DiffGeneratorTool",
+      "module_path": "langchain.diff_generator.tools"
+    },
+    "crewai": {
+      "tool_class": "DiffGeneratorTool",
+      "module_path": "crewai.diff_generator.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/diff-generator/openapi.json",
+      "openapi_spec": "openai/diff-generator/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/diff-generator",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "system": []
+  }
+}
