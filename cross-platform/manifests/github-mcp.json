@@ -1,0 +1,178 @@
+{
+  "name": "github-mcp",
+  "version": "1.0.0",
+  "description": "GitHub API integration via MCP. Manages repositories, files, branches, pull requests, issues, and releases programmatically without browser automation.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/github-mcp",
+  "capabilities": [
+    {
+      "name": "github_manage_repo",
+      "description": "Create, update, and manage GitHub repositories and their settings",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string",
+            "description": "Repository owner"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository name"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "get",
+              "create",
+              "update",
+              "list"
+            ],
+            "description": "Repository action"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "action"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    {
+      "name": "github_manage_files",
+      "description": "Create, read, update, and delete files in GitHub repositories via API",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "path": {
+            "type": "string",
+            "description": "File path in repository"
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "get",
+              "create",
+              "update",
+              "delete"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "description": "File content (for create/update)"
+          },
+          "message": {
+            "type": "string",
+            "description": "Commit message"
+          },
+          "branch": {
+            "type": "string",
+            "default": "main"
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "path",
+          "action"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "sha": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "github",
+        "integration",
+        "manages",
+        "repositories",
+        "files",
+        "branches",
+        "pull",
+        "requests",
+        "issues",
+        "releases",
+        "programmatically",
+        "browser",
+        "automation"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/github-mcp/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/github-mcp",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "GithubMcpTool",
+      "module_path": "langchain.github_mcp.tools"
+    },
+    "crewai": {
+      "tool_class": "GithubMcpTool",
+      "module_path": "crewai.github_mcp.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/github-mcp/openapi.json",
+      "openapi_spec": "openai/github-mcp/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/github-mcp",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [
+      "fastmcp>=3.1.0",
+      "requests>=2.31.0",
+      "python-dotenv>=1.0.0"
+    ],
+    "system": []
+  }
+}
