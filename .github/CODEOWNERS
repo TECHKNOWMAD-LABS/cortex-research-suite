@@ -1,0 +1,7 @@
+# Default owner for everything
+* @TECHKNOWMAD-LABS
+
+# Security-sensitive files require explicit review
+SECURITY.md @TECHKNOWMAD-LABS
+.github/workflows/ @TECHKNOWMAD-LABS
+skills/security-audit/ @TECHKNOWMAD-LABS
