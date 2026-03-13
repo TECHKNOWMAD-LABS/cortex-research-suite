@@ -1,0 +1,63 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  bandit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bandit
+        run: pip install bandit
+
+      - name: Run bandit (fail on HIGH)
+        run: bandit -r . -ll --severity-level high -f json -o bandit-report.json || true
+
+      - name: Check for HIGH severity
+        run: |
+          python3 -c "
+          import json, sys
+          with open('bandit-report.json') as f:
+              data = json.load(f)
+          high = [r for r in data.get('results', []) if r['issue_severity'] == 'HIGH']
+          if high:
+              for h in high:
+                  print(f'HIGH: {h[\"issue_text\"]} at {h[\"filename\"]}:{h[\"line_number\"]}')
+              sys.exit(1)
+          print('No HIGH severity findings.')
+          "
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Scan for secrets
+        run: |
+          echo "Scanning for leaked secrets..."
+          FOUND=0
+          grep -rn "ghp_[a-zA-Z0-9]\{36\}" --include="*.py" --include="*.yml" --include="*.yaml" --include="*.json" --include="*.md" . && FOUND=1 || true
+          grep -rn "github_pat_[a-zA-Z0-9]\{22\}_[a-zA-Z0-9]\{59\}" --include="*.py" --include="*.yml" . && FOUND=1 || true
+          grep -rn "AKIA[0-9A-Z]\{16\}" --include="*.py" --include="*.yml" . && FOUND=1 || true
+          if [ "$FOUND" -eq 1 ]; then
+            echo "Potential secrets detected!"
+            exit 1
+          fi
+          echo "No secrets found."
