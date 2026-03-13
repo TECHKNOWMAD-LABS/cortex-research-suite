@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TECHKNOWMAD Universal Skill Manifest",
+  "description": "Platform-agnostic skill definition that maps to Claude Skills, MCP Servers, LangChain Tools, CrewAI Tools, OpenAI GPT Actions, and AGENTS.md",
+  "type": "object",
+  "required": ["name", "version", "description", "capabilities", "platforms"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Kebab-case skill identifier"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "Human-readable description (used for discovery across all platforms)"
+    },
+    "author": {
+      "type": "string",
+      "default": "TECHKNOWMAD LABS"
+    },
+    "license": {
+      "type": "string",
+      "default": "MIT"
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri"
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description", "input_schema"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tool/function name (snake_case)"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this capability does"
+          },
+          "input_schema": {
+            "type": "object",
+            "description": "JSON Schema for inputs"
+          },
+          "output_schema": {
+            "type": "object",
+            "description": "JSON Schema for outputs"
+          }
+        }
+      }
+    },
+    "platforms": {
+      "type": "object",
+      "properties": {
+        "claude_skill": {
+          "type": "object",
+          "properties": {
+            "entry_point": { "type": "string" },
+            "triggers": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "mcp_server": {
+          "type": "object",
+          "properties": {
+            "transport": { "enum": ["stdio", "sse", "http"] },
+            "entry_point": { "type": "string" },
+            "command": { "type": "string" },
+            "args": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "langchain": {
+          "type": "object",
+          "properties": {
+            "tool_class": { "type": "string" },
+            "module_path": { "type": "string" }
+          }
+        },
+        "crewai": {
+          "type": "object",
+          "properties": {
+            "tool_class": { "type": "string" },
+            "module_path": { "type": "string" }
+          }
+        },
+        "openai_gpt": {
+          "type": "object",
+          "properties": {
+            "action_schema_url": { "type": "string", "format": "uri" },
+            "openapi_spec": { "type": "string" }
+          }
+        },
+        "github_copilot": {
+          "type": "object",
+          "properties": {
+            "mcp_config": { "type": "object" }
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "object",
+      "properties": {
+        "python": { "type": "string", "description": "Minimum Python version" },
+        "packages": { "type": "array", "items": { "type": "string" } },
+        "system": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}
