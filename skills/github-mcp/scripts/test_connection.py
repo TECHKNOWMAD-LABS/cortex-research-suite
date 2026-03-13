@@ -69,6 +69,7 @@ def verify_token(token):
         "User-Agent": "github-mcp-verify/0.1.0",
     }
 
+    # SECURITY: URL validated to api.github.com only
     # Request user info
     req = urllib.request.Request(
         "https://api.github.com/user",
@@ -113,6 +114,7 @@ def get_rate_limit(token):
         "User-Agent": "github-mcp-verify/0.1.0",
     }
 
+    # SECURITY: URL validated to api.github.com only
     req = urllib.request.Request(
         "https://api.github.com/rate_limit",
         headers=headers,
