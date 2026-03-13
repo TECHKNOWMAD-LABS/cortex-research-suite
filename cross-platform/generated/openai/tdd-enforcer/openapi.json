@@ -1,0 +1,89 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "tdd-enforcer API",
+    "version": "1.0.0",
+    "description": "Enforces test-driven development workflow. Validates that tests exist before implementation, checks coverage thresholds, detects test anti-patterns, and blocks commits without adequate test coverage."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/tdd-enforcer"
+    }
+  ],
+  "paths": {
+    "/enforce_tdd": {
+      "post": {
+        "operationId": "enforce_tdd",
+        "summary": "Validate TDD compliance for a codebase — tests exist, coverage meets threshold, no anti-patterns",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "target": {
+                    "type": "string",
+                    "description": "Path to codebase"
+                  },
+                  "coverage_threshold": {
+                    "type": "number",
+                    "default": 80,
+                    "description": "Minimum coverage percentage"
+                  },
+                  "check_anti_patterns": {
+                    "type": "boolean",
+                    "default": true
+                  },
+                  "block_commit": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Return exit code for pre-commit hook"
+                  }
+                },
+                "required": [
+                  "target"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "compliant": {
+                      "type": "boolean"
+                    },
+                    "coverage": {
+                      "type": "number"
+                    },
+                    "anti_patterns": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "missing_tests": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "report": {
+                      "type": "object"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
