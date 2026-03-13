@@ -1,0 +1,98 @@
+{
+  "schema": "techknowmad-universal-skill-manifest",
+  "version": "1.0.0",
+  "generated": true,
+  "skill_count": 18,
+  "skills": {
+    "agent-orchestrator": {
+      "manifest": "agent-orchestrator.json",
+      "status": "ok",
+      "path": "manifests/agent-orchestrator.json"
+    },
+    "agent-output-validator": {
+      "manifest": "agent-output-validator.json",
+      "status": "ok",
+      "path": "manifests/agent-output-validator.json"
+    },
+    "code-review-engine": {
+      "manifest": "code-review-engine.json",
+      "status": "ok",
+      "path": "manifests/code-review-engine.json"
+    },
+    "context-engineer": {
+      "manifest": "context-engineer.json",
+      "status": "ok",
+      "path": "manifests/context-engineer.json"
+    },
+    "de-slop": {
+      "manifest": "de-slop.json",
+      "status": "ok",
+      "path": "manifests/de-slop.json"
+    },
+    "design-system-forge": {
+      "manifest": "design-system-forge.json",
+      "status": "ok",
+      "path": "manifests/design-system-forge.json"
+    },
+    "dev-lifecycle-engine": {
+      "manifest": "dev-lifecycle-engine.json",
+      "status": "ok",
+      "path": "manifests/dev-lifecycle-engine.json"
+    },
+    "diff-generator": {
+      "manifest": "diff-generator.json",
+      "status": "ok",
+      "path": "manifests/diff-generator.json"
+    },
+    "github-mcp": {
+      "manifest": "github-mcp.json",
+      "status": "ok",
+      "path": "manifests/github-mcp.json"
+    },
+    "meta-skill-evolver": {
+      "manifest": "meta-skill-evolver.json",
+      "status": "ok",
+      "path": "manifests/meta-skill-evolver.json"
+    },
+    "persistent-memory": {
+      "manifest": "persistent-memory.json",
+      "status": "ok",
+      "path": "manifests/persistent-memory.json"
+    },
+    "pre-package-pipeline": {
+      "manifest": "pre-package-pipeline.json",
+      "status": "ok",
+      "path": "manifests/pre-package-pipeline.json"
+    },
+    "repo-publisher": {
+      "manifest": "repo-publisher.json",
+      "status": "ok",
+      "path": "manifests/repo-publisher.json"
+    },
+    "security-audit": {
+      "manifest": "security-audit.json",
+      "status": "ok",
+      "path": "manifests/security-audit.json"
+    },
+    "session-memory": {
+      "manifest": "session-memory.json",
+      "status": "ok",
+      "path": "manifests/session-memory.json"
+    },
+    "skill-test-harness": {
+      "manifest": "skill-test-harness.json",
+      "status": "ok",
+      "path": "manifests/skill-test-harness.json"
+    },
+    "skill-validator": {
+      "manifest": "skill-validator.json",
+      "status": "ok",
+      "path": "manifests/skill-validator.json"
+    },
+    "tdd-enforcer": {
+      "manifest": "tdd-enforcer.json",
+      "status": "ok",
+      "path": "manifests/tdd-enforcer.json"
+    }
+  }
+}
