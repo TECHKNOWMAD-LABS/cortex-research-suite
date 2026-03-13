@@ -1,0 +1,159 @@
+{
+  "name": "security-audit",
+  "version": "1.0.0",
+  "description": "Automated security scanning for code repositories. Runs bandit (Python SAST), semgrep (multi-language static analysis), and secret detection to produce machine-readable reports.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/security-audit",
+  "capabilities": [
+    {
+      "name": "security_scan",
+      "description": "Run a full security scan on a target directory with bandit, semgrep, and secret detection",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "target": {
+            "type": "string",
+            "description": "Directory path to scan"
+          },
+          "output": {
+            "type": "string",
+            "description": "Output path for the report"
+          },
+          "format": {
+            "type": "string",
+            "enum": [
+              "json",
+              "markdown",
+              "both"
+            ],
+            "default": "both"
+          },
+          "severity_threshold": {
+            "type": "string",
+            "enum": [
+              "critical",
+              "high",
+              "medium",
+              "low"
+            ],
+            "default": "low"
+          }
+        },
+        "required": [
+          "target"
+        ]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "warn",
+              "fail"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "critical": {
+                "type": "integer"
+              },
+              "high": {
+                "type": "integer"
+              },
+              "medium": {
+                "type": "integer"
+              },
+              "low": {
+                "type": "integer"
+              },
+              "secrets_detected": {
+                "type": "integer"
+              }
+            }
+          },
+          "findings": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "report_path": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md",
+      "triggers": [
+        "security",
+        "scanning",
+        "code",
+        "repositories",
+        "runs",
+        "bandit",
+        "python",
+        "sast",
+        "semgrep",
+        "multi-language",
+        "static",
+        "analysis",
+        "secret",
+        "detection",
+        "produce"
+      ]
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/security-audit/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/security-audit",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "SecurityAuditTool",
+      "module_path": "langchain.security_audit.tools"
+    },
+    "crewai": {
+      "tool_class": "SecurityAuditTool",
+      "module_path": "crewai.security_audit.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/security-audit/openapi.json",
+      "openapi_spec": "openai/security-audit/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/security-audit",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [
+      "bandit>=1.7.0"
+    ],
+    "system": [
+      "bandit",
+      "semgrep"
+    ]
+  }
+}
