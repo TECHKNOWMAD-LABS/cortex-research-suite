@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TECHKNOWMAD LABS - Documentation</title>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --surface: #161b22;
+            --border: #30363d;
+            --text: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #58a6ff;
+            --green: #3fb950;
+            --orange: #d29922;
+            --red: #f85149;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .container { max-width: 960px; margin: 0 auto; padding: 2rem; }
+        header {
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+        h1 span { color: var(--accent); }
+        .tagline {
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+        nav {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            padding: 0.25rem 0;
+            border-bottom: 2px solid transparent;
+        }
+        nav a:hover, nav a.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.25rem;
+        }
+        .card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            margin-right: 0.25rem;
+        }
+        .badge-green { background: rgba(63,185,80,0.15); color: var(--green); }
+        .badge-orange { background: rgba(210,153,34,0.15); color: var(--orange); }
+        .badge-blue { background: rgba(88,166,255,0.15); color: var(--accent); }
+        section { margin: 2rem 0; }
+        section h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 0.6rem 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        code {
+            font-family: 'SF Mono', monospace;
+            font-size: 0.8rem;
+            background: var(--surface);
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+        }
+        .status-ok { color: var(--green); }
+        .status-warn { color: var(--orange); }
+        footer {
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><span>TECHKNOWMAD</span> LABS</h1>
+            <p class="tagline">AI/ML Research Lab — Autonomous Intelligence Development</p>
+            <nav>
+                <a href="#" class="active">Overview</a>
+                <a href="#skills">Skills</a>
+                <a href="#security">Security</a>
+                <a href="#contributing">Contributing</a>
+            </nav>
+        </header>
+
+        <section>
+            <h2>Repositories</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>cortex</h3>
+                    <p>18 autonomous skills for Claude Code. Research workflows, MLOps, security auditing, agent orchestration.</p>
+                    <div style="margin-top:0.75rem">
+                        <span class="badge badge-green">Active</span>
+                        <span class="badge badge-blue">Python</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>ViralForge</h3>
+                    <p>End-to-end video content pipeline. Script generation, visual planning, content strategy.</p>
+                    <div style="margin-top:0.75rem">
+                        <span class="badge badge-green">Active</span>
+                        <span class="badge badge-blue">Python</span>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>.github</h3>
+                    <p>Org-level configuration. Issue templates, PR templates, community health files.</p>
+                    <div style="margin-top:0.75rem">
+                        <span class="badge badge-green">Active</span>
+                        <span class="badge badge-orange">Config</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills">
+            <h2>Skill Catalog</h2>
+            <table>
+                <tr><th>Skill</th><th>Category</th><th>Status</th></tr>
+                <tr><td><code>research-commander</code></td><td>Research</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>prompt-architect</code></td><td>Engineering</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>tdd-enforcer</code></td><td>Testing</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>agent-orchestrator</code></td><td>Agents</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>code-review-engine</code></td><td>Engineering</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>security-audit</code></td><td>Security</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>persistent-memory</code></td><td>Infrastructure</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>dev-lifecycle-engine</code></td><td>DevOps</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>github-mcp</code></td><td>Integration</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>pre-package-pipeline</code></td><td>Packaging</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>skill-test-harness</code></td><td>Testing</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>mlops-standards</code></td><td>MLOps</td><td class="status-ok">Active</td></tr>
+                <tr><td><code>research-workflow</code></td><td>Research</td><td class="status-ok">Active</td></tr>
+            </table>
+        </section>
+
+        <section id="security">
+            <h2>Security Posture</h2>
+            <table>
+                <tr><th>Control</th><th>Status</th></tr>
+                <tr><td>Secret Scanning + Push Protection</td><td class="status-ok">Enabled</td></tr>
+                <tr><td>Dependabot Security Updates</td><td class="status-ok">Enabled</td></tr>
+                <tr><td>CI/CD Security Scanning (Bandit)</td><td class="status-ok">Active</td></tr>
+                <tr><td>SECURITY.md Disclosure Policy</td><td class="status-ok">Published</td></tr>
+                <tr><td>CODEOWNERS Review Requirements</td><td class="status-ok">Configured</td></tr>
+                <tr><td>Branch Protection</td><td class="status-warn">Script ready, needs manual activation</td></tr>
+                <tr><td>Commit Signing</td><td class="status-warn">Recommended, not enforced</td></tr>
+            </table>
+        </section>
+
+        <section id="contributing">
+            <h2>Contributing</h2>
+            <p style="font-size:0.9rem;color:var(--text-muted);">
+                See <a href="https://github.com/TECHKNOWMAD-LABS/cortex/blob/main/CONTRIBUTING.md" style="color:var(--accent)">CONTRIBUTING.md</a> 
+                for the full contribution guide. All PRs require passing CI checks and one approving review.
+            </p>
+        </section>
+
+        <footer>
+            <p>TECHKNOWMAD LABS &mdash; AI/ML research advancing autonomous intelligence through open-source tools.</p>
+            <p style="margin-top:0.25rem">Last audit: March 13, 2026</p>
+        </footer>
+    </div>
+</body>
+</html>
