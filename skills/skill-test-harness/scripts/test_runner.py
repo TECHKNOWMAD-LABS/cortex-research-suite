@@ -78,8 +78,8 @@ class TestRunner:
         
         try:
             process = subprocess.Popen(
-                expanded_command,
-                shell=True,
+                shlex.split(expanded_command) if isinstance(expanded_command, str) else expanded_command,
+                shell=False,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
