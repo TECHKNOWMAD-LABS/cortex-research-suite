@@ -54,9 +54,7 @@ def sanitize_input(
         raise InputValidationError(f"Expected string input, got {type(text).__name__}")
 
     if len(text) > max_length:
-        raise InputValidationError(
-            f"Input exceeds maximum length ({len(text)} > {max_length})"
-        )
+        raise InputValidationError(f"Input exceeds maximum length ({len(text)} > {max_length})")
 
     if strip_control_chars:
         # Keep newlines, tabs, and standard whitespace
@@ -65,9 +63,7 @@ def sanitize_input(
     if check_injection:
         injection_matches = detect_injection(text)
         if injection_matches:
-            raise InputValidationError(
-                f"Potential prompt injection detected: {', '.join(injection_matches)}"
-            )
+            raise InputValidationError(f"Potential prompt injection detected: {', '.join(injection_matches)}")
 
     return text.strip()
 

@@ -103,11 +103,7 @@ class TaskGraph:
                 task_input = node.transform(initial_input, dep_outputs)
             elif node.dependencies:
                 # Concatenate dependency outputs
-                dep_texts = [
-                    f"## {dep}\n{dep_outputs[dep]}"
-                    for dep in node.dependencies
-                    if dep in dep_outputs
-                ]
+                dep_texts = [f"## {dep}\n{dep_outputs[dep]}" for dep in node.dependencies if dep in dep_outputs]
                 task_input = f"{initial_input}\n\n{''.join(dep_texts)}"
             else:
                 task_input = initial_input

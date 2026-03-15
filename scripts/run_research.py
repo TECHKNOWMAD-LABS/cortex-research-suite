@@ -28,12 +28,14 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.mock:
-        provider = MockProvider([
-            "Research findings: The topic has significant implications across multiple domains.",
-            "Critique: The analysis lacks quantitative evidence.",
-            "Strategy: Focus on high-impact areas first.",
-            "Synthesis: Comprehensive report combining all perspectives.",
-        ])
+        provider = MockProvider(
+            [
+                "Research findings: The topic has significant implications across multiple domains.",
+                "Critique: The analysis lacks quantitative evidence.",
+                "Strategy: Focus on high-impact areas first.",
+                "Synthesis: Comprehensive report combining all perspectives.",
+            ]
+        )
     else:
         provider = ClaudeProvider()
 

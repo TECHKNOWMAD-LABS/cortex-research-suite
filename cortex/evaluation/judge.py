@@ -29,10 +29,7 @@ class JudgeScore:
     def overall(self) -> float:
         """Weighted overall score (0-5 scale)."""
         return round(
-            0.30 * self.accuracy
-            + 0.30 * self.reasoning
-            + 0.20 * self.completeness
-            + 0.20 * self.coherence,
+            0.30 * self.accuracy + 0.30 * self.reasoning + 0.20 * self.completeness + 0.20 * self.coherence,
             3,
         )
 

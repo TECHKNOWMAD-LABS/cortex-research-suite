@@ -94,11 +94,7 @@ class ShardManager:
 
     def list_categories(self) -> list[str]:
         """List all available dataset categories."""
-        return [
-            d.name
-            for d in self._base_dir.iterdir()
-            if d.is_dir() and (d / "index.json").exists()
-        ]
+        return [d.name for d in self._base_dir.iterdir() if d.is_dir() and (d / "index.json").exists()]
 
     @property
     def stats(self) -> dict[str, Any]:

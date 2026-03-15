@@ -59,10 +59,15 @@ _HALLUCINATION_TRIGGERS = [
 ]
 
 _TOPICS = [
-    "AI automation", "quantum computing", "gene editing",
-    "autonomous vehicles", "cryptocurrency regulation",
-    "climate engineering", "nuclear fusion energy",
-    "universal basic income", "space colonization",
+    "AI automation",
+    "quantum computing",
+    "gene editing",
+    "autonomous vehicles",
+    "cryptocurrency regulation",
+    "climate engineering",
+    "nuclear fusion energy",
+    "universal basic income",
+    "space colonization",
     "synthetic biology",
 ]
 

@@ -109,8 +109,6 @@ class DatasetValidator:
             max_cat = max(report.category_distribution.values())
             min_cat = min(report.category_distribution.values())
             if max_cat > 0 and min_cat / max_cat < 0.1:
-                report.errors.append(
-                    f"Severe category imbalance: {report.category_distribution}"
-                )
+                report.errors.append(f"Severe category imbalance: {report.category_distribution}")
 
         return valid, report

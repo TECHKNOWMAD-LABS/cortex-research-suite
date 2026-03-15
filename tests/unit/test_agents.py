@@ -41,12 +41,14 @@ class TestAgents:
 
 class TestOrchestrator:
     def test_full_pipeline(self):
-        provider = MockProvider([
-            "Research output",
-            "Critique output",
-            "Strategy output",
-            "Final synthesis",
-        ])
+        provider = MockProvider(
+            [
+                "Research output",
+                "Critique output",
+                "Strategy output",
+                "Final synthesis",
+            ]
+        )
         orchestrator = AgentOrchestrator(provider)
         result = orchestrator.run("AI in healthcare")
         assert len(result.stages) == 4
@@ -74,15 +76,17 @@ class TestOrchestrator:
 
 class TestDebateArena:
     def test_debate_produces_rounds(self):
-        provider = MockProvider([
-            "Argument for",
-            "Argument against",
-            "Refined argument for",
-            "Refined argument against",
-            "Final for",
-            "Final against",
-            "Synthesis of debate",
-        ])
+        provider = MockProvider(
+            [
+                "Argument for",
+                "Argument against",
+                "Refined argument for",
+                "Refined argument against",
+                "Final for",
+                "Final against",
+                "Synthesis of debate",
+            ]
+        )
         arena = DebateArena(provider, num_rounds=3)
         result = arena.debate("Should AI be regulated?")
         assert len(result.rounds) == 3

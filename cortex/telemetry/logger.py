@@ -79,9 +79,7 @@ class CortexLogger:
         self._log(logging.DEBUG, message, context)
 
     def _log(self, level: int, message: str, context: dict[str, Any]) -> None:
-        record = self._logger.makeRecord(
-            self._logger.name, level, "(cortex)", 0, message, (), None
-        )
+        record = self._logger.makeRecord(self._logger.name, level, "(cortex)", 0, message, (), None)
         if context:
             record.context = context  # type: ignore[attr-defined]
         self._logger.handle(record)

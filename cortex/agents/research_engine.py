@@ -100,7 +100,9 @@ class ResearchEngine:
                 quality_score=quality,
             )
 
-            if best_report is None or quality.normalized > (best_report.quality_score.normalized if best_report.quality_score else 0):
+            if best_report is None or quality.normalized > (
+                best_report.quality_score.normalized if best_report.quality_score else 0
+            ):
                 best_report = report
 
             if quality.normalized >= self._min_quality:

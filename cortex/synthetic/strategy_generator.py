@@ -22,31 +22,55 @@ _STRATEGY_TEMPLATES = [
 ]
 
 _INDUSTRIES = [
-    "healthcare technology", "financial services", "clean energy",
-    "enterprise software", "logistics and supply chain", "biotechnology",
-    "telecommunications", "semiconductor manufacturing", "digital media",
-    "autonomous vehicles", "space technology", "agricultural technology",
-    "cybersecurity services", "quantum computing", "advanced materials",
+    "healthcare technology",
+    "financial services",
+    "clean energy",
+    "enterprise software",
+    "logistics and supply chain",
+    "biotechnology",
+    "telecommunications",
+    "semiconductor manufacturing",
+    "digital media",
+    "autonomous vehicles",
+    "space technology",
+    "agricultural technology",
+    "cybersecurity services",
+    "quantum computing",
+    "advanced materials",
 ]
 
 _TRENDS = [
-    "AI-driven automation", "decentralized finance", "remote work normalization",
-    "sustainability mandates", "data sovereignty regulations", "edge computing growth",
-    "demographic aging", "nearshoring of manufacturing", "synthetic biology advances",
+    "AI-driven automation",
+    "decentralized finance",
+    "remote work normalization",
+    "sustainability mandates",
+    "data sovereignty regulations",
+    "edge computing growth",
+    "demographic aging",
+    "nearshoring of manufacturing",
+    "synthetic biology advances",
     "open-source model proliferation",
 ]
 
 _CHALLENGES = [
-    "incumbent dominance", "regulatory uncertainty", "talent scarcity",
-    "capital constraints", "rapid technology obsolescence", "geopolitical instability",
-    "customer acquisition costs", "supply chain fragility",
+    "incumbent dominance",
+    "regulatory uncertainty",
+    "talent scarcity",
+    "capital constraints",
+    "rapid technology obsolescence",
+    "geopolitical instability",
+    "customer acquisition costs",
+    "supply chain fragility",
 ]
 
 _ORG_TYPES = ["startup", "mid-market company", "enterprise organization", "research institute", "government agency"]
 
 _CONSTRAINTS = [
-    "limited capital", "a 3-year runway", "regulatory complexity",
-    "a distributed workforce", "emerging competition from AI-native players",
+    "limited capital",
+    "a 3-year runway",
+    "regulatory complexity",
+    "a distributed workforce",
+    "emerging competition from AI-native players",
 ]
 
 

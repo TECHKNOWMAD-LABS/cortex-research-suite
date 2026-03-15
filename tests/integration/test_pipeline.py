@@ -21,10 +21,12 @@ class TestDatasetPipeline:
         """Generate -> validate -> shard -> read back."""
         with tempfile.TemporaryDirectory() as tmpdir:
             pipeline = DatasetPipeline(output_dir=tmpdir, shard_size=50)
-            report = pipeline.run([
-                (ReasoningGenerator(seed=42), 100),
-                (AdversarialGenerator(seed=42), 50),
-            ])
+            report = pipeline.run(
+                [
+                    (ReasoningGenerator(seed=42), 100),
+                    (AdversarialGenerator(seed=42), 50),
+                ]
+            )
 
             assert report.total_generated == 150
             assert report.total_valid > 0

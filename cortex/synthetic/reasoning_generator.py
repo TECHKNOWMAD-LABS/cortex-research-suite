@@ -22,13 +22,26 @@ _TEMPLATES = [
 ]
 
 _TOPICS = [
-    "AI automation", "labor market dynamics", "global supply chains",
-    "energy transition", "monetary policy", "healthcare access",
-    "education technology", "urbanization", "climate adaptation",
-    "demographic shifts", "digital infrastructure", "food security",
-    "geopolitical realignment", "quantum computing adoption",
-    "regulatory frameworks", "social mobility", "innovation ecosystems",
-    "data governance", "biotechnology advances", "space commercialization",
+    "AI automation",
+    "labor market dynamics",
+    "global supply chains",
+    "energy transition",
+    "monetary policy",
+    "healthcare access",
+    "education technology",
+    "urbanization",
+    "climate adaptation",
+    "demographic shifts",
+    "digital infrastructure",
+    "food security",
+    "geopolitical realignment",
+    "quantum computing adoption",
+    "regulatory frameworks",
+    "social mobility",
+    "innovation ecosystems",
+    "data governance",
+    "biotechnology advances",
+    "space commercialization",
 ]
 
 _PREMISES = [
