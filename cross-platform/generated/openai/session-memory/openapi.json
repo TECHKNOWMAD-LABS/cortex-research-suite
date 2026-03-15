@@ -1,0 +1,60 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "session-memory API",
+    "version": "1.0.0",
+    "description": "Session-scoped memory persistence across conversations with automatic context restoration."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/session-memory"
+    }
+  ],
+  "paths": {
+    "/session_operation": {
+      "post": {
+        "operationId": "session_operation",
+        "summary": "Store or retrieve session-scoped memory",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "operation": {
+                    "type": "string",
+                    "description": "Operation: save, load, list, clear"
+                  },
+                  "session_id": {
+                    "type": "string",
+                    "description": "Session identifier"
+                  },
+                  "data": {
+                    "type": "object",
+                    "description": "Data to persist"
+                  }
+                },
+                "required": [
+                  "operation"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
