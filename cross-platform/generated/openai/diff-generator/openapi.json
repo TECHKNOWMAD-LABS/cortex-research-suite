@@ -1,0 +1,62 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "diff-generator API",
+    "version": "1.0.0",
+    "description": "Structured diff generation for code and document changes with context-aware formatting."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/diff-generator"
+    }
+  ],
+  "paths": {
+    "/generate_diff": {
+      "post": {
+        "operationId": "generate_diff",
+        "summary": "Generate structured diff between two versions of content",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "original": {
+                    "type": "string",
+                    "description": "Original content"
+                  },
+                  "modified": {
+                    "type": "string",
+                    "description": "Modified content"
+                  },
+                  "format": {
+                    "type": "string",
+                    "description": "Output format",
+                    "default": "unified"
+                  }
+                },
+                "required": [
+                  "original",
+                  "modified"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
