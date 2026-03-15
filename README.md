@@ -1,6 +1,6 @@
 # Cortex
 
-Autonomous skill suite for AI/ML research and development. 18 skills covering research workflows, MLOps, security auditing, agent orchestration, and developer tooling.
+Autonomous skill suite for AI/ML research and development. 21 skills covering research workflows, MLOps, security auditing, agent orchestration, quality assurance, and developer tooling.
 
 ## Quick Start
 
@@ -17,24 +17,31 @@ cd cortex/skills/<skill-name>
 
 | Skill | Category | Description |
 |-------|----------|-------------|
-| `research-commander` | Research | Full research lifecycle orchestrator |
-| `prompt-architect` | Engineering | Prompt engineering and optimization |
-| `tdd-enforcer` | Testing | Test-driven development enforcement with coverage tracking |
 | `agent-orchestrator` | Agents | Multi-agent coordination and task dispatch |
+| `agent-output-validator` | Validation | Automated validation of agent outputs against quality gates |
 | `code-review-engine` | Engineering | Automated code review with security checks |
-| `security-audit` | Security | Bandit + semgrep + secret scanning pipeline |
-| `persistent-memory` | Infrastructure | SQLite-backed memory with FTS5 search |
+| `context-engineer` | Engineering | Context window optimization and prompt context management |
+| `de-slop` | Quality | AI-generated writing pattern detection and removal |
+| `design-system-forge` | Design | Design system generation and component library scaffolding |
 | `dev-lifecycle-engine` | DevOps | Development lifecycle management |
+| `diff-generator` | Engineering | Structured diff generation for code and document changes |
 | `github-mcp` | Integration | GitHub API via Model Context Protocol |
-| `pre-package-pipeline` | Packaging | Skill validation and packaging pipeline |
-| `skill-test-harness` | Testing | Automated skill testing framework |
+| `meta-skill-evolver` | Meta | Evolutionary skill improvement and mutation engine |
 | `mlops-standards` | MLOps | ML operations best practices enforcement |
+| `persistent-memory` | Infrastructure | SQLite-backed memory with FTS5 search |
+| `pre-package-pipeline` | Packaging | Skill validation and packaging pipeline |
+| `prompt-architect` | Engineering | Prompt engineering and optimization |
+| `repo-publisher` | DevOps | Pre-publish pipeline with security scanning and quality gates |
 | `research-workflow` | Research | Experiment design and methodology |
-| `model-evaluator` | MLOps | Automated benchmark suite with leaderboards |
-| `cost-optimizer` | Operations | Cross-cloud spend analysis |
-| `self-healing-agent` | Agents | Autonomous failure detection and recovery |
-| `swarm-commander` | Agents | Multi-agent swarm coordination |
-| `knowledge-distiller` | Engineering | Document compression into skill prompts |
+| `security-audit` | Security | Bandit + semgrep + secret scanning pipeline |
+| `session-memory` | Infrastructure | Session-scoped memory persistence across conversations |
+| `skill-test-harness` | Testing | Automated skill testing framework |
+| `skill-validator` | Validation | Skill structure and manifest validation |
+| `tdd-enforcer` | Testing | Test-driven development enforcement with coverage tracking |
+
+## Skill Organism
+
+The `skill-organism/` directory contains the evolution engine — an autonomous system that observes skill performance, mutates underperformers, selects via fitness tournaments, reproduces top performers through crossbreeding, and self-heals population collapse. Features founding skill immortality (generation 0-1 skills never deprecate), fossil resurrection, and enterprise-grade runner with SHA-256 integrity, atomic rollback, and CI/CD exit codes.
 
 ## Multi-Platform Support
 
@@ -94,10 +101,15 @@ Each skill has a platform-agnostic manifest at `cross-platform/manifests/<skill>
 
 ```
 cortex/
-├── skills/                    # Native Claude Code skills (18 skills)
+├── skills/                    # Native Claude Code skills (21 skills)
 │   ├── <skill-name>/
 │   │   ├── SKILL.md           # Skill definition and instructions
 │   │   └── scripts/           # Python implementations
+├── skill-organism/            # Autonomous skill evolution engine
+│   ├── organism.py            # Core evolution: observe/mutate/select/reproduce/heal
+│   ├── enterprise_runner.py   # Production runner with SHA-256 integrity
+│   └── cortex_skill_organism/ # Installable package
+├── packages/                  # Distributable skill packages
 ├── cross-platform/
 │   ├── manifests/             # Universal Skill Manifests (JSON)
 │   ├── generated/             # Platform-specific adapters
