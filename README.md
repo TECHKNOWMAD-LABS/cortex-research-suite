@@ -54,7 +54,7 @@ The `cross-platform/` directory contains generated adapters for each platform.
 | LangChain | Tool Classes | `cross-platform/generated/langchain/` | Generated |
 | CrewAI | Tool Wrappers | `cross-platform/generated/crewai/` | Generated |
 | OpenAI GPT Actions | Action Schemas | `cross-platform/generated/openai/` | Generated |
-| AGENTS.md | Agent Definitions | `cross-platform/generated/agents-md/` | Generated |
+| AGENTS.md | Agent Definitions | `cross-platform/generated/agents/` | Generated |
 | VS Code | MCP via Extension | `cross-platform/generated/mcp/` | Compatible |
 | JetBrains IDEs | MCP via Plugin | `cross-platform/generated/mcp/` | Compatible |
 | GitHub Copilot | MCP via Extension | `cross-platform/generated/mcp/` | Compatible |
@@ -115,7 +115,7 @@ cortex-research-suite/
 │   │   ├── langchain/         # LangChain tools
 │   │   ├── crewai/            # CrewAI tools
 │   │   ├── openai/            # GPT Action schemas
-│   │   └── agents-md/         # AGENTS.md definitions
+│   │   └── agents/            # AGENTS.md definitions
 │   └── adapters/              # Cross-platform adapter framework
 ├── docs/                      # Documentation site (GitHub Pages)
 ├── .github/
