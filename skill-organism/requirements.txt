@@ -1,0 +1,15 @@
+# Skill Organism - No external dependencies required
+# Uses Python standard library only:
+# - sqlite3 (database)
+# - json (serialization)
+# - pathlib (file operations)
+# - logging (structured logs)
+# - datetime (timestamps)
+# - hashlib (checksums)
+# - difflib (text similarity)
+# - random (mutations)
+# - dataclasses (type safety)
+# - re (pattern matching)
+# - statistics (metrics)
+
+# Minimum Python version: 3.9+
