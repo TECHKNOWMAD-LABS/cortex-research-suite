@@ -1,10 +1,10 @@
 # agent-orchestrator
 
-Multi-agent workflow orchestration with dependency resolution, parallel execution, and fault-tolerant task routing. Coordinates complex pipelines where multiple agents collaborate on compound tasks.
+Multi-agent coordination and task dispatch with dynamic routing and load balancing.
 
 ## Tools
 
-- **orchestrate_workflow**: Execute a multi-agent workflow with dependency resolution and parallel task routing
+- **orchestrate_agents**: Coordinate multiple agents to execute tasks with dynamic routing
 
 ## Integration
 
