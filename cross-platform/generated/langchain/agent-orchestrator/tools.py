@@ -8,27 +8,26 @@ import json
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 
-class OrchestrateWorkflowToolInput(BaseModel):
-    workflow: dict = Field(description="Workflow definition with tasks, dependencies, and agent assignments")
-    config: dict = Field(description="Execution config (parallelism, timeout, retry policy)")
-    dry_run: bool = Field(description="Validate without executing")
+class Orchestrate_agentsToolInput(BaseModel):
+    task: str = Field(description="Task description to orchestrate")
+    agents: list = Field(description="List of agent identifiers to coordinate")
 
 
-class OrchestrateWorkflowTool(BaseTool):
-    name: str = "orchestrate_workflow"
-    description: str = "Execute a multi-agent workflow with dependency resolution and parallel task routing"
-    args_schema: type[BaseModel] = OrchestrateWorkflowToolInput
+class Orchestrate_agentsTool(BaseTool):
+    name: str = "orchestrate_agents"
+    description: str = "Coordinate multiple agents to execute tasks with dynamic routing"
+    args_schema: type[BaseModel] = Orchestrate_agentsToolInput
 
     def _run(self, **kwargs) -> str:
         from skills.agent_orchestrator import execute_sync
-        return json.dumps(execute_sync("orchestrate_workflow", kwargs))
+        return json.dumps(execute_sync("orchestrate_agents", kwargs))
 
     async def _arun(self, **kwargs) -> str:
         from skills.agent_orchestrator import execute
-        result = await execute("orchestrate_workflow", kwargs)
+        result = await execute("orchestrate_agents", kwargs)
         return json.dumps(result)
 
 
 def get_all_tools() -> list[BaseTool]:
     """Return all tools for this skill."""
-    return [OrchestrateWorkflowTool()]
+    return [Orchestrate_agentsTool()]
