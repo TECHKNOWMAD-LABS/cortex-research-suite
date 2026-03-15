@@ -1,209 +1,142 @@
 # Cortex
 
-Autonomous skill suite — runs on Claude, MCP, LangChain, CrewAI, OpenAI GPTs, and any A2A-compatible agent.
-
-Cortex is a modular collection of 18 skills that extend AI agent capabilities across the full software development lifecycle — from design intelligence and test-driven development to multi-agent orchestration and self-evolving skill generation.
-
-Built by [TechKnowmad AI](https://techknowmad.ai).
-
----
+Autonomous skill suite for AI/ML research and development. 18 skills covering research workflows, MLOps, security auditing, agent orchestration, and developer tooling.
 
 ## Quick Start
 
-### Claude Desktop / Cowork (Skill)
-Download any `.skill` file from [`packages/`](./packages) and drag it into Claude Desktop or Cowork.
-
-### MCP Server (Claude, Copilot, Cursor, Windsurf, VS Code, JetBrains)
 ```bash
-cd cross-platform/generated/mcp/<skill-name> && uv run python server.py
+# Clone the repo
+git clone https://github.com/TECHKNOWMAD-LABS/cortex.git
+
+# Install a skill in Claude Code
+cd cortex/skills/<skill-name>
+# Follow the SKILL.md in each skill directory
 ```
 
-### LangChain / LangGraph
+## Skills
+
+| Skill | Category | Description |
+|-------|----------|-------------|
+| `research-commander` | Research | Full research lifecycle orchestrator |
+| `prompt-architect` | Engineering | Prompt engineering and optimization |
+| `tdd-enforcer` | Testing | Test-driven development enforcement with coverage tracking |
+| `agent-orchestrator` | Agents | Multi-agent coordination and task dispatch |
+| `code-review-engine` | Engineering | Automated code review with security checks |
+| `security-audit` | Security | Bandit + semgrep + secret scanning pipeline |
+| `persistent-memory` | Infrastructure | SQLite-backed memory with FTS5 search |
+| `dev-lifecycle-engine` | DevOps | Development lifecycle management |
+| `github-mcp` | Integration | GitHub API via Model Context Protocol |
+| `pre-package-pipeline` | Packaging | Skill validation and packaging pipeline |
+| `skill-test-harness` | Testing | Automated skill testing framework |
+| `mlops-standards` | MLOps | ML operations best practices enforcement |
+| `research-workflow` | Research | Experiment design and methodology |
+| `model-evaluator` | MLOps | Automated benchmark suite with leaderboards |
+| `cost-optimizer` | Operations | Cross-cloud spend analysis |
+| `self-healing-agent` | Agents | Autonomous failure detection and recovery |
+| `swarm-commander` | Agents | Multi-agent swarm coordination |
+| `knowledge-distiller` | Engineering | Document compression into skill prompts |
+
+## Multi-Platform Support
+
+Cortex skills are designed for portability. The `cross-platform/` directory contains generated adapters for each platform.
+
+### Supported Platforms
+
+| Platform | Adapter Type | Directory | Status |
+|----------|-------------|-----------|--------|
+| Claude Code | Native Skills | `skills/` | Primary |
+| MCP (Model Context Protocol) | FastMCP Servers | `cross-platform/generated/mcp/` | Generated |
+| LangChain | Tool Classes | `cross-platform/generated/langchain/` | Generated |
+| CrewAI | Tool Wrappers | `cross-platform/generated/crewai/` | Generated |
+| OpenAI GPT Actions | Action Schemas | `cross-platform/generated/openai/` | Generated |
+| AGENTS.md | Agent Definitions | `cross-platform/generated/agents-md/` | Generated |
+| VS Code | MCP via Extension | `cross-platform/generated/mcp/` | Compatible |
+| JetBrains IDEs | MCP via Plugin | `cross-platform/generated/mcp/` | Compatible |
+| GitHub Copilot | MCP via Extension | `cross-platform/generated/mcp/` | Compatible |
+| Cursor | MCP via Settings | `cross-platform/generated/mcp/` | Compatible |
+| Windsurf | MCP via Config | `cross-platform/generated/mcp/` | Compatible |
+
+### Using with MCP
+
+Each MCP adapter is a standalone FastMCP server:
+
+```bash
+cd cross-platform/generated/mcp/<skill-name>/
+pip install -e .
+python -m <skill_module>
+```
+
+### Using with LangChain
+
 ```python
-from langchain.<skill_name>.tools import get_all_tools
-tools = get_all_tools()
-agent = create_react_agent(llm, tools)
+from langchain_cortex import SecurityAuditTool
+
+tool = SecurityAuditTool()
+result = tool.run({"target": "./my-project"})
 ```
 
-### CrewAI
+### Using with CrewAI
+
 ```python
-from crewai.<skill_name>.tools import *
-agent = Agent(role="...", tools=[SecurityScanTool()])
-```
+from crewai_cortex import SecurityAuditTool
 
-### OpenAI Custom GPT
-Import `cross-platform/generated/openai/<skill-name>/openapi.json` as a GPT Action in the GPT Builder.
-
----
-
-## Supported Platforms
-
-| Platform | Transport | Status |
-|----------|-----------|--------|
-| Claude Desktop / Claude Code | Skill (.skill) | Production |
-| Claude Desktop | MCP (stdio) | Production |
-| GitHub Copilot | MCP (stdio) | Production |
-| Cursor | MCP (stdio) | Production |
-| Windsurf | MCP (stdio) | Production |
-| VS Code (Copilot) | MCP (stdio) | Production |
-| JetBrains IDEs | MCP (stdio) | Production |
-| LangChain / LangGraph | Python SDK | Production |
-| CrewAI | Python SDK | Production |
-| OpenAI GPTs | OpenAPI Action | Production |
-| Google A2A | Agent Card | Available |
-
----
-
-## Skill Catalog
-
-### Development Lifecycle
-
-| Skill | Description |
-|---|---|
-| [`dev-lifecycle-engine`](./skills/dev-lifecycle-engine) | 7-phase mandatory pipeline: brainstorm, plan, setup, implement, test, review, merge. |
-| [`tdd-enforcer`](./skills/tdd-enforcer) | RED-GREEN-REFACTOR enforcement with 12 anti-pattern detectors and quality scoring. |
-| [`code-review-engine`](./skills/code-review-engine) | Two-stage review separating spec compliance from code quality with severity-based blocking. |
-
-### Memory and Context
-
-| Skill | Description |
-|---|---|
-| [`persistent-memory`](./skills/persistent-memory) | SQLite + FTS5 hybrid search with progressive disclosure and cross-session persistence. |
-| [`context-engineer`](./skills/context-engineer) | Token budget management with 4-factor relevance scoring and auto-pruning. |
-| [`session-memory`](./skills/session-memory) | Lightweight session state checkpointing for context compaction recovery. |
-
-### Multi-Agent Orchestration
-
-| Skill | Description |
-|---|---|
-| [`agent-orchestrator`](./skills/agent-orchestrator) | DAG-based task graphs with fan-out, pipeline, and map-reduce patterns. Self-healing recovery. |
-| [`agent-output-validator`](./skills/agent-output-validator) | Contract-based output verification for parallel agent dispatches. |
-
-### Design Intelligence
-
-| Skill | Description |
-|---|---|
-| [`design-system-forge`](./skills/design-system-forge) | 50+ industry design rules, WCAG validation, and framework-specific output. |
-
-### Quality and Security
-
-| Skill | Description |
-|---|---|
-| [`security-audit`](./skills/security-audit) | Bandit + semgrep SAST scanning with secret detection and severity scoring. |
-| [`de-slop`](./skills/de-slop) | AI writing pattern scanner detecting emoji headers, hyperbolic language, and buzzword stacking. |
-| [`skill-validator`](./skills/skill-validator) | Pre-flight validation for YAML frontmatter, directory structure, and script syntax. |
-| [`pre-package-pipeline`](./skills/pre-package-pipeline) | 4-stage quality gate: validation, security, writing quality, packaging. |
-
-### Meta and Evolution
-
-| Skill | Description |
-|---|---|
-| [`meta-skill-evolver`](./skills/meta-skill-evolver) | Autonomous skill generation, validation, testing, and packaging pipeline. |
-| [`skill-test-harness`](./skills/skill-test-harness) | JSON-defined test suites with 7 assertion types and regression detection. |
-| [`diff-generator`](./skills/diff-generator) | File snapshots and unified diffs for safe multi-file editing with rollback. |
-
-### Infrastructure
-
-| Skill | Description |
-|---|---|
-| [`github-mcp`](./skills/github-mcp) | GitHub MCP server builder with 18 REST API tools via FastMCP. |
-| [`repo-publisher`](./skills/repo-publisher) | Pre-publish pipeline: security scan, slop detection, structure validation, metadata updates. |
-
----
-
-## Cross-Platform Architecture
-
-Every skill is defined once and generates platform-specific outputs automatically via the Universal Skill Manifest system.
-
-```
-cortex/
-├── skills/                         # Source skills (SKILL.md + scripts/ + references/)
-├── packages/                       # .skill files for Claude Desktop
-├── cross-platform/
-│   ├── AGENTS.md                   # Org-level agent discovery document
-│   ├── a2a-agent-card.json         # Google A2A Agent Card
-│   ├── pipeline.py                 # End-to-end build orchestrator
-│   ├── manifests/                  # Universal Skill Manifests (18 JSON files)
-│   │   └── skill-manifest.schema.json
-│   ├── adapters/
-│   │   └── universal_adapter.py    # Manifest → platform code generator
-│   ├── tools/
-│   │   ├── skill_to_manifest.py    # SKILL.md → manifest converter
-│   │   └── generate_all_manifests.py
-│   └── generated/                  # Platform-specific outputs
-│       ├── mcp/                    # 18 FastMCP servers
-│       ├── langchain/              # 18 LangChain BaseTool classes
-│       ├── crewai/                 # 18 CrewAI BaseTool classes
-│       ├── openai/                 # 18 OpenAPI 3.1 specs for GPT Actions
-│       └── agents/                 # 18 per-skill AGENTS.md files
-└── README.md
+agent = Agent(
+    role="Security Analyst",
+    tools=[SecurityAuditTool()]
+)
 ```
 
 ### Universal Skill Manifest
 
-Each skill is defined by a single JSON manifest that maps to all platforms:
+Each skill has a platform-agnostic manifest at `cross-platform/manifests/<skill>.json` describing inputs, outputs, dependencies, and platform-specific configuration.
 
-```json
-{
-  "name": "security-audit",
-  "version": "1.0.0",
-  "capabilities": [
-    {
-      "name": "security_scan",
-      "input_schema": { "type": "object", "properties": {...} },
-      "output_schema": { "type": "object", "properties": {...} }
-    }
-  ],
-  "platforms": {
-    "claude_skill": { "entry_point": "SKILL.md" },
-    "mcp_server": { "command": "uv", "args": [...] },
-    "langchain": { "tool_class": "SecurityScanTool" },
-    "crewai": { "tool_class": "SecurityScanTool" },
-    "openai_gpt": { "openapi_spec": "openai/security-audit/openapi.json" },
-    "github_copilot": { "mcp_config": {...} }
-  }
-}
-```
-
----
-
-## Skill Architecture
-
-Each skill follows a standard structure:
+## Project Structure
 
 ```
-skill-name/
-├── SKILL.md              # Frontmatter + instructions
-├── scripts/              # Executable tools (Python 3.10+, stdlib-only)
-│   └── tool.py
-└── references/           # Supporting documentation (optional)
-    └── reference.md
+cortex/
+├── skills/                    # Native Claude Code skills (18 skills)
+│   ├── <skill-name>/
+│   │   ├── SKILL.md           # Skill definition and instructions
+│   │   └── scripts/           # Python implementations
+├── cross-platform/
+│   ├── manifests/             # Universal Skill Manifests (JSON)
+│   ├── generated/             # Platform-specific adapters
+│   │   ├── mcp/               # FastMCP servers
+│   │   ├── langchain/         # LangChain tools
+│   │   ├── crewai/            # CrewAI tools
+│   │   ├── openai/            # GPT Action schemas
+│   │   └── agents-md/         # AGENTS.md definitions
+│   └── adapters/              # Cross-platform adapter framework
+├── docs/                      # Documentation site (GitHub Pages)
+├── .github/
+│   ├── workflows/             # CI/CD (security, lint, CodeQL)
+│   ├── CODEOWNERS             # Review requirements
+│   └── scripts/               # Setup automation
+├── SECURITY.md
+├── CONTRIBUTING.md
+├── CODE_OF_CONDUCT.md
+└── LICENSE                    # MIT
 ```
 
-Skills compose into production stacks:
+## Security
 
-```
-dev-lifecycle-engine
-  ├── tdd-enforcer          (test phase)
-  ├── code-review-engine    (review phase)
-  ├── security-audit        (pre-merge gate)
-  └── de-slop               (documentation gate)
+All code passes automated security scanning on every push:
 
-agent-orchestrator
-  ├── agent-output-validator (post-dispatch verification)
-  ├── persistent-memory      (cross-session state)
-  └── context-engineer       (token budget management)
+- **Bandit** — Python SAST, zero HIGH findings
+- **CodeQL** — GitHub's semantic code analysis
+- **Secret scanning** — Push protection enabled
+- **Dependabot** — Automated dependency updates
+- **defusedxml** — Safe XML parsing (no XXE)
 
-meta-skill-evolver
-  ├── skill-validator       (validation stage)
-  ├── skill-test-harness    (testing stage)
-  └── pre-package-pipeline  (packaging stage)
-```
+Report vulnerabilities to admin@techknowmad.ai. See [SECURITY.md](SECURITY.md).
 
-## Requirements
+## Contributing
 
-Python 3.10+ with stdlib only. No external dependencies.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. All PRs require:
+- Passing CI checks (bandit, lint, tests)
+- One approving review
+- No leaked secrets or credentials
 
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).
