@@ -1,17 +1,15 @@
-# Cortex
+# Cortex Research Suite
 
-Autonomous skill suite for AI/ML research and development. 21 skills covering research workflows, MLOps, security auditing, agent orchestration, quality assurance, and developer tooling.
+21 autonomous skills for AI/ML research and development. Covers research workflows, MLOps enforcement, security auditing, agent orchestration, quality assurance, and developer tooling. Works natively with Claude Code and integrates with LangChain, CrewAI, and OpenAI via MCP adapters.
 
 ## Quick Start
 
 ```bash
-# Clone the repo
-git clone https://github.com/TECHKNOWMAD-LABS/cortex.git
-
-# Install a skill in Claude Code
-cd cortex/skills/<skill-name>
-# Follow the SKILL.md in each skill directory
+git clone https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git
+cd cortex-research-suite/skills/<skill-name>
 ```
+
+Each skill directory contains a `SKILL.md` with setup instructions and a `scripts/` directory with Python implementations.
 
 ## Skills
 
@@ -41,13 +39,13 @@ cd cortex/skills/<skill-name>
 
 ## Skill Organism
 
-The `skill-organism/` directory contains the evolution engine — an autonomous system that observes skill performance, mutates underperformers, selects via fitness tournaments, reproduces top performers through crossbreeding, and self-heals population collapse. Features founding skill immortality (generation 0-1 skills never deprecate), fossil resurrection, and enterprise-grade runner with SHA-256 integrity, atomic rollback, and CI/CD exit codes.
+The `skill-organism/` directory contains the evolution engine. Skills are automatically tested and scored. Underperformers get modified via mutation, top performers get replicated via crossbreeding, and the system recovers from population loss by restoring previously successful versions. Generation 0-1 skills are preserved indefinitely.
 
-## Multi-Platform Support
+The enterprise runner (`enterprise_runner.py`) enforces SHA-256 integrity checks on the skill registry, supports atomic rollback on failure, and returns CI/CD-compatible exit codes.
 
-Cortex skills are designed for portability. The `cross-platform/` directory contains generated adapters for each platform.
+## Cross-Platform Support
 
-### Supported Platforms
+The `cross-platform/` directory contains generated adapters for each platform.
 
 | Platform | Adapter Type | Directory | Status |
 |----------|-------------|-----------|--------|
@@ -100,12 +98,12 @@ Each skill has a platform-agnostic manifest at `cross-platform/manifests/<skill>
 ## Project Structure
 
 ```
-cortex/
+cortex-research-suite/
 ├── skills/                    # Native Claude Code skills (21 skills)
 │   ├── <skill-name>/
 │   │   ├── SKILL.md           # Skill definition and instructions
 │   │   └── scripts/           # Python implementations
-├── skill-organism/            # Autonomous skill evolution engine
+├── skill-organism/            # Skill evolution engine
 │   ├── organism.py            # Core evolution: observe/mutate/select/reproduce/heal
 │   ├── enterprise_runner.py   # Production runner with SHA-256 integrity
 │   └── cortex_skill_organism/ # Installable package
@@ -134,17 +132,18 @@ cortex/
 
 All code passes automated security scanning on every push:
 
-- **Bandit** — Python SAST, zero HIGH findings
-- **CodeQL** — GitHub's semantic code analysis
-- **Secret scanning** — Push protection enabled
-- **Dependabot** — Automated dependency updates
-- **defusedxml** — Safe XML parsing (no XXE)
+- Bandit Python SAST with zero HIGH findings
+- CodeQL semantic code analysis
+- Secret scanning with push protection enabled
+- Dependabot automated dependency updates
+- Safe XML parsing via defusedxml (no XXE)
 
 Report vulnerabilities to admin@techknowmad.ai. See [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. All PRs require:
+
 - Passing CI checks (bandit, lint, tests)
 - One approving review
 - No leaked secrets or credentials
