@@ -1,8 +1,9 @@
 line-length = 120
 target-version = "py311"
 
-# Exclude directories from ALL ruff operations (lint + format)
-# [lint.per-file-ignores] only affects 'ruff check', not 'ruff format'
+# Exclude directories from ALL ruff operations (lint + format).
+# Top-level exclude is required because [lint.per-file-ignores]
+# only affects 'ruff check', NOT 'ruff format --check'.
 exclude = [
     "cross-platform/**",
     "skill-organism/**",
@@ -21,12 +22,6 @@ ignore = [
     "W293",   # blank line contains whitespace (cosmetic, auto-fixable)
     "W291",   # trailing whitespace (cosmetic, auto-fixable)
 ]
-
-[lint.per-file-ignores]
-"cross-platform/**" = ["ALL"]
-"skill-organism/**" = ["ALL"]
-"packages/**" = ["ALL"]
-"skills/**/scripts/**" = ["E", "W"]
 
 [format]
 line-ending = "auto"
