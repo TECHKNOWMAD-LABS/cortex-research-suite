@@ -1,0 +1,79 @@
+{
+  "name": "prompt-architect",
+  "version": "1.0.0",
+  "description": "Prompt engineering and optimization. Analyzes, improves, and tests prompts for AI/ML tasks and agent systems.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/prompt-architect",
+  "capabilities": [
+    {
+      "name": "optimize_prompt",
+      "description": "Analyze and optimize a prompt for improved performance",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Prompt to optimize"
+          },
+          "task_type": {
+            "type": "string",
+            "description": "Type of task the prompt is for"
+          },
+          "model": {
+            "type": "string",
+            "description": "Target model"
+          }
+        },
+        "required": [
+          "prompt"
+        ]
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md"
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/prompt-architect/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/prompt-architect",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "Optimize_promptTool",
+      "module_path": "langchain.prompt_architect.tools"
+    },
+    "crewai": {
+      "tool_class": "Optimize_promptTool",
+      "module_path": "crewai.prompt_architect.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/prompt-architect/openapi.json",
+      "openapi_spec": "openai/prompt-architect/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/prompt-architect",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": []
+  }
+}
