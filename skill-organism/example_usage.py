@@ -3,8 +3,6 @@ Example Usage: Skill Organism
 Demonstrates core API patterns for integrating with your skill system.
 """
 
-from datetime import datetime
-from pathlib import Path
 from organism import SkillOrganism, setup_logging
 from telemetry import SkillTelemetry
 import logging
