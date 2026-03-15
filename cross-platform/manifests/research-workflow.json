@@ -1,0 +1,79 @@
+{
+  "name": "research-workflow",
+  "version": "1.0.0",
+  "description": "Experiment design and research methodology for AI/ML research projects with hypothesis generation and evaluation frameworks.",
+  "author": "TECHKNOWMAD LABS",
+  "license": "MIT",
+  "repository": "https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/research-workflow",
+  "capabilities": [
+    {
+      "name": "design_experiment",
+      "description": "Design a structured experiment with hypothesis, methodology, and evaluation criteria",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Research topic"
+          },
+          "hypothesis": {
+            "type": "string",
+            "description": "Research hypothesis"
+          },
+          "methodology": {
+            "type": "string",
+            "description": "Preferred methodology"
+          }
+        },
+        "required": [
+          "topic"
+        ]
+      }
+    }
+  ],
+  "platforms": {
+    "claude_skill": {
+      "entry_point": "SKILL.md"
+    },
+    "mcp_server": {
+      "transport": "stdio",
+      "entry_point": "mcp/research-workflow/server.py",
+      "command": "uv",
+      "args": [
+        "--directory",
+        "mcp/research-workflow",
+        "run",
+        "python",
+        "server.py"
+      ]
+    },
+    "langchain": {
+      "tool_class": "Design_experimentTool",
+      "module_path": "langchain.research_workflow.tools"
+    },
+    "crewai": {
+      "tool_class": "Design_experimentTool",
+      "module_path": "crewai.research_workflow.tools"
+    },
+    "openai_gpt": {
+      "action_schema_url": "https://api.techknowmad.ai/skills/research-workflow/openapi.json",
+      "openapi_spec": "openai/research-workflow/openapi.json"
+    },
+    "github_copilot": {
+      "mcp_config": {
+        "command": "uv",
+        "args": [
+          "--directory",
+          "mcp/research-workflow",
+          "run",
+          "python",
+          "server.py"
+        ]
+      }
+    }
+  },
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": []
+  }
+}
