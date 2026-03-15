@@ -3,7 +3,7 @@
   "info": {
     "title": "tdd-enforcer API",
     "version": "1.0.0",
-    "description": "Enforces test-driven development workflow. Validates that tests exist before implementation, checks coverage thresholds, detects test anti-patterns, and blocks commits without adequate test coverage."
+    "description": "Test-driven development enforcement with coverage tracking, test-first workflow validation, and red-green-refactor cycle monitoring."
   },
   "servers": [
     {
@@ -14,7 +14,7 @@
     "/enforce_tdd": {
       "post": {
         "operationId": "enforce_tdd",
-        "summary": "Validate TDD compliance for a codebase — tests exist, coverage meets threshold, no anti-patterns",
+        "summary": "Enforce TDD workflow with coverage tracking and cycle validation",
         "requestBody": {
           "required": true,
           "content": {
@@ -22,27 +22,23 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "target": {
+                  "project_path": {
                     "type": "string",
-                    "description": "Path to codebase"
+                    "description": "Path to project"
                   },
                   "coverage_threshold": {
                     "type": "number",
-                    "default": 80,
-                    "description": "Minimum coverage percentage"
+                    "description": "Minimum coverage percentage",
+                    "default": 80
                   },
-                  "check_anti_patterns": {
+                  "strict": {
                     "type": "boolean",
+                    "description": "Block commits without tests",
                     "default": true
-                  },
-                  "block_commit": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Return exit code for pre-commit hook"
                   }
                 },
                 "required": [
-                  "target"
+                  "project_path"
                 ]
               }
             }
@@ -54,30 +50,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "compliant": {
-                      "type": "boolean"
-                    },
-                    "coverage": {
-                      "type": "number"
-                    },
-                    "anti_patterns": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    },
-                    "missing_tests": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
-                    "report": {
-                      "type": "object"
-                    }
-                  }
+                  "type": "object"
                 }
               }
             }
