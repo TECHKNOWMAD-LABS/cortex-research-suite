@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "prompt-architect API",
+    "version": "1.0.0",
+    "description": "Prompt engineering and optimization. Analyzes, improves, and tests prompts for AI/ML tasks and agent systems."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/prompt-architect"
+    }
+  ],
+  "paths": {
+    "/optimize_prompt": {
+      "post": {
+        "operationId": "optimize_prompt",
+        "summary": "Analyze and optimize a prompt for improved performance",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string",
+                    "description": "Prompt to optimize"
+                  },
+                  "task_type": {
+                    "type": "string",
+                    "description": "Type of task the prompt is for"
+                  },
+                  "model": {
+                    "type": "string",
+                    "description": "Target model",
+                    "default": "claude-sonnet-4-20250514"
+                  }
+                },
+                "required": [
+                  "prompt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
