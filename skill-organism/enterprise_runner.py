@@ -201,7 +201,7 @@ def verify_registry_integrity(path: Path) -> bool:
                 logger.error(f"Integrity: skill '{skill['id']}' fitness out of range: {skill['fitness_score']}")
                 return False
 
-            if skill["status"] not in ("active", "dormant", "deprecated"):
+            if skill["status"] not in ("active", "dormant", "deprecated", "extinct"):
                 logger.error(f"Integrity: skill '{skill['id']}' invalid status: {skill['status']}")
                 return False
 
@@ -218,26 +218,47 @@ def verify_registry_integrity(path: Path) -> bool:
 
 
 def check_health_gate(organism: SkillOrganism) -> bool:
-    """Pre-flight health gate: abort if ecosystem is critically degraded."""
+    """Pre-flight health gate: abort if ecosystem is critically degraded.
+
+    Accounts for full lifecycle states: active, dormant, deprecated, extinct.
+    Extinct skills are excluded from the living population denominator since
+    they are permanently removed from the active gene pool.
+    """
     total = len(organism.skills)
     if total == 0:
         logger.error("Health gate: no skills in registry")
         return False
 
+    extinct_count = sum(
+        1 for s in organism.skills.values()
+        if s.status == "extinct"
+    )
+    living_count = total - extinct_count
+    if living_count == 0:
+        logger.error("Health gate BLOCKED: entire population is extinct — "
+                      "no living skills remain for evolution")
+        return False
+
     critical_count = sum(
         1 for s in organism.skills.values()
-        if s.health == "critical"
+        if s.health == "critical" and s.status != "extinct"
     )
     deprecated_count = sum(
         1 for s in organism.skills.values()
         if s.status == "deprecated"
     )
+    active_count = sum(
+        1 for s in organism.skills.values()
+        if s.status == "active"
+    )
 
-    critical_ratio = critical_count / total
-    deprecated_ratio = deprecated_count / total
+    critical_ratio = critical_count / living_count
+    deprecated_ratio = deprecated_count / living_count
+    active_ratio = active_count / living_count
 
     logger.info(
-        f"Health gate: {total} skills, "
+        f"Health gate: {total} total ({living_count} living, {extinct_count} extinct), "
+        f"{active_count} active ({active_ratio:.1%}), "
         f"{critical_count} critical ({critical_ratio:.1%}), "
         f"{deprecated_count} deprecated ({deprecated_ratio:.1%})"
     )
@@ -255,6 +276,14 @@ def check_health_gate(organism: SkillOrganism) -> bool:
             "exceeds 80% threshold — mass deprecation detected"
         )
         return False
+
+    # Warn (but don't block) if active population is dangerously low
+    # The organism's heal() will trigger population collapse recovery
+    if active_ratio < 0.4:
+        logger.warning(
+            f"Health gate WARNING: active ratio {active_ratio:.1%} below 40% — "
+            "organism heal() will attempt population collapse recovery"
+        )
 
     return True
 
@@ -388,7 +417,13 @@ def run_evolution_cycle() -> int:
         logger.info(f"  Culled: {len(select.get('culled', []))}")
         logger.info(f"  Promoted: {len(select.get('promoted', []))}")
         logger.info(f"  Offspring: {reproduce.get('offspring_created', 0)}")
+        logger.info(f"  Resurrections: {reproduce.get('fossils_resurrected', 0)}")
         logger.info(f"  Critical (healing): {len(heal.get('critical', []))}")
+        logger.info(f"  Deprecation decay: {heal.get('decay_count', 0)} → extinct")
+        logger.info(f"  Collapse recovery: {heal.get('collapse_resurrected', 0)} resurrected")
+        logger.info(f"  Ecosystem: {report.get('active_skills', '?')} active, "
+                     f"{report.get('extinct_skills', 0)} extinct, "
+                     f"{report.get('fossil_archive_size', 0)} fossils")
         logger.info(f"  Report: {report_path.name}")
         logger.info(f"{'='*60}")
 
