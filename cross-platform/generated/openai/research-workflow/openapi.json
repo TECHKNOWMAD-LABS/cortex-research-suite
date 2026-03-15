@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "research-workflow API",
+    "version": "1.0.0",
+    "description": "Experiment design and research methodology for AI/ML research projects with hypothesis generation and evaluation frameworks."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/research-workflow"
+    }
+  ],
+  "paths": {
+    "/design_experiment": {
+      "post": {
+        "operationId": "design_experiment",
+        "summary": "Design a structured experiment with hypothesis, methodology, and evaluation criteria",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "description": "Research topic"
+                  },
+                  "hypothesis": {
+                    "type": "string",
+                    "description": "Research hypothesis"
+                  },
+                  "methodology": {
+                    "type": "string",
+                    "description": "Preferred methodology",
+                    "default": "ablation"
+                  }
+                },
+                "required": [
+                  "topic"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
