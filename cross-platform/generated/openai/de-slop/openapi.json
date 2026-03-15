@@ -1,0 +1,57 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "de-slop API",
+    "version": "1.0.0",
+    "description": "AI-generated writing pattern detection and removal. Scans for emoji in headers, hyperbolic language, buzzword stacking, and other LLM artifacts."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/de-slop"
+    }
+  ],
+  "paths": {
+    "/scan_content": {
+      "post": {
+        "operationId": "scan_content",
+        "summary": "Scan content for AI-generated writing patterns and flag violations",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "Content to scan for AI patterns"
+                  },
+                  "fix": {
+                    "type": "boolean",
+                    "description": "Auto-fix detected patterns",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "content"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
