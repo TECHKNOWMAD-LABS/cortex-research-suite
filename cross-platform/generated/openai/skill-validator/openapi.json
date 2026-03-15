@@ -1,0 +1,57 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "skill-validator API",
+    "version": "1.0.0",
+    "description": "Skill structure and manifest validation ensuring compliance with the TECHKNOWMAD skill specification."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/skill-validator"
+    }
+  ],
+  "paths": {
+    "/validate_skill": {
+      "post": {
+        "operationId": "validate_skill",
+        "summary": "Validate skill structure and manifest against specification",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "skill_path": {
+                    "type": "string",
+                    "description": "Path to skill directory"
+                  },
+                  "strict": {
+                    "type": "boolean",
+                    "description": "Enable strict validation",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "skill_path"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
