@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "agent-output-validator API",
+    "version": "1.0.0",
+    "description": "Automated validation of agent outputs against quality gates, schema compliance, and correctness criteria."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/agent-output-validator"
+    }
+  ],
+  "paths": {
+    "/validate_output": {
+      "post": {
+        "operationId": "validate_output",
+        "summary": "Validate agent output against quality gates and schema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "output": {
+                    "type": "string",
+                    "description": "Agent output to validate"
+                  },
+                  "schema": {
+                    "type": "object",
+                    "description": "Expected output schema"
+                  },
+                  "quality_threshold": {
+                    "type": "number",
+                    "description": "Minimum quality score (0-1)",
+                    "default": 0.8
+                  }
+                },
+                "required": [
+                  "output"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
