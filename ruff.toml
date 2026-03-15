@@ -1,0 +1,32 @@
+line-length = 120
+target-version = "py311"
+
+# Exclude directories from ALL ruff operations (lint + format)
+# [lint.per-file-ignores] only affects 'ruff check', not 'ruff format'
+exclude = [
+    "cross-platform/**",
+    "skill-organism/**",
+    "packages/**",
+    "skills/**",
+]
+
+[lint]
+select = ["E", "F", "W"]
+ignore = [
+    "F401",   # unused import (common in __init__.py re-exports and conditional imports)
+    "F541",   # f-string without placeholders (common in logging patterns)
+    "F841",   # local variable assigned but never used (common in try/except)
+    "E722",   # bare except (acceptable in resilience-focused agent code)
+    "E501",   # line too long (handled by line-length setting)
+    "W293",   # blank line contains whitespace (cosmetic, auto-fixable)
+    "W291",   # trailing whitespace (cosmetic, auto-fixable)
+]
+
+[lint.per-file-ignores]
+"cross-platform/**" = ["ALL"]
+"skill-organism/**" = ["ALL"]
+"packages/**" = ["ALL"]
+"skills/**/scripts/**" = ["E", "W"]
+
+[format]
+line-ending = "auto"

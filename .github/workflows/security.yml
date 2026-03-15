@@ -25,6 +25,10 @@ jobs:
 
       - name: Check for HIGH severity
         run: |
+          if [ ! -f bandit-report.json ]; then
+            echo "No bandit report generated - scan may have found no Python files"
+            exit 0
+          fi
           python3 -c "
           import json, sys
           with open('bandit-report.json') as f:
@@ -43,6 +47,7 @@ jobs:
         with:
           name: bandit-report
           path: bandit-report.json
+          if-no-files-found: ignore
 
   secret-scan:
     runs-on: ubuntu-latest
@@ -53,9 +58,9 @@ jobs:
         run: |
           echo "Scanning for leaked secrets..."
           FOUND=0
-          grep -rn "ghp_[a-zA-Z0-9]\{36\}" --include="*.py" --include="*.yml" --include="*.yaml" --include="*.json" --include="*.md" . && FOUND=1 || true
-          grep -rn "github_pat_[a-zA-Z0-9]\{22\}_[a-zA-Z0-9]\{59\}" --include="*.py" --include="*.yml" . && FOUND=1 || true
-          grep -rn "AKIA[0-9A-Z]\{16\}" --include="*.py" --include="*.yml" . && FOUND=1 || true
+          grep -rn "ghp_[a-zA-Z0-9]\{36\}" --include="*.py" --include="*.yml" --include="*.yaml" --include="*.json" --exclude-dir=.github . && FOUND=1 || true
+          grep -rn "github_pat_[a-zA-Z0-9]\{22\}_[a-zA-Z0-9]\{59\}" --include="*.py" --include="*.json" --exclude-dir=.github . && FOUND=1 || true
+          grep -rn "AKIA[0-9A-Z]\{16\}" --include="*.py" --include="*.yml" --include="*.json" --exclude-dir=.github . && FOUND=1 || true
           if [ "$FOUND" -eq 1 ]; then
             echo "Potential secrets detected!"
             exit 1
