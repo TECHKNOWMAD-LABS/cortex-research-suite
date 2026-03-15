@@ -101,20 +101,26 @@ class MetricsCollector:
         limit: int = 1000,
     ) -> list[dict[str, Any]]:
         """Query metrics with optional filters."""
+        # Validate limit to prevent resource exhaustion
+        if not isinstance(limit, int) or limit < 1:
+            limit = 1000
+        limit = min(limit, 100_000)
+
+        # All conditions use parameterized queries — no user input in SQL strings
         conditions: list[str] = []
         params: list[Any] = []
         if skill:
             conditions.append("skill = ?")
-            params.append(skill)
+            params.append(str(skill))
         if metric_name:
             conditions.append("metric_name = ?")
-            params.append(metric_name)
+            params.append(str(metric_name))
         if since:
             conditions.append("timestamp >= ?")
-            params.append(since)
+            params.append(float(since))
 
-        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
-        query = f"SELECT skill, metric_name, value, timestamp, metadata FROM metrics {where} ORDER BY timestamp DESC LIMIT ?"
+        where = f"WHERE {' AND '.join(conditions)}" if conditions else ""  # nosec B608 — conditions are hardcoded strings, values are parameterized
+        query = f"SELECT skill, metric_name, value, timestamp, metadata FROM metrics {where} ORDER BY timestamp DESC LIMIT ?"  # nosec B608
         params.append(limit)
 
         with self._lock:

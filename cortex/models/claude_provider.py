@@ -71,10 +71,23 @@ class ClaudeProvider(ModelProvider):
         )
 
     def _generate_cli(self, prompt: str, *, max_tokens: int) -> ModelResponse:
-        """Fallback: generate via claude CLI subprocess."""
+        """Fallback: generate via claude CLI subprocess.
+
+        Security: shell=False (default) prevents shell injection.
+        The prompt is passed as a single argv element, not interpreted by a shell.
+        Model name is validated to contain only safe characters.
+        """
         start = time.time()
+        # Validate model name contains only safe chars (prevent argument injection)
+        if not all(c.isalnum() or c in "-_." for c in self.model):
+            return ModelResponse(
+                content="",
+                model=self.model,
+                latency_ms=0.0,
+                metadata={"error": "Invalid model name", "method": "cli"},
+            )
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603, S607
                 ["claude", "--print", "--model", self.model, prompt],
                 capture_output=True,
                 text=True,

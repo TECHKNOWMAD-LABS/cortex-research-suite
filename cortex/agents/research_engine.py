@@ -79,8 +79,9 @@ class ResearchEngine:
                 prompt = topic
             else:
                 # Refinement: include previous quality feedback
-                assert best_report is not None
-                assert best_report.quality_score is not None
+                if best_report is None or best_report.quality_score is None:
+                    prompt = topic
+                    continue
                 prompt = (
                     f"{topic}\n\n"
                     f"Previous attempt scored {best_report.quality_score.normalized:.2f}/1.0. "
@@ -105,7 +106,8 @@ class ResearchEngine:
             if quality.normalized >= self._min_quality:
                 break
 
-        assert best_report is not None
+        if best_report is None:
+            raise RuntimeError("Research engine produced no results after all iterations")
         return best_report
 
     def save_report(self, report: ResearchReport, path: str | Path) -> None:

@@ -27,8 +27,17 @@ class ShardManager:
         self._shard_size = shard_size
         self._base_dir.mkdir(parents=True, exist_ok=True)
 
+    @staticmethod
+    def _validate_category(name: str) -> None:
+        """Validate category name to prevent path traversal."""
+        if not name or "/" in name or "\\" in name or ".." in name or "\x00" in name:
+            raise ValueError(f"Invalid category name: {name!r}")
+        if not all(c.isalnum() or c in "-_" for c in name):
+            raise ValueError(f"Category name must be alphanumeric with - or _: {name!r}")
+
     def write_shards(self, category: str, prompts: list[GeneratedPrompt]) -> list[Path]:
         """Write prompts to shards, returning paths of created shard files."""
+        self._validate_category(category)
         cat_dir = self._base_dir / category
         cat_dir.mkdir(parents=True, exist_ok=True)
 
@@ -56,11 +65,15 @@ class ShardManager:
 
     def read_shard(self, category: str, shard_index: int) -> list[dict[str, Any]]:
         """Read a specific shard by category and index."""
+        self._validate_category(category)
+        if not isinstance(shard_index, int) or shard_index < 0:
+            raise ValueError(f"Invalid shard index: {shard_index}")
         shard_path = self._base_dir / category / f"shard_{shard_index:04d}.json"
         return read_json(shard_path)
 
     def iter_shards(self, category: str):
         """Iterate over all shards in a category, yielding prompt dicts."""
+        self._validate_category(category)
         cat_dir = self._base_dir / category
         index_path = cat_dir / "index.json"
         if not index_path.exists():
@@ -73,6 +86,7 @@ class ShardManager:
 
     def get_index(self, category: str) -> dict[str, Any] | None:
         """Get the shard index for a category."""
+        self._validate_category(category)
         index_path = self._base_dir / category / "index.json"
         if not index_path.exists():
             return None

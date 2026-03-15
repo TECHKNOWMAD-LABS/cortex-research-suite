@@ -60,7 +60,13 @@ class SkillRunner:
 
     def load_skill(self, skill_name: str) -> SkillDefinition:
         """Load a skill definition from the skills directory."""
+        # Prevent path traversal via skill name
+        if "/" in skill_name or "\\" in skill_name or ".." in skill_name:
+            raise ValueError(f"Invalid skill name (path traversal attempt): {skill_name}")
         skill_dir = self._skills_dir / skill_name
+        # Verify the resolved path is within skills directory
+        if not skill_dir.resolve().is_relative_to(self._skills_dir.resolve()):
+            raise ValueError(f"Skill path escapes skills directory: {skill_name}")
 
         # Load prompt
         prompt_path = skill_dir / "prompt.md"
