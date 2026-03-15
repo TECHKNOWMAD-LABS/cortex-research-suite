@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "pre-package-pipeline API",
+    "version": "1.0.0",
+    "description": "Skill validation and packaging pipeline for distribution-ready skill bundles."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/pre-package-pipeline"
+    }
+  ],
+  "paths": {
+    "/package_skill": {
+      "post": {
+        "operationId": "package_skill",
+        "summary": "Validate and package a skill for distribution",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "skill_path": {
+                    "type": "string",
+                    "description": "Path to skill directory"
+                  },
+                  "output": {
+                    "type": "string",
+                    "description": "Output path for package"
+                  },
+                  "validate_only": {
+                    "type": "boolean",
+                    "description": "Only validate without packaging",
+                    "default": false
+                  }
+                },
+                "required": [
+                  "skill_path"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
