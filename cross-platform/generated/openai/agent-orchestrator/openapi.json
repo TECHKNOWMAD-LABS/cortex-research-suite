@@ -3,7 +3,7 @@
   "info": {
     "title": "agent-orchestrator API",
     "version": "1.0.0",
-    "description": "Multi-agent workflow orchestration with dependency resolution, parallel execution, and fault-tolerant task routing. Coordinates complex pipelines where multiple agents collaborate on compound tasks."
+    "description": "Multi-agent coordination and task dispatch with dynamic routing and load balancing."
   },
   "servers": [
     {
@@ -11,10 +11,10 @@
     }
   ],
   "paths": {
-    "/orchestrate_workflow": {
+    "/orchestrate_agents": {
       "post": {
-        "operationId": "orchestrate_workflow",
-        "summary": "Execute a multi-agent workflow with dependency resolution and parallel task routing",
+        "operationId": "orchestrate_agents",
+        "summary": "Coordinate multiple agents to execute tasks with dynamic routing",
         "requestBody": {
           "required": true,
           "content": {
@@ -22,22 +22,17 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "workflow": {
-                    "type": "object",
-                    "description": "Workflow definition with tasks, dependencies, and agent assignments"
+                  "task": {
+                    "type": "string",
+                    "description": "Task description to orchestrate"
                   },
-                  "config": {
-                    "type": "object",
-                    "description": "Execution config (parallelism, timeout, retry policy)"
-                  },
-                  "dry_run": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Validate without executing"
+                  "agents": {
+                    "type": "array",
+                    "description": "List of agent identifiers to coordinate"
                   }
                 },
                 "required": [
-                  "workflow"
+                  "task"
                 ]
               }
             }
@@ -49,29 +44,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "enum": [
-                        "completed",
-                        "partial",
-                        "failed"
-                      ]
-                    },
-                    "results": {
-                      "type": "array",
-                      "items": {
-                        "type": "object"
-                      }
-                    },
-                    "execution_graph": {
-                      "type": "object"
-                    },
-                    "duration_ms": {
-                      "type": "integer"
-                    }
-                  }
+                  "type": "object"
                 }
               }
             }
