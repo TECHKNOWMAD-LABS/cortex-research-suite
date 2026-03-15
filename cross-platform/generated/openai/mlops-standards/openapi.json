@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "mlops-standards API",
+    "version": "1.0.0",
+    "description": "ML operations best practices enforcement covering experiment tracking, model versioning, CI/CD for ML, and deployment standards."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/mlops-standards"
+    }
+  ],
+  "paths": {
+    "/audit_mlops": {
+      "post": {
+        "operationId": "audit_mlops",
+        "summary": "Audit ML project for MLOps standards compliance",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_path": {
+                    "type": "string",
+                    "description": "Path to ML project"
+                  },
+                  "standards": {
+                    "type": "array",
+                    "description": "Standards to check against"
+                  },
+                  "level": {
+                    "type": "string",
+                    "description": "Maturity level to target",
+                    "default": "production"
+                  }
+                },
+                "required": [
+                  "project_path"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
