@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "meta-skill-evolver API",
+    "version": "1.0.0",
+    "description": "Evolutionary skill improvement and mutation engine. Analyzes skill performance and generates improved variants."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/meta-skill-evolver"
+    }
+  ],
+  "paths": {
+    "/evolve_skill": {
+      "post": {
+        "operationId": "evolve_skill",
+        "summary": "Analyze skill performance and generate improved variants through mutation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "skill_path": {
+                    "type": "string",
+                    "description": "Path to skill directory"
+                  },
+                  "metrics": {
+                    "type": "object",
+                    "description": "Performance metrics"
+                  },
+                  "strategy": {
+                    "type": "string",
+                    "description": "Evolution strategy",
+                    "default": "tournament"
+                  }
+                },
+                "required": [
+                  "skill_path"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
