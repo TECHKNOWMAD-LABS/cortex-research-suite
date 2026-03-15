@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "design-system-forge API",
+    "version": "1.0.0",
+    "description": "Design system generation and component library scaffolding with tokens, themes, and documentation."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/design-system-forge"
+    }
+  ],
+  "paths": {
+    "/generate_design_system": {
+      "post": {
+        "operationId": "generate_design_system",
+        "summary": "Generate a design system with tokens, components, and documentation",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "brand": {
+                    "type": "object",
+                    "description": "Brand configuration (colors, typography)"
+                  },
+                  "framework": {
+                    "type": "string",
+                    "description": "Target framework",
+                    "default": "react"
+                  },
+                  "output_dir": {
+                    "type": "string",
+                    "description": "Output directory for generated files"
+                  }
+                },
+                "required": [
+                  "brand"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
