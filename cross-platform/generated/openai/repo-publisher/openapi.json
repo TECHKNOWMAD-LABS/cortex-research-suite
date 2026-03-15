@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "repo-publisher API",
+    "version": "1.0.0",
+    "description": "Pre-publish pipeline with security scanning, AI slop detection, structure validation, and repo metadata updates."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/repo-publisher"
+    }
+  ],
+  "paths": {
+    "/publish_repo": {
+      "post": {
+        "operationId": "publish_repo",
+        "summary": "Run pre-publish checks and prepare repo for GitHub publication",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "repo_path": {
+                    "type": "string",
+                    "description": "Path to repository"
+                  },
+                  "target": {
+                    "type": "string",
+                    "description": "GitHub target (owner/repo)"
+                  },
+                  "dry_run": {
+                    "type": "boolean",
+                    "description": "Run checks without publishing",
+                    "default": true
+                  }
+                },
+                "required": [
+                  "repo_path"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
