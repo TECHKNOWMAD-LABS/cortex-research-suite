@@ -1,10 +1,10 @@
 # persistent-memory
 
-Persistent key-value memory system for AI agents. Stores, retrieves, and manages structured knowledge across sessions with TTL, tagging, and semantic search support.
+SQLite-backed persistent memory with FTS5 full-text search for cross-session knowledge retention.
 
 ## Tools
 
-- **memory_operation**: Store, retrieve, search, or manage persistent memory entries
+- **memory_operation**: Store, retrieve, or search persistent memory entries
 
 ## Integration
 
