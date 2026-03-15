@@ -2,6 +2,37 @@ __pycache__/
 *.pyc
 *.pyo
 .env
+.env.*
 .DS_Store
 *.swp
 *.swo
+
+# Build
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs and metrics
+logs/
+*.log
+metrics.db
+
+# Generated datasets (keep structure, ignore data)
+datasets/*/shard_*.json
+
+# Experiments (keep structure, ignore results)
+experiments/*.json
+experiments/baselines/
+experiments/research_reports/
+!experiments/.gitkeep

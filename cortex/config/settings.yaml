@@ -1,0 +1,39 @@
+model:
+  default: claude
+  reasoning: claude
+  evaluation: claude
+  temperature: 0.2
+  max_tokens: 4096
+  timeout_seconds: 120
+
+dataset:
+  root: datasets/
+  shard_size: 10000
+  max_prompt_length: 10000
+  min_prompt_length: 10
+  dedup_enabled: true
+
+evaluation:
+  judge_model: claude
+  metrics:
+    - accuracy
+    - reasoning
+    - completeness
+    - coherence
+  min_score_threshold: 0.6
+  regression_tolerance: 0.05
+  max_parallel_evals: 4
+
+security:
+  enable_input_sanitization: true
+  max_input_length: 50000
+  enable_output_validation: true
+  audit_log_enabled: true
+
+telemetry:
+  log_level: INFO
+  log_format: json
+  log_dir: logs/
+  max_log_size_mb: 50
+  retention_days: 90
+  enable_metrics: true

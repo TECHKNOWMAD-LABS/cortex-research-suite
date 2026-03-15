@@ -1,0 +1,12 @@
+# Core (zero external dependencies for base functionality)
+# Optional dependencies listed below
+
+# API access (optional)
+# anthropic>=0.40.0
+
+# YAML config (optional)
+# pyyaml>=6.0
+
+# Development
+pytest>=8.0
+pytest-cov>=5.0
