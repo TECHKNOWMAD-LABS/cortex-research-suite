@@ -1,6 +1,6 @@
 # security-audit
 
-Automated security scanning for code repositories. Runs bandit (Python SAST), semgrep (multi-language static analysis), and secret detection to produce machine-readable reports.
+Automated security scanning for code repositories. Runs bandit (Python SAST), semgrep (multi-language static analysis), and secret detection.
 
 ## Tools
 
