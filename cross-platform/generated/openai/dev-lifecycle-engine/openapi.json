@@ -1,0 +1,61 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "dev-lifecycle-engine API",
+    "version": "1.0.0",
+    "description": "Development lifecycle management covering planning, implementation, testing, and deployment phases."
+  },
+  "servers": [
+    {
+      "url": "https://api.techknowmad.ai/skills/dev-lifecycle-engine"
+    }
+  ],
+  "paths": {
+    "/manage_lifecycle": {
+      "post": {
+        "operationId": "manage_lifecycle",
+        "summary": "Execute development lifecycle phase with automated tracking",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phase": {
+                    "type": "string",
+                    "description": "Lifecycle phase to execute"
+                  },
+                  "project": {
+                    "type": "string",
+                    "description": "Project identifier"
+                  },
+                  "config": {
+                    "type": "object",
+                    "description": "Phase configuration"
+                  }
+                },
+                "required": [
+                  "phase",
+                  "project"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
