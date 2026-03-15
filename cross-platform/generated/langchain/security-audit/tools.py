@@ -8,17 +8,17 @@ import json
 from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 
-class SecurityScanToolInput(BaseModel):
+class Security_scanToolInput(BaseModel):
     target: str = Field(description="Directory path to scan")
     output: str = Field(description="Output path for the report")
-    format: str = Field(description="")
-    severity_threshold: str = Field(description="")
+    format: str = Field(description="Output format")
+    severity_threshold: str = Field(description="Minimum severity level")
 
 
-class SecurityScanTool(BaseTool):
+class Security_scanTool(BaseTool):
     name: str = "security_scan"
     description: str = "Run a full security scan on a target directory with bandit, semgrep, and secret detection"
-    args_schema: type[BaseModel] = SecurityScanToolInput
+    args_schema: type[BaseModel] = Security_scanToolInput
 
     def _run(self, **kwargs) -> str:
         from skills.security_audit import execute_sync
@@ -32,4 +32,4 @@ class SecurityScanTool(BaseTool):
 
 def get_all_tools() -> list[BaseTool]:
     """Return all tools for this skill."""
-    return [SecurityScanTool()]
+    return [Security_scanTool()]
