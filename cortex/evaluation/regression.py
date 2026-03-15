@@ -13,6 +13,14 @@ from typing import Any
 from cortex.utils.io import read_json, write_json
 
 
+def _validate_skill_name(name: str) -> None:
+    """Validate skill name to prevent path traversal."""
+    if not name or "/" in name or "\\" in name or ".." in name or "\x00" in name:
+        raise ValueError(f"Invalid skill name: {name!r}")
+    if not all(c.isalnum() or c in "-_" for c in name):
+        raise ValueError(f"Skill name must be alphanumeric with - or _: {name!r}")
+
+
 @dataclass(frozen=True)
 class RegressionResult:
     """Result of a regression check."""
@@ -52,6 +60,7 @@ class RegressionDetector:
 
         Returns list of RegressionResult for each metric.
         """
+        _validate_skill_name(skill)
         baseline = self._load_baseline(skill)
         if not baseline:
             # No baseline yet — store current as baseline
@@ -78,6 +87,7 @@ class RegressionDetector:
 
     def update_baseline(self, skill: str, scores: dict[str, float]) -> None:
         """Explicitly update the baseline for a skill."""
+        _validate_skill_name(skill)
         self._save_baseline(skill, scores)
 
     def _load_baseline(self, skill: str) -> dict[str, float] | None:

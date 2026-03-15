@@ -11,6 +11,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from cortex.models.provider import ModelProvider, ModelResponse
+from cortex.utils.security import sanitize_input
 
 
 @dataclass
@@ -48,7 +49,11 @@ class BaseAgent(ABC):
         """Execute the agent's task on the given input."""
 
     def _call_model(self, prompt: str, **kwargs) -> ModelResponse:
-        """Call the underlying model with the system prompt prepended."""
+        """Call the underlying model with the system prompt prepended.
+
+        Input is sanitized before being sent to the model provider.
+        """
+        prompt = sanitize_input(prompt)
         full_prompt = f"{self._system_prompt}\n\n{prompt}" if self._system_prompt else prompt
         return self._provider.generate(full_prompt, **kwargs)
 

@@ -101,13 +101,29 @@ class ClaudeProvider(ModelProvider):
                 latency_ms=latency,
                 metadata={"method": "cli"},
             )
-        except (subprocess.TimeoutExpired, subprocess.CalledProcessError, FileNotFoundError) as e:
+        except subprocess.TimeoutExpired:
             latency = self._measure_latency(start)
             return ModelResponse(
                 content="",
                 model=self.model,
                 latency_ms=latency,
-                metadata={"error": str(e), "method": "cli"},
+                metadata={"error": "CLI request timed out", "method": "cli"},
+            )
+        except subprocess.CalledProcessError:
+            latency = self._measure_latency(start)
+            return ModelResponse(
+                content="",
+                model=self.model,
+                latency_ms=latency,
+                metadata={"error": "CLI process returned non-zero exit code", "method": "cli"},
+            )
+        except FileNotFoundError:
+            latency = self._measure_latency(start)
+            return ModelResponse(
+                content="",
+                model=self.model,
+                latency_ms=latency,
+                metadata={"error": "CLI tool not found", "method": "cli"},
             )
 
 
