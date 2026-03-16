@@ -6,7 +6,7 @@ We built a Python framework where research skills don't just run -- they evolve.
 
 ## The Architecture: A 5-Layer Stack
 
-**Layer 1 -- Foundation.** 21 core skills (literature review, patent analysis, competitive intelligence, etc.) plus an evaluation lab that scores every skill output on accuracy, depth, and relevance.
+**Layer 1 -- Foundation.** 26 core skills (literature review, patent analysis, competitive intelligence, etc.) plus an evaluation lab that scores every skill output on accuracy, depth, and relevance.
 
 **Layer 2 -- Evolution.** The Skill Organism. Skills are treated as living entities with an ARENA.md configuration that defines competition rules. Skills fork, mutate their prompts and parameters, compete head-to-head, and the losers get pruned. This is the autoresearch loop.
 
@@ -24,13 +24,13 @@ Works with Claude Code natively. Also supports LangChain, CrewAI, and OpenAI via
 
 - **Skills are the unit of evolution, not prompts.** A skill includes its prompt, its tool chain, its evaluation criteria, and its mutation rules. Evolution operates on all of these simultaneously.
 - **The evaluation lab is deterministic and auditable.** Every skill run produces a scored trace. You can diff two skill versions the way you diff code.
-- **It is a research tool, not a chatbot wrapper.** The 21 base skills cover specific research workflows: systematic literature review, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
+- **It is a research tool, not a chatbot wrapper.** The 26 base skills cover specific research workflows: systematic literature review, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
 
 ## Technical Details
 
 - Python 3.10+
 - MIT license
-- 26 skills total (21 core + 5 meta/evolution skills)
+- 26 skills total (26 core skills including 5 trilogy integration skills)
 - MCP adapter layer for cross-framework compatibility
 - No vendor lock-in -- works with any LLM backend that supports tool use
 

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>mindspider-connector — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / mindspider-connector</div>
+<h1>mindspider-connector</h1>
+<span class="badge badge-arena">ARENA.md</span> <span class="badge badge-trilogy">MindSpider</span>
+<h2>SKILL.md</h2>
+<pre class="content"># mindspider-connector
+
+## Overview
+
+Connects Cortex Research Suite to a MindSpider social listening deployment. Pulls trending topics, sentiment scores, and sample posts from the MindSpider database and transforms them into Cortex-native evidence structures for the research pipeline.
+
+## Core instruction
+
+You are a data connector agent. Your job is to:
+
+1. Connect to a MindSpider MySQL database (or use demo mode for synthetic data)
+2. Extract today&#x27;s trending topics with sentiment scores and post counts
+3. Transform raw social data into structured evidence items
+4. Output Cortex-native JSON suitable for research_pipeline.py consumption
+
+## Input
+
+- `--source demo` — Generate synthetic demo data (no database required)
+- `--source mysql` — Connect to live MindSpider deployment via MINDSPIDER_DB_URL env var
+- `--domain &lt;keyword&gt;` — Filter topics by domain keyword
+- `--output &lt;path&gt;` — Write results to file (default: stdout)
+- `--format json|jsonl` — Output format
+
+## Output schema
+
+```json
+{
+  &quot;source&quot;: &quot;mindspider&quot;,
+  &quot;extraction_timestamp&quot;: &quot;2026-03-16T10:00:00Z&quot;,
+  &quot;topics&quot;: [
+    {
+      &quot;topic&quot;: &quot;string — topic title&quot;,
+      &quot;sentiment_score&quot;: &quot;float — -1.0 to 1.0&quot;,
+      &quot;post_count&quot;: &quot;int — number of posts&quot;,
+      &quot;trend_direction&quot;: &quot;string — rising|stable|declining&quot;,
+      &quot;sample_posts&quot;: [&quot;string — up to 3 excerpt strings&quot;],
+      &quot;platforms&quot;: [&quot;string — platform names&quot;],
+      &quot;first_seen&quot;: &quot;string — ISO datetime&quot;,
+      &quot;peak_time&quot;: &quot;string — ISO datetime&quot;
+    }
+  ],
+  &quot;metadata&quot;: {
+    &quot;total_topics&quot;: &quot;int&quot;,
+    &quot;time_range_hours&quot;: 24,
+    &quot;source_mode&quot;: &quot;demo|mysql&quot;
+  }
+}
+```
+
+## Data handling
+
+- Demo mode generates synthetic data with no external connections
+- Live mode connects only to the user&#x27;s own MindSpider deployment
+- No PII is retained beyond the sample_posts field (limited to 3 excerpts per topic)
+- today_topics.json is overwritten on each run — no historical accumulation
+- See datasets/mindspider/DATA_NOTICE.md for full data handling policy
+
+## Common gotchas
+
+- MINDSPIDER_DB_URL must be set for live mode; without it, the connector falls back to demo
+- MySQL connection timeout is 10 seconds; query timeout is 30 seconds
+- SQL queries use parameterized placeholders — never string concatenation
+- sample_posts are truncated to 280 characters each
+</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — mindspider-connector
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/mindspider-connector/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test
+transfer_dataset: &quot;datasets/synthetic/mindspider-connector/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: true
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Better = more accurate topic extraction, better sentiment calibration, robust fallback to demo mode.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

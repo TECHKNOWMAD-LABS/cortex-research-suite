@@ -10,11 +10,13 @@ patterns, and minority viewpoints.
 
 import argparse
 import json
+import os
 import re
 import sys
 from collections import Counter
 from datetime import datetime, timezone
 from html.parser import HTMLParser
+from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
 MAX_INPUT_CHARS = 50000
@@ -292,6 +294,15 @@ def analyze_forum(input_data: Dict[str, Any]) -> Dict[str, Any]:
 
 # ---------- CLI ----------
 
+def _safe_path(base_dir: Path, user_path: str) -> Path:
+    """Resolve user-provided path and ensure it's under base_dir."""
+    resolved = Path(user_path).resolve()
+    base = Path(base_dir).resolve()
+    if not str(resolved).startswith(str(base) + os.sep) and resolved != base:
+        raise ValueError(f"Path {user_path} escapes allowed directory {base_dir}")
+    return resolved
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="forum-intelligence: Forum thread analysis with coordination detection"
@@ -310,7 +321,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    with open(args.input, "r", encoding="utf-8") as f:
+    # Validate CLI-provided file paths
+    cwd = Path.cwd()
+    input_path = _safe_path(cwd, args.input)
+    output_path = _safe_path(cwd, args.output)
+
+    with open(str(input_path), "r", encoding="utf-8") as f:
         raw = f.read()[:MAX_INPUT_CHARS]
         input_data = json.loads(raw)
 
@@ -322,10 +338,10 @@ def main() -> None:
 
     output_json = json.dumps(report, indent=2, ensure_ascii=False)
 
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open(str(output_path), "w", encoding="utf-8") as f:
         f.write(output_json)
 
-    print(f"Forum intelligence report written to {args.output}")
+    print(f"Forum intelligence report written to {output_path}")
     print(f"Threads analyzed: {report['metadata']['total_threads']}")
     print(f"Total posts: {report['metadata']['total_posts']}")
     print(f"Coordination detected: {report['coordination_detected']}")

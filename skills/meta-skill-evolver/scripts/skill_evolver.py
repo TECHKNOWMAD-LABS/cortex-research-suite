@@ -811,10 +811,22 @@ class SkillEvolver:
             registry_path or Path.home() / '.vce' / 'skill-registry.json'
         )
 
+    @staticmethod
+    def _validate_skill_name(name: str) -> None:
+        """Validate skill name to prevent path traversal."""
+        if not re.match(r'^[a-zA-Z0-9][a-zA-Z0-9_-]*$', name):
+            raise ValueError(f"Invalid skill name: {name}")
+
     def generate_skill(self, name: str, description: str,
                       output_dir: Path) -> Dict[str, Any]:
         """Generate a new skill."""
+        self._validate_skill_name(name)
         skill_dir = output_dir / name
+        # Ensure resolved path stays under output_dir
+        resolved = skill_dir.resolve()
+        base = output_dir.resolve()
+        if not str(resolved).startswith(str(base) + "/") and resolved != base:
+            raise ValueError(f"Skill directory escapes allowed base: {output_dir}")
 
         success, msg = SkillScaffoldGenerator.create_skill(skill_dir, name, description)
 

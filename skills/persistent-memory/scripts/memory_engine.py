@@ -21,6 +21,8 @@ from enum import Enum
 import re
 import os
 
+MAX_INPUT_CHARS = 50000
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -239,6 +241,10 @@ class MemoryEngine:
             raise ValueError("observation_type is required")
         if not content:
             raise ValueError("content is required")
+        # Input length validation
+        content = content[:MAX_INPUT_CHARS]
+        if context:
+            context = context[:MAX_INPUT_CHARS]
 
         if memory_session_id is None:
             memory_session_id = self._generate_session_id(project)
@@ -398,37 +404,40 @@ class MemoryEngine:
                 filters.append("o.memory_session_id = ?")
                 params.append(session_id)
 
-            where_clause = " AND ".join(filters) if filters else "1=1"
+            # Build WHERE clause from safe, hardcoded filter fragments
+            # (no user input in the SQL string itself — all values via params)
+            where_parts = ["1=1"] + filters
+            where_clause = " AND ".join(where_parts)
 
             # Hybrid search: combine FTS and semantic scoring
-            sql = f"""
-                SELECT
-                    o.observation_id,
-                    o.summary,
-                    o.observation_type,
-                    o.timestamp,
-                    o.project,
-                    (
-                        0.6 * (
-                            CASE WHEN f.rank IS NOT NULL
-                            THEN ABS(f.rank) / 100.0
-                            ELSE 0.0
-                            END
-                        ) +
-                        0.4 * (
-                            (
-                                (LENGTH(o.summary) - LENGTH(REPLACE(LOWER(o.summary), LOWER(?), '')))
-                                / LENGTH(?)
-                            ) / 2.0
-                        )
-                    ) as match_score
-                FROM observations o
-                LEFT JOIN observations_fts f ON o.rowid = f.rowid
-                WHERE {where_clause}
-                AND match_score > 0
-                ORDER BY match_score DESC
-                LIMIT ?
-            """
+            sql = (
+                "SELECT"
+                "    o.observation_id,"
+                "    o.summary,"
+                "    o.observation_type,"
+                "    o.timestamp,"
+                "    o.project,"
+                "    ("
+                "        0.6 * ("
+                "            CASE WHEN f.rank IS NOT NULL"
+                "            THEN ABS(f.rank) / 100.0"
+                "            ELSE 0.0"
+                "            END"
+                "        ) +"
+                "        0.4 * ("
+                "            ("
+                "                (LENGTH(o.summary) - LENGTH(REPLACE(LOWER(o.summary), LOWER(?), '')))"
+                "                / LENGTH(?)"
+                "            ) / 2.0"
+                "        )"
+                "    ) as match_score"
+                " FROM observations o"
+                " LEFT JOIN observations_fts f ON o.rowid = f.rowid"
+                " WHERE " + where_clause +
+                " AND match_score > 0"
+                " ORDER BY match_score DESC"
+                " LIMIT ?"
+            )
 
             params.extend([query, query, limit])
 
@@ -599,6 +608,15 @@ class MemoryEngine:
             logger.error(f"Full retrieval error: {e}")
             raise
 
+    @staticmethod
+    def _safe_path(base_dir: Path, user_path: str) -> Path:
+        """Resolve user-provided path and ensure it's under base_dir."""
+        resolved = Path(user_path).resolve()
+        base = Path(base_dir).resolve()
+        if not str(resolved).startswith(str(base) + os.sep) and resolved != base:
+            raise ValueError(f"Path {user_path} escapes allowed directory {base_dir}")
+        return resolved
+
     def export_observations(
         self,
         output_path: str,
@@ -613,6 +631,10 @@ class MemoryEngine:
             project: Optional filter to specific project
             include_private: Whether to include private observations
         """
+        # Validate output path is under current working directory
+        safe_output = self._safe_path(Path.cwd(), output_path)
+        output_path = str(safe_output)
+
         cursor = self.conn.cursor()
 
         try:
@@ -875,10 +897,13 @@ def main():
 
     try:
         if args.command == 'save':
+            # Input length validation for CLI-provided content
+            content = args.content[:MAX_INPUT_CHARS]
+            context = args.context[:MAX_INPUT_CHARS] if args.context else None
             obs_id = engine.save_observation(
                 observation_type=args.type,
-                content=args.content,
-                context=args.context,
+                content=content,
+                context=context,
                 project=args.project,
                 tags=args.tags.split(',') if args.tags else None,
                 private=args.private
@@ -886,8 +911,10 @@ def main():
             print(f"Saved: {obs_id}")
 
         elif args.command == 'search':
+            # Input length validation for CLI-provided query
+            query = args.query[:MAX_INPUT_CHARS]
             results = engine.search_index(
-                query=args.query,
+                query=query,
                 limit=args.limit,
                 project=args.project,
                 observation_type=args.type
@@ -913,11 +940,13 @@ def main():
             print(json.dumps(stats, indent=2))
 
         elif args.command == 'export':
+            # Path validation for CLI-provided export path
+            safe_output = MemoryEngine._safe_path(Path.cwd(), args.output)
             engine.export_observations(
-                args.output,
+                str(safe_output),
                 project=args.project
             )
-            print(f"Exported to {args.output}")
+            print(f"Exported to {safe_output}")
 
     finally:
         engine.close()

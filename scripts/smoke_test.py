@@ -43,6 +43,10 @@ def main():
                 if py.name == "__init__.py":
                     continue
                 try:
+                    file_size = py.stat().st_size
+                    if file_size > 1_000_000:  # 1 MB cap
+                        print(f"    WARNING: Skipping {py} — file too large ({file_size} bytes)")
+                        continue
                     compile(py.read_text(), str(py), "exec")
                 except SyntaxError as e:
                     import_ok = False

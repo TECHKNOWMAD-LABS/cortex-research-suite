@@ -64,9 +64,9 @@ canvas{max-height:280px}
 <div class="header">
   <h1>Cortex Skill Arena</h1>
   <div class="badges">
-    <span>21 Skills</span>
+    <span>26 Skills</span>
     <span>Autoresearch</span>
-    <span>v1.0.0</span>
+    <span>v1.1.0</span>
   </div>
 </div>
 
@@ -198,7 +198,7 @@ function initSkillList(){
   }
   // Generate demo skills if no snapshot
   if(Object.keys(SKILLS_SNAPSHOT).length===0){
-    const names=['agent-orchestrator','agent-output-validator','code-review-engine','context-engineer','de-slop','design-system-forge','dev-lifecycle-engine','diff-generator','github-mcp','meta-skill-evolver','mlops-standards','persistent-memory','pre-package-pipeline','prompt-architect','repo-publisher','research-workflow','security-audit','session-memory','skill-test-harness','skill-validator','tdd-enforcer'];
+    const names=['agent-orchestrator','agent-output-validator','code-review-engine','context-engineer','de-slop','design-system-forge','dev-lifecycle-engine','diff-generator','forum-intelligence','github-mcp','intelligence-query','meta-skill-evolver','mindspider-connector','mlops-standards','multimodal-analyst','persistent-memory','pre-package-pipeline','prompt-architect','repo-publisher','research-workflow','scenario-simulator','security-audit','session-memory','skill-test-harness','skill-validator','tdd-enforcer'];
     names.forEach(n=>{SKILLS_SNAPSHOT[n]={name:n,skill_md_preview:`# ${n}\n\nSkill for ${n.replace(/-/g,' ')} operations.`,has_arena:true}});
   }
   renderSkillList();

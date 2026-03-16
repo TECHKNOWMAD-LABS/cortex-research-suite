@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate arena snapshot JS constants for skill_arena_demo.html.
 
-Reads all 21 skills' SKILL.md (first 1200 chars) and ARENA.md configs.
+Reads all 26 skills' SKILL.md (first 1200 chars) and ARENA.md configs.
 Outputs SKILLS_SNAPSHOT and ARENA_CONFIGS as JS const declarations.
 
 Usage:

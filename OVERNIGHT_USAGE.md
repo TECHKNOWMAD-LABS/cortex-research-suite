@@ -5,7 +5,7 @@ Run the Skill Organism evolution engine overnight for continuous improvement.
 ## Quick start
 
 ```bash
-# Run 10 generations across all 21 skills (default)
+# Run 10 generations across all 26 skills (default)
 python skill-organism/enterprise_runner.py --overnight
 
 # Custom generation count
@@ -49,7 +49,7 @@ open dashboards/evolution_dashboard.html
 Each skill evaluation is capped at `eval_budget_seconds` (default: 30s) from its ARENA.md.
 The total overnight budget is approximately: `generations × skills × budget_seconds`.
 
-For 10 generations × 21 skills × 30s = ~105 minutes of evaluation time.
+For 10 generations × 26 skills × 30s = ~105 minutes of evaluation time.
 
 ## Safety
 

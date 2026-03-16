@@ -12,7 +12,7 @@ Research skills that do not stay static. They compete in an evaluation arena, mu
 
 **The 5-layer architecture:**
 
-- Foundation: 21 core research skills + deterministic evaluation lab
+- Foundation: 26 core research skills + deterministic evaluation lab
 - Evolution: Skill Organism with arena-based competition (ARENA.md)
 - Data: MindSpider connector for live data ingestion and social listening
 - Intelligence: Multi-source cross-referencing with contradiction detection
@@ -32,7 +32,7 @@ Works with Claude Code natively. MCP adapters for LangChain, CrewAI, and OpenAI.
 
 **Technical details:**
 - Python 3.10+
-- 26 skills (21 core + 5 meta/evolution)
+- 26 skills (26 core skills including 5 trilogy integration skills)
 - MIT license
 - Deterministic, auditable evaluation traces
 

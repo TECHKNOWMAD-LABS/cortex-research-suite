@@ -2,7 +2,7 @@
 """Synthetic dataset generator for skill evaluation.
 
 Generates n prompts per skill with 10% adversarial variants.
-Includes default templates for all 21 skill types.
+Includes default templates for all 26 skill types.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 # ---------------------------------------------------------------------------
-# Skill template registry — default prompts for all 21 skills
+# Skill template registry — default prompts for all 26 skills
 # ---------------------------------------------------------------------------
 
 SKILL_TEMPLATES: dict[str, list[str]] = {
@@ -108,7 +108,7 @@ SKILL_TEMPLATES: dict[str, list[str]] = {
     "pre-package-pipeline": [
         "Validate that skill {skill} meets all packaging requirements for .skill format.",
         "Check the manifest.json for skill {skill} for completeness and schema compliance.",
-        "Run pre-packaging checks on all 21 skills and report which are ready.",
+        "Run pre-packaging checks on all 26 skills and report which are ready.",
         "Validate the dependency declarations for skill {skill}.",
         "Check that skill {skill} has all required files: SKILL.md, scripts/, references/.",
     ],
@@ -206,7 +206,7 @@ _FILL_MAP: dict[str, list[str]] = {
     "task": _TASKS,
     "market_condition": ["bull market", "recession", "high volatility"],
     "output_stub": ['{"analysis": "...", "confidence": 0.85}'],
-    "code_stub": ["def process(data): return eval(data)"],
+    "code_stub": ["def process(data): return json.loads(data)"],
     "text_stub": ["This groundbreaking solution leverages cutting-edge AI to revolutionize workflows."],
 }
 
@@ -386,7 +386,7 @@ def main() -> int:
         nargs="*",
         help="Multiple skills (comma or space separated)",
     )
-    parser.add_argument("--all-skills", action="store_true", help="Generate for all 21 skills")
+    parser.add_argument("--all-skills", action="store_true", help="Generate for all 26 skills")
     parser.add_argument("-n", "--n", type=int, default=50, help="Prompts per skill (default: 50)")
     parser.add_argument("--count", type=int, default=None, help="Alias for -n")
     parser.add_argument("--adversarial-ratio", type=float, default=0.10, help="Fraction of adversarial prompts")

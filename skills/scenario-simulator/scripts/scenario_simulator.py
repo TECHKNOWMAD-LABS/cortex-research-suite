@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 import time
@@ -655,10 +656,21 @@ def main() -> int:
     )
     args = parser.parse_args()
 
+    # Path validation helper
+    def _safe_path(base_dir: Path, user_path: str) -> Path:
+        resolved = Path(user_path).resolve()
+        base = Path(base_dir).resolve()
+        if not str(resolved).startswith(str(base) + os.sep) and resolved != base:
+            raise ValueError(f"Path {user_path} escapes allowed directory {base_dir}")
+        return resolved
+
+    cwd = Path.cwd()
+
     # Resolve seed report: file path or direct text
     seed_path = Path(args.seed_report)
     if seed_path.is_file():
-        seed_text = seed_path.read_text(encoding="utf-8")
+        safe_seed = _safe_path(cwd, args.seed_report)
+        seed_text = safe_seed.read_text(encoding="utf-8")
     else:
         seed_text = args.seed_report
 
@@ -672,7 +684,7 @@ def main() -> int:
     output_json = json.dumps(report.to_dict(), indent=2, ensure_ascii=False)
 
     if args.output:
-        out_path = Path(args.output)
+        out_path = _safe_path(cwd, args.output)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(output_json, encoding="utf-8")
         print(f"Report written to {out_path}", file=sys.stderr)

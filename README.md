@@ -70,7 +70,7 @@ print(f"Quality: {score.normalized:.0%}")  # e.g., Quality: 87%
 | **4. Intelligence** | BettaFish-inspired analysis engine | Multi-source intelligence queries, forum analysis, multimodal | `skills/intelligence-query/`, `skills/forum-intelligence/`, `skills/multimodal-analyst/` |
 | **3. Data** | MindSpider connector | Live topic feeds from social listening deployments | `skills/mindspider-connector/` |
 | **2. Evolution** | Skill Organism + ARENA.md | Autonomous overnight evolution with fitness tracking | `skill-organism/`, `skills/*/ARENA.md` |
-| **1. Foundation** | 21 core skills + evaluation lab | Research, security, MLOps, orchestration, quality | `skills/`, `cortex/` |
+| **1. Foundation** | 26 core skills + evaluation lab | Research, security, MLOps, orchestration, quality | `skills/`, `cortex/` |
 
 ## Skills (26)
 

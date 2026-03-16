@@ -20,7 +20,7 @@ The architecture is organized into five layers, each building on the one below.
 
 ### Layer 1: Foundation -- Core Skills and Evaluation Lab
 
-The base layer provides 21 research skills covering specific workflows: systematic literature review, patent landscape analysis, competitive intelligence, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
+The base layer provides 26 research skills covering specific workflows: systematic literature review, patent landscape analysis, competitive intelligence, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
 
 Every skill execution passes through an evaluation lab that scores outputs on three dimensions: accuracy, depth, and relevance. These scores are deterministic and produce JSON traces that can be diffed like code.
 

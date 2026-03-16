@@ -11,10 +11,12 @@ analysis. In demo mode, generates synthetic multimodal analysis.
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
 from html.parser import HTMLParser
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 MAX_INPUT_CHARS = 50000
@@ -258,7 +260,19 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    with open(args.input, "r", encoding="utf-8") as f:
+    # Validate CLI-provided file paths
+    def _safe_path(base_dir: Path, user_path: str) -> Path:
+        resolved = Path(user_path).resolve()
+        base = Path(base_dir).resolve()
+        if not str(resolved).startswith(str(base) + os.sep) and resolved != base:
+            raise ValueError(f"Path {user_path} escapes allowed directory {base_dir}")
+        return resolved
+
+    cwd = Path.cwd()
+    input_path = _safe_path(cwd, args.input)
+    output_path = _safe_path(cwd, args.output)
+
+    with open(str(input_path), "r", encoding="utf-8") as f:
         raw = f.read()[:MAX_INPUT_CHARS]
         input_data = json.loads(raw)
 
@@ -289,10 +303,10 @@ def main() -> None:
 
     output_json = json.dumps(report, indent=2, ensure_ascii=False)
 
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open(str(output_path), "w", encoding="utf-8") as f:
         f.write(output_json)
 
-    print(f"Multimodal analysis written to {args.output}")
+    print(f"Multimodal analysis written to {output_path}")
     print(f"Content types detected: {content_types}")
     print(f"Overall confidence: {report['confidence_scores']['overall']}")
 

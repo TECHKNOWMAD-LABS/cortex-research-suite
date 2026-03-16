@@ -16,7 +16,7 @@ We just open-sourced Cortex Research Suite and wanted to share it here since it 
 
 **The 5-layer architecture:**
 
-1. **Foundation** -- 21 core skills + evaluation lab with deterministic scoring
+1. **Foundation** -- 26 core skills + evaluation lab with deterministic scoring
 2. **Evolution** -- Skill Organism + ARENA.md competition rules
 3. **Data** -- MindSpider connector for live social listening and data ingestion
 4. **Intelligence** -- Multi-source cross-referencing with contradiction detection

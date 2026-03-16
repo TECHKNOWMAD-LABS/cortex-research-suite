@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run evaluation for all 21 skills using offline mode
+# Run evaluation for all 26 skills using offline mode
 # Usage: bash skills/skill-test-harness/scripts/run_all_evals.sh
 
 set -euo pipefail

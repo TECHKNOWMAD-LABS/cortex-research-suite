@@ -12,11 +12,13 @@ intelligence report.
 import argparse
 import hashlib
 import json
+import os
 import re
 import sys
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from io import StringIO
+from pathlib import Path
 from typing import Any, Dict, List
 
 MAX_INPUT_CHARS = 50000
@@ -204,6 +206,17 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    # Validate CLI-provided output path
+    def _safe_path(base_dir: Path, user_path: str) -> Path:
+        resolved = Path(user_path).resolve()
+        base = Path(base_dir).resolve()
+        if not str(resolved).startswith(str(base) + os.sep) and resolved != base:
+            raise ValueError(f"Path {user_path} escapes allowed directory {base_dir}")
+        return resolved
+
+    cwd = Path.cwd()
+    output_path = _safe_path(cwd, args.output)
+
     decomposer = QueryDecomposer()
     collector = SourceCollector(source_mode=args.sources)
     synthesizer = IntelligenceSynthesizer()
@@ -214,10 +227,10 @@ def main() -> None:
 
     output_json = json.dumps(report, indent=2, ensure_ascii=False)
 
-    with open(args.output, "w", encoding="utf-8") as f:
+    with open(str(output_path), "w", encoding="utf-8") as f:
         f.write(output_json)
 
-    print(f"Intelligence report written to {args.output}")
+    print(f"Intelligence report written to {output_path}")
     print(f"Confidence level: {report['confidence_level']}")
     print(f"Sub-queries analyzed: {len(sub_queries)}")
     print(f"Sources consulted: {len(sources)}")

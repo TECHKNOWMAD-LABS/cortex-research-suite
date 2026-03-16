@@ -133,4 +133,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CODE_OF_CONDUCT.md
 - Publish report with full pipeline results
 
+[1.1.0]: https://github.com/TECHKNOWMAD-LABS/cortex-research-suite/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/TECHKNOWMAD-LABS/cortex-research-suite/releases/tag/v1.0.0

@@ -28,7 +28,7 @@ Weights are configurable in ARENA.md. Default is 0.4 / 0.35 / 0.25. We arrived a
 
 **Architecture overview (5 layers):**
 
-1. **Foundation** -- 21 core skills + evaluation lab. Every execution produces a scored JSON trace.
+1. **Foundation** -- 26 core skills + evaluation lab. Every execution produces a scored JSON trace.
 2. **Evolution** -- Skill Organism + ARENA.md. Tournament selection, configurable mutation rate, crossover support.
 3. **Data** -- MindSpider connector for live data (APIs, RSS, web). Normalized schema.
 4. **Intelligence** -- Multi-source analysis with contradiction detection and confidence weighting.

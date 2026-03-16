@@ -6,36 +6,36 @@ Complete registry of all 26 skills in the Cortex Research Suite, including trilo
 
 | Skill | Category | Trilogy | Description |
 |-------|----------|---------|-------------|
-| `arxiv-researcher` | Research | MindSpider | Searches and summarizes arXiv papers with semantic relevance ranking |
-| `code-reviewer` | Development | BettaFish | Automated code review with style, correctness, and security checks |
-| `data-pipeline` | Data | MiroFish | Builds and validates ETL pipelines for research datasets |
-| `deep-search` | Research | MindSpider | Multi-source deep web search with result synthesis |
-| `diff-generator` | Development | BettaFish | Generates structured diffs across files, notebooks, and repos |
-| `doc-writer` | Documentation | MindSpider | Auto-generates documentation from code and annotations |
-| `eval-harness` | Evaluation | MiroFish | LLM evaluation harness with configurable benchmarks |
-| `experiment-tracker` | Research | MiroFish | Tracks ML experiments, hyperparameters, and results |
-| `few-shot-builder` | Prompting | BettaFish | Constructs optimized few-shot prompt templates |
-| `git-historian` | Development | MindSpider | Analyzes git history for patterns, contributors, and trends |
-| `hypothesis-gen` | Research | MindSpider | Generates testable hypotheses from literature and data |
-| `jupyter-runner` | Development | BettaFish | Executes and validates Jupyter notebooks programmatically |
-| `knowledge-graph` | Research | MindSpider | Builds knowledge graphs from unstructured text sources |
-| `lit-review` | Research | MindSpider | Conducts systematic literature reviews with citation mapping |
-| `metric-dashboard` | Evaluation | MiroFish | Real-time metrics dashboard for model performance |
-| `model-compare` | Evaluation | BettaFish | Side-by-side LLM comparison with statistical significance tests |
-| `paper-replicator` | Research | MiroFish | Replicates methodology from published papers |
-| `prompt-optimizer` | Prompting | BettaFish | Iteratively optimizes prompts using evaluation feedback |
-| `rag-builder` | Development | BettaFish | Builds retrieval-augmented generation pipelines |
-| `report-gen` | Documentation | MindSpider | Generates formatted research reports from structured data |
-| `security-audit` | Security | BettaFish | Scans code for security vulnerabilities and LLM-specific risks |
-| `stat-analyzer` | Data | MiroFish | Statistical analysis toolkit for research data |
-| `survey-builder` | Research | MindSpider | Builds research surveys from topic ontologies |
-| `tdd-enforcer` | Development | BettaFish | Enforces test-driven development with mutation testing |
-| `toolkit-scanner` | DevOps | MiroFish | Scans and audits project dependencies and toolchains |
-| `viz-generator` | Data | MiroFish | Generates publication-quality visualizations from data |
+| `agent-orchestrator` | Agents | — | Multi-agent orchestration with parallel dispatch, dependency resolution, and DAG task graphs |
+| `agent-output-validator` | Validation | — | Verify outputs from parallel agent dispatches against expected contracts |
+| `code-review-engine` | Engineering | — | Two-stage code review with spec compliance validation and code quality analysis |
+| `context-engineer` | Engineering | — | Token-optimized context management with auto-pruning and relevance scoring |
+| `de-slop` | Quality | — | Detect and flag AI-generated writing patterns in markdown and documentation |
+| `design-system-forge` | Design | — | AI-powered design system generator with industry-specific rules and anti-pattern detection |
+| `dev-lifecycle-engine` | DevOps | — | Autonomous development lifecycle orchestrator for the full pipeline |
+| `diff-generator` | Engineering | — | Snapshot files, apply edits, and generate unified diffs for review |
+| `forum-intelligence` | Intelligence | BettaFish | Forum thread analysis with coordination detection, sentiment distribution, and minority viewpoint extraction |
+| `github-mcp` | Integration | — | Build and deploy a GitHub MCP server for repository management |
+| `intelligence-query` | Intelligence | BettaFish | Multi-source intelligence analysis engine with query decomposition and parallel source collection |
+| `meta-skill-evolver` | Meta | — | Autonomous skill lifecycle engine that generates, validates, tests, and packages skills |
+| `mindspider-connector` | Data | MindSpider | Live social listening feed connector with demo/MySQL modes and parameterized SQL |
+| `mlops-standards` | MLOps | — | MLOps best practices enforcement and standards validation |
+| `multimodal-analyst` | Intelligence | BettaFish | Cross-modal content analysis for text, image URLs, and video URLs with hallucination warnings |
+| `persistent-memory` | Infrastructure | — | Enterprise persistent memory with progressive disclosure retrieval |
+| `pre-package-pipeline` | Packaging | — | Single-command pre-flight pipeline before .skill packaging |
+| `prompt-architect` | Engineering | — | Prompt engineering and optimization for improved LLM outputs |
+| `repo-publisher` | DevOps | — | Pre-publish pipeline for GitHub repositories with security scanning |
+| `research-workflow` | Research | — | Experiment design and methodology planning |
+| `scenario-simulator` | Simulation | MiroFish | Swarm scenario simulation with counterfactual injection and system-generated personas |
+| `security-audit` | Security | — | Automated security scanning with bandit, semgrep, and secret detection |
+| `session-memory` | Infrastructure | — | Automatic checkpointing of session state to survive context compaction |
+| `skill-test-harness` | Testing | — | Automated test runner for skill scripts with fixtures and assertions |
+| `skill-validator` | Validation | — | Pre-flight validation for Claude Code skills before packaging |
+| `tdd-enforcer` | Testing | — | Enforces test-driven development with mandatory RED-GREEN-REFACTOR cycles |
 
 ## Trilogy Integration
 
-The Cortex Research Suite integrates with the ARENA trilogy: **MindSpider**, **BettaFish**, and **MiroFish**. Each skill is aligned with one trilogy engine based on its primary function.
+The Cortex Research Suite integrates with the ARENA trilogy: **MindSpider**, **BettaFish**, and **MiroFish**. Each trilogy-integrated skill is aligned with one trilogy engine based on its primary function.
 
 ### Trilogy Engines
 
@@ -91,7 +91,7 @@ skills:
     bettafish_engine_type: "analysis"
     mirofish_simulation_enabled: false
 
-  eval-harness:
+  scenario-simulator:
     mindspider_feed_enabled: false
     bettafish_engine_type: null
     mirofish_simulation_enabled: true
