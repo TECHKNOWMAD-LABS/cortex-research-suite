@@ -9,7 +9,7 @@ ORGANISM_DIR = Path(__file__).parent.parent.parent / "skill-organism"
 sys.path.insert(0, str(ORGANISM_DIR))
 
 
-def _make_dna(skill_id: str = "test-skill", instructions: str = "Do the thing.") -> "SkillDNA":
+def _make_dna(skill_id: str = "test-skill", instructions: str = "Do the thing."):  # noqa: F821
     from skill_dna import SkillDNA
 
     return SkillDNA(

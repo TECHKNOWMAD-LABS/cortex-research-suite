@@ -8,7 +8,7 @@ from pathlib import Path
 KNOWLEDGE_DIR = Path(__file__).parent.parent.parent / "knowledge"
 sys.path.insert(0, str(KNOWLEDGE_DIR))
 
-from graph_store import GraphStore, Triple
+from graph_store import GraphStore, Triple  # noqa: E402
 
 
 class TestGraphStore:

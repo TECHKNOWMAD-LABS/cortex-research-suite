@@ -9,7 +9,7 @@ from pathlib import Path
 CONNECTOR_DIR = Path(__file__).parent.parent.parent / "skills" / "mindspider-connector" / "scripts"
 sys.path.insert(0, str(CONNECTOR_DIR))
 
-from connector import generate_demo_data, run_connector
+from connector import generate_demo_data, run_connector  # noqa: E402
 
 REQUIRED_KEYS = {"topic", "sentiment_score", "post_count", "trend_direction", "platforms"}
 

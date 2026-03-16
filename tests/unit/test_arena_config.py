@@ -10,7 +10,7 @@ ORGANISM_DIR = Path(__file__).parent.parent.parent / "skill-organism"
 SKILLS_DIR = Path(__file__).parent.parent.parent / "skills"
 sys.path.insert(0, str(ORGANISM_DIR))
 
-from arena_config import ArenaConfig
+from arena_config import ArenaConfig  # noqa: E402
 
 
 class TestArenaConfig:
