@@ -1,0 +1,10 @@
+{
+  "skill": "multimodal-analyst",
+  "composite_mean": 0.65,
+  "status": "baseline_pending",
+  "mean_scores": {
+    "correctness": 0.68,
+    "reasoning_depth": 0.62,
+    "completeness": 0.65
+  }
+}

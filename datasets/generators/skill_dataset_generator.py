@@ -168,6 +168,41 @@ SKILL_TEMPLATES: dict[str, list[str]] = {
         "Detect shared mutable state and flickering tests in this test directory.",
         "Enforce RED-GREEN-REFACTOR discipline for the latest commit.",
     ],
+    "mindspider-connector": [
+        "Pull today's trending topics from social platforms and rank by engagement velocity.",
+        "Run sentiment analysis on the last 24h of mentions for {topic} across Twitter and Reddit.",
+        "Generate a platform breakdown showing where {topic} discussions are most active.",
+        "Extract emerging narratives around {topic} from social listening data.",
+        "Compare sentiment trajectories for {topic} across 3 social platforms over the past week.",
+    ],
+    "intelligence-query": [
+        "Query the knowledge base for all evidence related to {topic} and rank by relevance.",
+        "Perform semantic search across stored research to find connections to {topic}.",
+        "Cross-reference findings on {topic} from multiple sources and flag contradictions.",
+        "Decompose this complex question about {topic} into sub-queries for parallel retrieval.",
+        "Synthesize answers from 5 knowledge base hits into a single evidence-grounded response on {topic}.",
+    ],
+    "multimodal-analyst": [
+        "Analyze this mixed-media report containing text, tables, and images about {topic}.",
+        "Detect the content types in this document and route each to the appropriate analyzer.",
+        "Synthesize findings across text and tabular data in this {topic} research report.",
+        "Extract key claims from this PDF containing charts and narrative text about {topic}.",
+        "Perform cross-modal consistency check between the text and figures in this {topic} analysis.",
+    ],
+    "forum-intelligence": [
+        "Scan recent forum threads about {topic} and extract the dominant viewpoints.",
+        "Detect coordinated posting patterns in discussions about {topic} across 3 forums.",
+        "Track how the discussion around {topic} has evolved over the past month.",
+        "Extract expert opinions versus noise in this forum thread about {topic}.",
+        "Identify emerging consensus or polarization in forum discussions about {topic}.",
+    ],
+    "scenario-simulator": [
+        "Run a 3-persona simulation debating the impact of {topic} on the industry.",
+        "Generate 2 counterfactual scenarios: what if {topic} adoption doubled or halved?",
+        "Simulate a regulatory review panel deliberating on {topic} with 4 stakeholder personas.",
+        "Run a multi-round counterfactual analysis on {topic} with escalating constraints.",
+        "Generate scenario projections for {topic} under optimistic, baseline, and pessimistic assumptions.",
+    ],
 }
 
 # Fill-in variables
@@ -279,6 +314,11 @@ EXPECTED_STRUCTURES: dict[str, dict[str, Any]] = {
     "skill-test-harness": {"passed": 0, "failed": 0, "coverage": 0.0, "results": []},
     "skill-validator": {"valid": True, "errors": [], "warnings": [], "schema_version": ""},
     "tdd-enforcer": {"test_quality": 0.0, "anti_patterns": [], "coverage": {}, "grade": ""},
+    "mindspider-connector": {"trending_topics": [], "sentiment": {}, "platform_breakdown": {}, "timestamp": ""},
+    "intelligence-query": {"query": "", "results": [], "contradictions": [], "confidence": 0.0},
+    "multimodal-analyst": {"content_types": [], "analysis": {}, "cross_modal_consistency": 0.0},
+    "forum-intelligence": {"threads_analyzed": 0, "viewpoints": [], "coordination_score": 0.0, "consensus": ""},
+    "scenario-simulator": {"scenarios": [], "personas": [], "counterfactuals": [], "projections": {}},
 }
 
 
