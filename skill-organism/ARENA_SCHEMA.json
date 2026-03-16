@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ARENA.md Schema",
+  "description": "JSON Schema for skill ARENA.md configuration files used by the Cortex Skill Organism evolution engine.",
+  "type": "object",
+  "properties": {
+    "fitness_metric": {
+      "type": "object",
+      "properties": {
+        "primary": { "type": "string", "default": "composite_score" },
+        "formula": { "type": "string" },
+        "improvement_threshold": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.05 },
+        "regression_threshold": { "type": "number", "minimum": 0, "maximum": 1, "default": 0.10 }
+      },
+      "required": ["primary", "formula"]
+    },
+    "experiment_budget": {
+      "type": "object",
+      "properties": {
+        "eval_budget_seconds": { "type": "integer", "minimum": 5, "maximum": 300, "default": 30 },
+        "eval_dataset": { "type": "string", "pattern": "^datasets/" },
+        "eval_n_items": { "type": "integer", "minimum": 1, "maximum": 500, "default": 50 },
+        "max_experiments_per_generation": { "type": "integer", "minimum": 1, "maximum": 50, "default": 12 }
+      },
+      "required": ["eval_dataset", "eval_n_items"]
+    },
+    "mutation_strategies": {
+      "type": "object",
+      "properties": {
+        "allowed_mutations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "instruction_clarity",
+              "example_replacement",
+              "output_schema_tightening",
+              "edge_case_handling",
+              "reasoning_scaffolding",
+              "prompt_compression",
+              "few_shot_addition",
+              "chain_of_thought"
+            ]
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "transfer_test": {
+      "type": "object",
+      "properties": {
+        "transfer_dataset": { "type": "string", "pattern": "^datasets/" },
+        "transfer_n_items": { "type": "integer", "minimum": 1, "default": 30 },
+        "transfer_pass_threshold": { "type": "number", "minimum": -1, "maximum": 0, "default": -0.15 }
+      }
+    },
+    "browser_arena": {
+      "type": "object",
+      "properties": {
+        "browser_demo_enabled": { "type": "boolean", "default": true },
+        "demo_eval_dimensions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["correctness", "reasoning_depth", "completeness", "hallucination_risk", "coherence"]
+          }
+        }
+      }
+    },
+    "trilogy_integration": {
+      "type": "object",
+      "properties": {
+        "mindspider_feed_enabled": { "type": "boolean", "default": false },
+        "bettafish_engine_type": { "type": ["string", "null"], "default": null },
+        "mirofish_simulation_enabled": { "type": "boolean", "default": false },
+        "counterfactual_injection_points": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": []
+        }
+      }
+    },
+    "improvement_requires": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "notes": { "type": "string" }
+  }
+}

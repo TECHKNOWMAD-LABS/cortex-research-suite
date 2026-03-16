@@ -27,7 +27,7 @@ from typing import Dict, Optional
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
-from organism import SkillOrganism, setup_logging
+from organism import SkillOrganism, setup_logging  # noqa: E402
 
 # ─── Constants ───────────────────────────────────────────────────
 VERSION = "1.0.0"
@@ -53,7 +53,238 @@ EXIT_HEALTH_GATE_BLOCKED = 4
 EXIT_ROLLBACK_TRIGGERED = 5
 
 
+# ─── EvalBudget Context Manager ──────────────────────────────────
+
+
+class EvalBudget:
+    """Context manager tracking elapsed evaluation time against a budget."""
+
+    def __init__(self, budget_seconds: float = 30.0) -> None:
+        self._budget = budget_seconds
+        self._start: float = 0.0
+        self._elapsed: float = 0.0
+
+    def __enter__(self) -> "EvalBudget":
+        self._start = time.monotonic()
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self._elapsed = time.monotonic() - self._start
+
+    @property
+    def elapsed(self) -> float:
+        if self._start == 0:
+            return 0.0
+        return time.monotonic() - self._start
+
+    def remaining(self) -> float:
+        return max(0.0, self._budget - self.elapsed)
+
+    def expired(self) -> bool:
+        return self.elapsed >= self._budget
+
+    def over_budget(self) -> bool:
+        return self.expired()
+
+
+# ─── Crash-safe evolution event emitter ──────────────────────────
+
+
+def _emit_evolution_event(
+    generation: int,
+    skill: str,
+    score_before: float,
+    score_after: float,
+    mutation_type: str,
+    status: str,
+    budget_elapsed_s: float = 0.0,
+    git_commit: str = "",
+    browser_demo_url: str = "",
+    trilogy_integration: Optional[Dict] = None,
+) -> None:
+    """Append one JSON line to evolution_log.jsonl (crash-safe)."""
+    log_path = SCRIPT_DIR / "evolution_log.jsonl"
+    entry = {
+        "generation": generation,
+        "skill": skill,
+        "score_before": round(score_before, 4),
+        "score_after": round(score_after, 4),
+        "delta": round(score_after - score_before, 4),
+        "mutation_type": mutation_type,
+        "status": status,
+        "budget_elapsed_s": round(budget_elapsed_s, 2),
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "git_commit": git_commit,
+        "browser_demo_url": browser_demo_url,
+        "trilogy_integration": trilogy_integration
+        or {
+            "mindspider_active": False,
+            "bettafish_engine": None,
+            "mirofish_active": False,
+        },
+    }
+    try:
+        with open(log_path, "a") as f:
+            f.write(json.dumps(entry) + "\n")
+            f.flush()
+    except OSError:
+        pass  # Never crash the evolution cycle due to logging
+
+
+# ─── Git-per-experiment branch strategy ──────────────────────────
+
+
+def apply_mutation_with_git(
+    skill_dir: Path,
+    mutation_fn,
+    arena_config: Dict,
+    generation: int,
+) -> Dict:
+    """Apply a mutation on a git branch, evaluate, merge if improved."""
+    import subprocess
+
+    skill_name = skill_dir.name
+    branch = f"skill-evo/{skill_name}/gen{generation}"
+    result = {"branch": branch, "status": "pending", "merged": False}
+
+    try:
+        # Create branch
+        subprocess.run(
+            ["git", "checkout", "-b", branch],
+            capture_output=True,
+            timeout=10,
+        )
+
+        # Apply mutation
+        mutation_result = mutation_fn(skill_dir, arena_config)
+        result["mutation"] = mutation_result
+
+        # Evaluate (placeholder — actual eval uses eval_judge.py)
+        score_before = mutation_result.get("score_before", 0.0)
+        score_after = mutation_result.get("score_after", 0.0)
+        improved = (score_after - score_before) >= arena_config.get("improvement_threshold", 0.05)
+
+        if improved:
+            subprocess.run(
+                ["git", "add", "-A"],
+                capture_output=True,
+                timeout=10,
+            )
+            subprocess.run(
+                [
+                    "git",
+                    "commit",
+                    "-m",
+                    f"evo({skill_name}): gen{generation} +{score_after - score_before:.4f}",
+                ],
+                capture_output=True,
+                timeout=10,
+            )
+            subprocess.run(
+                ["git", "checkout", "main"],
+                capture_output=True,
+                timeout=10,
+            )
+            subprocess.run(
+                ["git", "merge", branch],
+                capture_output=True,
+                timeout=10,
+            )
+            result["status"] = "merged"
+            result["merged"] = True
+        else:
+            subprocess.run(
+                ["git", "checkout", "main"],
+                capture_output=True,
+                timeout=10,
+            )
+            result["status"] = "discarded"
+
+        # Clean up branch
+        subprocess.run(
+            ["git", "branch", "-D", branch],
+            capture_output=True,
+            timeout=10,
+        )
+
+    except Exception as e:
+        result["status"] = "error"
+        result["error"] = str(e)
+        # Ensure we're back on main
+        subprocess.run(
+            ["git", "checkout", "main"],
+            capture_output=True,
+            timeout=10,
+        )
+
+    return result
+
+
+# ─── Parallel overnight runner ───────────────────────────────────
+
+
+async def _run_skill_evolution(
+    skill_dir: Path,
+    generation: int,
+    semaphore,
+) -> Dict:
+    """Run one skill evolution cycle under semaphore control."""
+    import asyncio
+
+    async with semaphore:
+        skill_name = skill_dir.name
+        budget = EvalBudget(budget_seconds=30)
+
+        with budget:
+            # Placeholder: actual evolution uses organism.evolve()
+            _emit_evolution_event(
+                generation=generation,
+                skill=skill_name,
+                score_before=0.65,
+                score_after=0.70,
+                mutation_type="instruction_clarity",
+                status="improved",
+                budget_elapsed_s=budget.elapsed,
+            )
+
+        return {
+            "skill": skill_name,
+            "generation": generation,
+            "elapsed": budget.elapsed,
+        }
+
+
+async def run_parallel_generation(
+    skill_dirs: list,
+    generation: int,
+    max_concurrent: int = 4,
+) -> list:
+    """Run evolution across multiple skills in parallel."""
+    import asyncio
+
+    semaphore = asyncio.Semaphore(max_concurrent)
+    tasks = [_run_skill_evolution(d, generation, semaphore) for d in skill_dirs]
+    return await asyncio.gather(*tasks, return_exceptions=True)
+
+
+def run_overnight(generations: int = 10) -> None:
+    """CLI entry point for overnight autonomous evolution."""
+    import asyncio
+
+    skills_dir = SCRIPT_DIR.parent / "skills"
+    skill_dirs = sorted([d for d in skills_dir.iterdir() if (d / "ARENA.md").exists()])
+
+    logger.info(f"Overnight run: {generations} generations × {len(skill_dirs)} skills")
+
+    for gen in range(1, generations + 1):
+        logger.info(f"Generation {gen}/{generations}")
+        results = asyncio.run(run_parallel_generation(skill_dirs, gen))
+        completed = sum(1 for r in results if not isinstance(r, Exception))
+        logger.info(f"  Completed: {completed}/{len(skill_dirs)}")
+
+
 # ─── Utilities ───────────────────────────────────────────────────
+
 
 def sha256_file(path: Path) -> str:
     """Compute SHA-256 checksum of a file."""
@@ -118,9 +349,7 @@ def setup_enterprise_logging() -> None:
 
     # Console handler (human-readable)
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(
-        logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-    )
+    console_handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
 
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
@@ -130,6 +359,7 @@ def setup_enterprise_logging() -> None:
 
 
 # ─── Core Functions ──────────────────────────────────────────────
+
 
 def create_backup() -> Path:
     """Create timestamped backup of registry. Returns backup path."""
@@ -185,9 +415,16 @@ def verify_registry_integrity(path: Path) -> bool:
             return False
 
         required_fields = {
-            "id", "name", "version", "status", "fitness_score",
-            "usage_count", "category", "health", "generation",
-            "mutation_count"
+            "id",
+            "name",
+            "version",
+            "status",
+            "fitness_score",
+            "usage_count",
+            "category",
+            "health",
+            "generation",
+            "mutation_count",
         }
 
         for i, skill in enumerate(data["skills"]):
@@ -229,28 +466,15 @@ def check_health_gate(organism: SkillOrganism) -> bool:
         logger.error("Health gate: no skills in registry")
         return False
 
-    extinct_count = sum(
-        1 for s in organism.skills.values()
-        if s.status == "extinct"
-    )
+    extinct_count = sum(1 for s in organism.skills.values() if s.status == "extinct")
     living_count = total - extinct_count
     if living_count == 0:
-        logger.error("Health gate BLOCKED: entire population is extinct — "
-                      "no living skills remain for evolution")
+        logger.error("Health gate BLOCKED: entire population is extinct — no living skills remain for evolution")
         return False
 
-    critical_count = sum(
-        1 for s in organism.skills.values()
-        if s.health == "critical" and s.status != "extinct"
-    )
-    deprecated_count = sum(
-        1 for s in organism.skills.values()
-        if s.status == "deprecated"
-    )
-    active_count = sum(
-        1 for s in organism.skills.values()
-        if s.status == "active"
-    )
+    critical_count = sum(1 for s in organism.skills.values() if s.health == "critical" and s.status != "extinct")
+    deprecated_count = sum(1 for s in organism.skills.values() if s.status == "deprecated")
+    active_count = sum(1 for s in organism.skills.values() if s.status == "active")
 
     critical_ratio = critical_count / living_count
     deprecated_ratio = deprecated_count / living_count
@@ -265,15 +489,13 @@ def check_health_gate(organism: SkillOrganism) -> bool:
 
     if critical_ratio > HEALTH_GATE_THRESHOLD:
         logger.error(
-            f"Health gate BLOCKED: {critical_ratio:.1%} critical "
-            f"exceeds threshold {HEALTH_GATE_THRESHOLD:.1%}"
+            f"Health gate BLOCKED: {critical_ratio:.1%} critical exceeds threshold {HEALTH_GATE_THRESHOLD:.1%}"
         )
         return False
 
     if deprecated_ratio > 0.8:
         logger.error(
-            f"Health gate BLOCKED: {deprecated_ratio:.1%} deprecated "
-            "exceeds 80% threshold — mass deprecation detected"
+            f"Health gate BLOCKED: {deprecated_ratio:.1%} deprecated exceeds 80% threshold — mass deprecation detected"
         )
         return False
 
@@ -295,11 +517,10 @@ def manage_telemetry_retention() -> None:
 
     try:
         import sqlite3
+
         conn = sqlite3.connect(str(TELEMETRY_DB))
         cutoff = (datetime.utcnow() - timedelta(days=TELEMETRY_RETENTION_DAYS)).isoformat()
-        cursor = conn.execute(
-            "DELETE FROM invocations WHERE timestamp < ?", (cutoff,)
-        )
+        cursor = conn.execute("DELETE FROM invocations WHERE timestamp < ?", (cutoff,))
         deleted = cursor.rowcount
         conn.commit()
         conn.close()
@@ -309,7 +530,59 @@ def manage_telemetry_retention() -> None:
         logger.warning(f"Telemetry retention skipped: {e}")
 
 
+EVOLUTION_LOG_PATH = SCRIPT_DIR / "evolution_log.jsonl"
+
+
+def emit_evolution_log(
+    cycle_id: str,
+    elapsed: float,
+    result: Dict,
+    report: Dict,
+) -> None:
+    """Append a structured JSONL entry for dashboard consumption."""
+    stage = result.get("stage_results", {})
+    observe = stage.get("observe", {})
+    mutate = stage.get("mutate", {})
+    select = stage.get("select", {})
+    reproduce = stage.get("reproduce", {})
+    heal = stage.get("heal", {})
+
+    # Per-skill fitness snapshot
+    skill_fitness: Dict[str, float] = {}
+    for skill in report.get("skills", []):
+        if isinstance(skill, dict):
+            skill_fitness[skill.get("id", skill.get("name", "unknown"))] = skill.get("fitness_score", 0.0)
+
+    entry = {
+        "cycle_id": cycle_id,
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "elapsed_seconds": round(elapsed, 2),
+        "total_skills": observe.get("total_skills", 0),
+        "active_skills": report.get("active_skills", 0),
+        "extinct_skills": report.get("extinct_skills", 0),
+        "mean_fitness": report.get("mean_fitness", 0.0),
+        "anomalies": observe.get("anomalies_detected", 0),
+        "mutants_created": mutate.get("mutants_created", 0),
+        "culled": len(select.get("culled", [])),
+        "promoted": len(select.get("promoted", [])),
+        "offspring": reproduce.get("offspring_created", 0),
+        "resurrections": reproduce.get("fossils_resurrected", 0),
+        "critical_count": len(heal.get("critical", [])),
+        "decay_to_extinct": heal.get("decay_count", 0),
+        "collapse_resurrected": heal.get("collapse_resurrected", 0),
+        "skill_fitness": skill_fitness,
+    }
+
+    try:
+        with open(EVOLUTION_LOG_PATH, "a") as f:
+            f.write(json.dumps(entry) + "\n")
+        logger.info(f"Evolution log entry written: {EVOLUTION_LOG_PATH.name}")
+    except OSError as e:
+        logger.warning(f"Failed to write evolution log: {e}")
+
+
 # ─── Main Entry Point ────────────────────────────────────────────
+
 
 def run_evolution_cycle() -> int:
     """Execute one enterprise-grade evolution cycle. Returns exit code."""
@@ -317,9 +590,9 @@ def run_evolution_cycle() -> int:
     start_time = time.monotonic()
 
     setup_enterprise_logging()
-    logger.info(f"{'='*60}")
+    logger.info(f"{'=' * 60}")
     logger.info(f"EVOLUTION CYCLE START — ID: {cycle_id} — Runner v{VERSION}")
-    logger.info(f"{'='*60}")
+    logger.info(f"{'=' * 60}")
 
     # ── Step 1: Acquire lock ──
     lock_fd = acquire_lock()
@@ -390,16 +663,23 @@ def run_evolution_cycle() -> int:
 
         report_path = LOG_DIR / f"evolution_report_{cycle_id}.json"
         with open(report_path, "w") as f:
-            json.dump({
-                "cycle_id": cycle_id,
-                "runner_version": VERSION,
-                "pre_checksum": pre_checksum,
-                "post_checksum": post_checksum,
-                "evolution_result": result,
-                "ecosystem_report": report,
-            }, f, indent=2)
+            json.dump(
+                {
+                    "cycle_id": cycle_id,
+                    "runner_version": VERSION,
+                    "pre_checksum": pre_checksum,
+                    "post_checksum": post_checksum,
+                    "evolution_result": result,
+                    "ecosystem_report": report,
+                },
+                f,
+                indent=2,
+            )
 
         elapsed = time.monotonic() - start_time
+
+        # ── Step 10: Emit evolution log entry (JSONL) ──
+        emit_evolution_log(cycle_id, elapsed, result, report)
 
         # ── Summary ──
         stage = result.get("stage_results", {})
@@ -409,7 +689,7 @@ def run_evolution_cycle() -> int:
         reproduce = stage.get("reproduce", {})
         heal = stage.get("heal", {})
 
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
         logger.info(f"EVOLUTION CYCLE COMPLETE — {elapsed:.2f}s")
         logger.info(f"  Skills observed: {observe.get('total_skills', 'N/A')}")
         logger.info(f"  Anomalies: {observe.get('anomalies_detected', 0)}")
@@ -421,11 +701,13 @@ def run_evolution_cycle() -> int:
         logger.info(f"  Critical (healing): {len(heal.get('critical', []))}")
         logger.info(f"  Deprecation decay: {heal.get('decay_count', 0)} → extinct")
         logger.info(f"  Collapse recovery: {heal.get('collapse_resurrected', 0)} resurrected")
-        logger.info(f"  Ecosystem: {report.get('active_skills', '?')} active, "
-                     f"{report.get('extinct_skills', 0)} extinct, "
-                     f"{report.get('fossil_archive_size', 0)} fossils")
+        logger.info(
+            f"  Ecosystem: {report.get('active_skills', '?')} active, "
+            f"{report.get('extinct_skills', 0)} extinct, "
+            f"{report.get('fossil_archive_size', 0)} fossils"
+        )
         logger.info(f"  Report: {report_path.name}")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
 
         return EXIT_SUCCESS
 
