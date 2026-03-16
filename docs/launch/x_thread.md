@@ -82,7 +82,7 @@ Plug individual skills into your existing pipeline or run the full stack.
 
 **Tweet 9 (Who We Are)**
 
-Built by TECHKNOWMAD LABS (DPIIT registered, India).
+Built by TECHKNOWMAD LABS — DPIIT registered, NVIDIA Inception, Zoho for Startups. India.
 
 This is our contribution to the open-source AI tooling ecosystem. We believe research infrastructure should be auditable, evolvable, and free.
 

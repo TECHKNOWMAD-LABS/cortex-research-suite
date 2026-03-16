@@ -26,4 +26,4 @@ When MindSpider data is used as evidence in research_pipeline.py:
 - Evolution log entries (evolution_log.jsonl) never contain raw social data —
   only skill fitness scores and mutation metadata
 
-TechKnowMad Labs · DPIIT registered · admin@techknowmad.ai
+TechKnowMad Labs · DPIIT Registered · NVIDIA Inception Program · Zoho for Startups · admin@techknowmad.ai

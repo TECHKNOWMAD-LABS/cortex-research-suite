@@ -34,4 +34,4 @@ Works with Claude Code natively. Also supports LangChain, CrewAI, and OpenAI via
 - MCP adapter layer for cross-framework compatibility
 - No vendor lock-in -- works with any LLM backend that supports tool use
 
-Built by TECHKNOWMAD LABS. We'd appreciate feedback on the evolution mechanics specifically -- the arena scoring function and the mutation strategy are the parts we're least certain about.
+Built by TECHKNOWMAD LABS (DPIIT registered, NVIDIA Inception Program, Zoho for Startups). We'd appreciate feedback on the evolution mechanics specifically -- the arena scoring function and the mutation strategy are the parts we're least certain about.

@@ -7,6 +7,9 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
 [![Skills: 26](https://img.shields.io/badge/skills-26-blueviolet.svg)](skills/)
+[![NVIDIA Inception](https://img.shields.io/badge/NVIDIA-Inception%20Program-76b900.svg)](https://www.nvidia.com/en-us/startups/)
+[![Zoho for Startups](https://img.shields.io/badge/Zoho-Startup%20Partner-e42527.svg)](https://www.zoho.com/startups/)
+[![DPIIT Registered](https://img.shields.io/badge/DPIIT-Registered%20Startup-ff9933.svg)](https://www.startupindia.gov.in/)
 
 **AI Research Operating System** — 26 self-evolving research skills built on [Karpathy's autoresearch pattern](https://github.com/karpathy/autoresearchgpt). Each skill has an ARENA.md (the "program.md" equivalent) that drives autonomous evolution through LLM-as-Judge evaluation. The Skill Organism engine runs genetic selection — skills compete, mutate, and reproduce. Includes trilogy integration (MindSpider social listening, intelligence analysis, scenario simulation), browser-based experiment arena, and cross-platform adapters for Claude Code, MCP, LangChain, CrewAI, and OpenAI.
 

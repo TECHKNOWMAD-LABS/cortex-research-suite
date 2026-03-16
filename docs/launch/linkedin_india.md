@@ -4,7 +4,7 @@
 
 We just open-sourced Cortex Research Suite -- a Python framework for AI-powered research with 26 self-evolving skills.
 
-Built by TECHKNOWMAD LABS, a DPIIT-registered startup based in India. This is our contribution to the global open-source AI infrastructure, and we are proud it is shipping from here.
+Built by TECHKNOWMAD LABS — a DPIIT-registered startup based in India, member of the NVIDIA Inception Program, and Zoho for Startups partner. This is our contribution to the global open-source AI infrastructure, and we are proud it is shipping from here.
 
 **What it does:**
 
@@ -35,6 +35,9 @@ Works with Claude Code natively. MCP adapters for LangChain, CrewAI, and OpenAI.
 - 26 skills (26 core skills including 5 trilogy integration skills)
 - MIT license
 - Deterministic, auditable evaluation traces
+- NVIDIA Inception Program member
+- Zoho for Startups partner
+- DPIIT registered startup
 
 We are looking for contributors -- especially those working on evaluation methodology, domain-specific research skills, and Indian language support for research workflows.
 

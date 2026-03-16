@@ -171,4 +171,4 @@ The project is MIT licensed and we are actively looking for contributors, especi
 
 GitHub: [https://github.com/TECHKNOWMAD-LABS/cortex-research-suite](https://github.com/TECHKNOWMAD-LABS/cortex-research-suite)
 
-Built by TECHKNOWMAD LABS (DPIIT registered, India).
+Built by TECHKNOWMAD LABS — DPIIT registered startup, NVIDIA Inception Program member, Zoho for Startups partner. India.
