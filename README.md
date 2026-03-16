@@ -13,6 +13,26 @@
 
 **AI Research Operating System** — 26 self-evolving research skills built on [Karpathy's autoresearch pattern](https://github.com/karpathy/autoresearchgpt). Each skill has an ARENA.md (the "program.md" equivalent) that drives autonomous evolution through LLM-as-Judge evaluation. The Skill Organism engine runs genetic selection — skills compete, mutate, and reproduce. Includes trilogy integration (MindSpider social listening, intelligence analysis, scenario simulation), browser-based experiment arena, and cross-platform adapters for Claude Code, MCP, LangChain, CrewAI, and OpenAI.
 
+## Installation
+
+### Full suite (recommended)
+
+```bash
+git clone https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git
+cd cortex-research-suite
+pip install -e ".[dev]"
+```
+
+This gives you all 26 skills, Skill Organism evolution engine, dashboards, knowledge store (GraphRAG), datasets, and CLI scripts.
+
+### Core framework only
+
+```bash
+pip install cortex-research-suite
+```
+
+> **Note:** `pip install` delivers only the `cortex/` Python package (synthetic data, evaluation, agents, models). For all 26 skills, Skill Organism, dashboards, and knowledge store, use `git clone`.
+
 ## Quickstart — 3 entry points
 
 ### 1. Browser (zero install)
@@ -22,9 +42,6 @@ Open `dashboards/skill_arena_demo.html` in any browser. Paste your Anthropic API
 ### 2. Terminal
 
 ```bash
-git clone https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git
-cd cortex-research-suite
-pip install -e ".[dev]"
 
 # Run the test suite
 pytest
@@ -165,6 +182,29 @@ cortex-research-suite/
 ├── tests/                     # Test suite
 └── .github/workflows/         # CI/CD (lint, test, security, eval, release)
 ```
+
+## Architecture Notes
+
+### Instruction-only skills
+
+3 skills have no `scripts/` directory — they are Claude Code instruction files read directly from SKILL.md:
+- `repo-publisher` — pre-publish pipeline checklist
+- `prompt-architect` — prompt engineering patterns and guidelines
+- `mlops-standards` — ML operations best practices reference
+
+### Two dataset generators
+
+| Generator | Path | Purpose |
+|-----------|------|---------|
+| Category-based | `scripts/generate_dataset.py` | Generates prompts by category (reasoning, strategy, healthcare, adversarial) for the cortex evaluation framework |
+| Per-skill | `datasets/generators/skill_dataset_generator.py` | Generates 50 prompts per skill (26 skills, 10% adversarial) for skill evolution and arena testing |
+
+### Two research pipelines
+
+| Pipeline | Path | Usage |
+|----------|------|-------|
+| Cortex package | `scripts/run_research.py` | Positional topic arg, `--mock` for offline mode |
+| Standalone skill | `skills/research-workflow/scripts/research_pipeline.py` | `--topic` flag, works offline automatically with hardcoded evidence |
 
 ## Security
 
