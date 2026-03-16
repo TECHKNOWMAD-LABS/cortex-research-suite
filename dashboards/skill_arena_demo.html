@@ -448,9 +448,9 @@ function renderLog(){
   const relevant=experiments.filter(e=>!currentSkill||e.skill===currentSkill).slice(-30).reverse();
   body.innerHTML=relevant.map(e=>{
     const cls=e.delta>0?'up':e.delta<0?'down':'neutral';
-    return `<tr><td>${e.id}</td><td>${escHtml(e.skill)}</td><td>${escHtml(e.mutation)}</td>
-      <td><span class="badge badge-${cls}">${e.delta>=0?'+':''}${e.delta.toFixed(4)}</span></td>
-      <td>${e.status}</td></tr>`;
+    return `<tr><td>${escHtml(String(e.id))}</td><td>${escHtml(e.skill)}</td><td>${escHtml(e.mutation)}</td>
+      <td><span class="badge badge-${escHtml(cls)}">${e.delta>=0?'+':''}${e.delta.toFixed(4)}</span></td>
+      <td>${escHtml(e.status||'')}</td></tr>`;
   }).join('');
 }
 

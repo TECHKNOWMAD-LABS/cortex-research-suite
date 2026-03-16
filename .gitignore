@@ -28,11 +28,29 @@ logs/
 *.log
 metrics.db
 
+# Session memory (contains experiment state — do not commit)
+skill-organism/.session_memory/
+
+# Knowledge store databases
+knowledge/*.db
+
 # Generated datasets (keep structure, ignore data)
 datasets/*/shard_*.json
+datasets/synthetic/
+
+# MindSpider live data (may contain PII)
+datasets/mindspider/today_topics.json
 
 # Experiments (keep structure, ignore results)
 experiments/*.json
 experiments/baselines/
 experiments/research_reports/
 !experiments/.gitkeep
+
+# Credentials and secrets
+*.pem
+*.key
+*.p12
+.pypirc
+credentials.json
+cortex-research-suite
