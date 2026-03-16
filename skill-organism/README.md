@@ -2,7 +2,7 @@
 
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue)](https://www.python.org/)
 [![MIT License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
-[![GitHub Stars](https://img.shields.io/github/stars/TECHKNOWMAD-LABS/cortex?style=social)](https://github.com/TECHKNOWMAD-LABS/cortex)
+[![GitHub Stars](https://img.shields.io/github/stars/TECHKNOWMAD-LABS/cortex-research-suite?style=social)](https://github.com/TECHKNOWMAD-LABS/cortex-research-suite)
 
 **Evolutionary intelligence for AI skill ecosystems.** Cortex implements a biological evolution engine that treats AI skills as living organisms. Skills compete, adapt, breed, and evolve through natural selection, genetic mutation, and fitness-driven reproduction.
 
@@ -76,8 +76,8 @@ pip install cortex-skill-organism
 Or from source:
 
 ```bash
-git clone https://github.com/TECHKNOWMAD-LABS/cortex.git
-cd cortex && pip install -e .
+git clone https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git
+cd cortex-research-suite && pip install -e .
 ```
 
 **Requirements:** Python 3.10+, zero external dependencies.
@@ -111,18 +111,18 @@ python enterprise_runner.py  # Production mode
 
 ## Live Results
 
-From actual evolution run on 23-skill ecosystem:
+From actual evolution run on 26-skill ecosystem (v1.1.0, includes 5 trilogy integration skills):
 
 ```
 EVOLUTION CYCLE COMPLETE — 0.03s
-  Skills observed: 27
+  Skills observed: 26
   Culled: 7
   Promoted: 1
   Offspring: 2
   Critical (healing): 3
 ```
 
-1,040 invocations processed. 7 categories: research, MLOps, agents, meta, security, prompting, creative.
+1,040+ invocations processed. 7 categories: research, MLOps, agents, meta, security, prompting, creative. Trilogy integration skills include MindSpider social listening, intelligence analysis, multimodal analysis, forum intelligence, and scenario simulation.
 
 ---
 
@@ -141,7 +141,7 @@ MIT. See [LICENSE](LICENSE).
   title={Cortex: Evolutionary Intelligence for AI Skill Ecosystems},
   author={TechKnowmad Labs},
   year={2026},
-  url={https://github.com/TECHKNOWMAD-LABS/cortex}
+  url={https://github.com/TECHKNOWMAD-LABS/cortex-research-suite}
 }
 ```
 

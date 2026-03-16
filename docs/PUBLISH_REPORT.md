@@ -1,8 +1,8 @@
 # Publish Report
 
 **Repository:** `TECHKNOWMAD-LABS/cortex-research-suite`
-**Version:** 1.0.0
-**Date:** 2026-03-15
+**Version:** 1.1.0
+**Date:** 2026-03-16
 **Status:** PASS
 
 ## Pipeline Results
@@ -24,7 +24,7 @@
 
 | Check | Status |
 |-------|--------|
-| Skills with SKILL.md | 21/21 |
+| Skills with SKILL.md | 26/26 |
 | Stub files detected | 0 |
 | Missing scripts/ dirs | 0 |
 
@@ -76,4 +76,4 @@
 
 ## Summary
 
-All 7 pipeline stages passed. The repository is production-ready for distribution.
+All 7 pipeline stages passed. v1.1.0 includes 5 new trilogy integration skills (MindSpider, intelligence, multimodal, forum, scenario) bringing the total to 26. The repository is production-ready for distribution.

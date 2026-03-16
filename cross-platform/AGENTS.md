@@ -23,6 +23,18 @@ Open-source AI agent tools for code quality, security, memory, orchestration, an
 - **github-mcp**: GitHub API integration (repos, files, branches, PRs, issues, releases) via MCP
 - **repo-publisher**: Pre-publish pipeline chaining security, slop detection, structure validation, and metadata updates
 
+### Research & MLOps
+- **research-workflow**: Experiment design, methodology enforcement, and structured research output
+- **mlops-standards**: ML operations best practices enforcement with reproducibility patterns
+- **prompt-architect**: Prompt engineering and optimization with structured prompt templates
+
+### Intelligence & Data (Trilogy Integration)
+- **mindspider-connector**: Social listening data connector (MindSpider integration)
+- **intelligence-query**: Multi-source intelligence analysis with query decomposition
+- **multimodal-analyst**: Cross-modal content analysis (text, image, video, audio)
+- **forum-intelligence**: Forum thread analysis with coordination detection
+- **scenario-simulator**: Multi-agent scenario simulation with counterfactual injection
+
 ### Skill Development
 - **meta-skill-evolver**: Automated skill analysis, metrics collection, and iterative self-improvement
 - **skill-validator**: Structure and frontmatter validation against canonical skill spec
@@ -63,7 +75,7 @@ cortex/
 │   ├── adapters/               # Platform adapter generators
 │   ├── tools/                  # Manifest generators and converters
 │   └── generated/              # Platform-specific outputs
-│       ├── mcp/                # FastMCP servers (18 skills)
+│       ├── mcp/                # FastMCP servers (26 skills)
 │       ├── langchain/          # LangChain BaseTool classes
 │       ├── crewai/             # CrewAI BaseTool classes
 │       ├── openai/             # OpenAPI 3.1 specs for GPT Actions

@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 # --- Skill Registry ---
-# Extracted from TECHKNOWMAD-LABS/cortex repo tree + SKILL.md frontmatter
+# Extracted from TECHKNOWMAD-LABS/cortex-research-suite repo tree + SKILL.md frontmatter
 
 SKILLS = [
     {
@@ -651,7 +651,7 @@ def build_manifest(skill: dict) -> dict:
         "description": skill["description"],
         "author": "TECHKNOWMAD LABS",
         "license": "MIT",
-        "repository": f"https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/{name}",
+        "repository": f"https://github.com/TECHKNOWMAD-LABS/cortex-research-suite/tree/main/skills/{name}",
         "capabilities": skill["capabilities"],
         "platforms": build_platforms(name, triggers),
         "dependencies": deps,

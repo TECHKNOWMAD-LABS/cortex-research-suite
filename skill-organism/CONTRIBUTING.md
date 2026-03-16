@@ -5,8 +5,8 @@ Thanks for considering a contribution. This guide covers the workflow and standa
 ## Development Setup
 
 ```bash
-git clone https://github.com/TECHKNOWMAD-LABS/cortex.git
-cd cortex/skill-organism
+git clone https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git
+cd cortex-research-suite/skill-organism
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
 ```

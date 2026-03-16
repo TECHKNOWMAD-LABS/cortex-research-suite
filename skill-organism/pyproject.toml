@@ -41,10 +41,10 @@ dev = [
 cortex-evolve = "cortex_skill_organism.evolution_cycle:main"
 
 [project.urls]
-Homepage = "https://github.com/TECHKNOWMAD-LABS/cortex"
-Repository = "https://github.com/TECHKNOWMAD-LABS/cortex.git"
-Documentation = "https://github.com/TECHKNOWMAD-LABS/cortex#readme"
-Issues = "https://github.com/TECHKNOWMAD-LABS/cortex/issues"
+Homepage = "https://github.com/TECHKNOWMAD-LABS/cortex-research-suite"
+Repository = "https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git"
+Documentation = "https://github.com/TECHKNOWMAD-LABS/cortex-research-suite#readme"
+Issues = "https://github.com/TECHKNOWMAD-LABS/cortex-research-suite/issues"
 
 [tool.setuptools]
 packages = ["cortex_skill_organism"]

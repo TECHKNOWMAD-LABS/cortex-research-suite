@@ -309,7 +309,7 @@ def convert_skill(skill_dir: Path, version: str = "1.0.0") -> dict:
         "description": description[:300],
         "author": "TECHKNOWMAD LABS",
         "license": "MIT",
-        "repository": f"https://github.com/TECHKNOWMAD-LABS/cortex/tree/main/skills/{name}",
+        "repository": f"https://github.com/TECHKNOWMAD-LABS/cortex-research-suite/tree/main/skills/{name}",
         "capabilities": capabilities,
         "platforms": platforms,
         "dependencies": dependencies,
