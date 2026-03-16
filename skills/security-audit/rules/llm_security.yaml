@@ -1,0 +1,130 @@
+rules:
+  - id: detect-prompt-injection
+    patterns:
+      - pattern-either:
+          - pattern: eval($USER_INPUT)
+          - pattern: exec($USER_INPUT)
+          - pattern: eval(request.$FIELD)
+          - pattern: exec(request.$FIELD)
+          - pattern: eval(input(...))
+          - pattern: exec(input(...))
+    message: >
+      Potential prompt injection vulnerability. User-controlled input is passed
+      directly to eval() or exec(). An attacker could inject arbitrary code or
+      manipulate LLM behavior through crafted input. Sanitize and validate all
+      user input before processing.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: prompt-injection
+      cwe: "CWE-94: Improper Control of Generation of Code"
+      confidence: HIGH
+      impact: HIGH
+      references:
+        - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+
+  - id: detect-api-key-hardcoded
+    patterns:
+      - pattern-either:
+          - pattern: $KEY = "sk-..."
+          - pattern: $KEY = "api_..."
+          - pattern: $KEY = "key_..."
+          - pattern: api_key="..."
+          - pattern: api_key = "..."
+          - pattern: openai.api_key = "..."
+      - pattern-regex: '(?:api[_-]?key|secret|token|password)\s*[=:]\s*["\x27][A-Za-z0-9_\-]{16,}["\x27]'
+    message: >
+      Hardcoded API key or secret detected. API keys should never be stored
+      directly in source code. Use environment variables, a secrets manager,
+      or a .env file (excluded from version control) instead.
+    languages: [python, javascript, typescript]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: hardcoded-secrets
+      cwe: "CWE-798: Use of Hard-coded Credentials"
+      confidence: HIGH
+      impact: HIGH
+      references:
+        - https://cwe.mitre.org/data/definitions/798.html
+
+  - id: detect-unsafe-pickle
+    patterns:
+      - pattern-either:
+          - pattern: pickle.loads(...)
+          - pattern: pickle.load(...)
+          - pattern: _pickle.loads(...)
+          - pattern: cPickle.loads(...)
+          - pattern: cPickle.load(...)
+    message: >
+      Unsafe use of pickle deserialization. pickle.loads() can execute arbitrary
+      code during deserialization and should never be used on untrusted data.
+      In LLM pipelines, this is especially dangerous when loading cached model
+      outputs or embeddings from external sources. Use json, safetensors, or
+      other safe serialization formats instead.
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: deserialization
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      confidence: HIGH
+      impact: HIGH
+      references:
+        - https://docs.python.org/3/library/pickle.html#restricting-globals
+
+  - id: detect-missing-input-validation
+    patterns:
+      - pattern-either:
+          - pattern: |
+              openai.ChatCompletion.create(..., messages=$MSGS, ...)
+          - pattern: |
+              client.chat.completions.create(..., messages=$MSGS, ...)
+          - pattern: |
+              anthropic.completions.create(..., prompt=$PROMPT, ...)
+      - pattern-not-inside: |
+          if len($INPUT) > $LIMIT:
+              ...
+      - pattern-not-inside: |
+          if len($INPUT) < $LIMIT:
+              ...
+    message: >
+      LLM API call detected without apparent input length validation. Unbounded
+      input can lead to excessive token usage, high costs, and potential denial
+      of service. Always validate and truncate user input before passing it to
+      LLM APIs. Enforce maximum length limits on prompts and message arrays.
+    languages: [python]
+    severity: WARNING
+    metadata:
+      category: security
+      subcategory: input-validation
+      cwe: "CWE-20: Improper Input Validation"
+      confidence: MEDIUM
+      impact: MEDIUM
+      references:
+        - https://owasp.org/www-project-top-10-for-large-language-model-applications/
+
+  - id: detect-unsafe-deserialization
+    patterns:
+      - pattern-either:
+          - pattern: yaml.load($DATA)
+          - pattern: yaml.load($DATA, ...)
+      - pattern-not: yaml.load($DATA, Loader=yaml.SafeLoader)
+      - pattern-not: yaml.load($DATA, Loader=yaml.CSafeLoader)
+      - pattern-not: yaml.safe_load($DATA)
+    message: >
+      Unsafe YAML deserialization detected. yaml.load() without SafeLoader can
+      execute arbitrary Python code embedded in YAML data. This is critical in
+      LLM pipelines where configuration or prompt templates may come from
+      untrusted sources. Use yaml.safe_load() or yaml.load(data, Loader=yaml.SafeLoader).
+    languages: [python]
+    severity: ERROR
+    metadata:
+      category: security
+      subcategory: deserialization
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      confidence: HIGH
+      impact: HIGH
+      references:
+        - https://pyyaml.org/wiki/PyYAMLDocumentation
