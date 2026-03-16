@@ -155,3 +155,37 @@ Thresholds:
   analysis, JSON and markdown output. Stdlib only.
 - **`references/anti-patterns.md`** — Full pattern catalog with examples and
   suggested rewrites for each category.
+
+## Worked Example
+
+Scanning a README and reviewing the slop score:
+
+```bash
+# 1. Run the scanner on a single file
+python scripts/slop_scanner.py --target ./README.md --output ./slop-report
+
+# 2. Review the report
+cat ./slop-report.md
+# AI Slop Audit Report
+# Files scanned: 1
+#
+# | File      | Score | Flags | Verdict |
+# |-----------|-------|-------|---------|
+# | README.md | 58    | 9     | FAIL    |
+#
+# Findings:
+#   Line 1:  Emoji in header (weight 3)
+#            > # 🚀 DataForge — Revolutionary Data Pipeline
+#            Fix: # DataForge — Batch data pipeline
+#   Line 8:  Buzzword stacking (weight 2)
+#            > Seamless, enterprise-grade, battle-tested ETL framework
+#            Fix: ETL framework for scheduled batch jobs
+#   Line 14: Filler pattern (weight 1)
+#            > In today's rapidly evolving data landscape...
+#            Fix: Remove entirely. Start with what the tool does.
+#   Line 22: Defensive framing (weight 2)
+#            > This is not just another ETL tool
+#            Fix: Remove. Describe capabilities instead.
+#
+# Overall: 58/100 — FAIL. Rewrite recommended.
+```

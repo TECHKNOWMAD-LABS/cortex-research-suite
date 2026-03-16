@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>github-mcp — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / github-mcp</div>
+<h1>github-mcp</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
+name: github-mcp
+description: &gt;
+  Build and deploy a GitHub MCP server for repository management. Use when the
+  user needs GitHub API integration, wants to push files without browser
+  automation, manage repos/PRs/issues via API, or mentions &quot;GitHub MCP&quot;,
+  &quot;GitHub connector&quot;, &quot;push to GitHub via API&quot;, or &quot;GitHub integration&quot;.
+---
+
+# GitHub MCP Server Builder
+
+Build a complete Model Context Protocol (MCP) server that integrates with GitHub&#x27;s REST API for programmatic repository, pull request, issue, and release management. This skill instantiates the mcp-builder pattern specifically for GitHub workflows.
+
+## Quick Start
+
+```bash
+python3 scripts/bootstrap.py
+export GITHUB_PAT=&quot;your_personal_access_token_here&quot;
+python3 src/server.py
+```
+
+Then connect to the server from Claude Code or other MCP clients via stdio transport.
+
+## Tool Inventory
+
+The GitHub MCP server implements these tools for Claude to call:
+
+### Repository Management
+- **github_get_repo** — Get repository metadata (name, description, stars, forks, visibility)
+- **github_list_repos** — List user&#x27;s repositories with filtering and sorting
+- **github_update_repo_settings** — Update description, topics, website, visibility
+
+### File Operations
+- **github_create_or_update_file** — Create or update a single file (commits via API)
+- **github_get_file_contents** — Retrieve file content from any branch
+- **github_delete_file** — Delete a file and commit the deletion
+
+### Branching &amp; Commits
+- **github_list_commits** — List commits on a branch with author/message filtering
+- **github_create_branch** — Create a new branch from a specific commit/ref
+- **github_list_branches** — List all branches with protection status
+
+### Pull Requests
+- **github_create_pull_request** — Create a PR with title, body, base/head branches
+- **github_list_pull_requests** — List PRs with filtering by state (open/closed/all)
+- **github_merge_pull_request** — Merge a PR with configurable merge strategy
+
+### Issues
+- **github_create_issue** — Create an issue with title, body, labels, assignees
+- **github_list_issues** — List issues with filtering by state, labels, assignee
+
+### Releases
+- **github_create_release** — Create a release with tag, name, body, assets
+
+## Architecture
+
+### Project Structure
+```
+github-mcp/
+├── src/
+│   ├── server.py              # FastMCP server entry point
+│   ├── github_client.py        # GitHub API wrapper (requests library)
+│   ├── tools/
+│   │   ├── __init__.py
+│   │   ├── repos.py           # Repository tools
+│   │   ├── files.py           # File operation tools
+│   │   ├── branches.py        # Branch and commit tools
+│   │   ├── pull_requests.py   # PR tools
+│   │   ├── issues.py          # Issue tools
+│   │   └── releases.py        # Release tools
+│   └── exceptions.py          # Custom exception classes
+├── scripts/
+│   ├── bootstrap.py           # Scaffolds the full project
+│   └── test_connection.py     # Validates GitHub PAT and API access
+├── requirements.txt
+└── README.md
+```
+
+### Authentication
+
+Use GitHub Personal Access Token (PAT) for authentication. The server reads the token from the `GITHUB_PAT` environment variable at startup.
+
+```bash
+export GITHUB_PAT=&quot;ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&quot;
+```
+
+**Required Scopes:**
+- `repo` — Full control of repositories (read/write)
+- `workflow` — Access to workflows (if managing GitHub Actions)
+- `public_repo` — Access to public repositories only (minimal scope)
+
+Generate a PAT at: https://github.com/settings/tokens
+
+### FastMCP Server Pattern
+
+```python
+from fastmcp import FastMCP
+import os
+
+app = FastMCP(&quot;github-mcp&quot;)
+GITHUB_PAT = os.getenv(&quot;GITHUB_PAT&quot;)
+GITHUB_API = &quot;https://api.github.com&quot;
+
+if not GITHUB_PAT:
+    raise ValueError(&quot;GITHUB_PAT environment variable not set&quot;)
+
+# Initialize GitHub client
+client = GitHubClient(GITHUB_PAT)
+
+# Register tools
+@app.tool()
+def github_get_repo(owner: str, repo: str) -&gt; dict:
+    &quot;&quot;&quot;Fetch repository metadata&quot;&quot;&quot;
+    return client.get_repo(owner, repo)
+
+@app.tool()
+def github_list_repos(owner: str, per_page: int = 30) -&gt; list:
+    &quot;&quot;&quot;List repositories with pagination&quot;&quot;&quot;
+    return client.list_repos(owner, per_page=per_page)
+
+# ... more tools ...
+
+if __name__ == &quot;__main__&quot;:
+    app.run()
+```
+
+### GitHub Client Implementation Pattern
+
+```python
+import requests
+from typing import Optional, Dict, List, Any
+
+class GitHubClient:
+    def __init__(self, pat: str):
+        self.token = pat
+        self.base_url = &quot;https://api.github.com&quot;
+        self.headers = {
+            &quot;Authorization&quot;: f&quot;token {pat}&quot;,
+            &quot;Accept&quot;: &quot;application/vnd.github.v3+json&quot;,
+            &quot;X-GitHub-Api-Version&quot;: &quot;2022-11-28&quot;
+        }
+    
+    def _request(self, method: str, endpoint: str, **kwargs) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;Make authenticated API request with error handling&quot;&quot;&quot;
+        url = f&quot;{self.base_url}{endpoint}&quot;
+        response = requests.request(method, url, headers=self.headers, **kwargs)
+        
+        # Handle rate limiting
+        if response.status_code == 403 and &quot;API rate limit exceeded&quot; in response.text:
+            raise RateLimitError(f&quot;GitHub API rate limit exceeded. Reset at {response.headers.get(&#x27;X-RateLimit-Reset&#x27;)}&quot;)
+        
+        # Handle not found
+        if response.status_code == 404:
+            raise NotFoundError(f&quot;Resource not found: {endpoint}&quot;)
+        
+        # Handle validation errors
+        if response.status_code == 422:
+            errors = response.json().get(&quot;errors&quot;, [])
+            raise ValidationError(f&quot;GitHub validation error: {errors}&quot;)
+        
+        response.raise_for_status()
+        return response.json() if response.text else {}
+    
+    def get_repo(self, owner: str, repo: str) -&gt; Dict[str, Any]:
+        &quot;&quot;&quot;GET /repos/{owner}/{repo}&quot;&quot;&quot;
+        return self._request(&quot;GET&quot;, f&quot;/repos/{owner}/{repo}&quot;)
+    
+    def list_repos(self, owner: str, per_page: int = 30, page: int = 1) -&gt; List[Dict]:
+        &quot;&quot;&quot;GET /users/{owner}/repos with pagination&quot;&quot;&quot;
+        params = {&quot;per_page&quot;: min(per_page, 100), &quot;page&quot;: page, &quot;type&quot;: &quot;all&quot;}
+        return self._request(&quot;GET&quot;, f&quot;/users/{owner}/repos&quot;, params=params)
+```
+
+### Tool Implementation Patterns
+
+#### File Operations Pattern
+```python
+def github_create_or_update_file(owner: str, repo: str, path: str, 
+                                  content: str, message: str, 
+                                  branch: str = &quot;main&quot;, sha: Optional[str] = None) -&gt; Dict:
+    &quot;&quot;&quot;Create or update a file in the repository&quot;&quot;&quot;
+    endpoint = f&quot;/repos/{owner}/{repo}/contents/{path}&quot;
+    
+    # Encode content to base64
+    import base64
+    encoded_content = base64.b64encode(content.encode()).decode()
+    
+    payload = {
+        &quot;message&quot;: message,
+        &quot;content&quot;: encoded_content,
+        &quot;branch&quot;: branch
+    }
+    
+    # If updating, include the current file&#x27;s SHA
+    if sha:
+        payload[&quot;sha&quot;] = sha
+    
+    return client._request(&quot;PUT&quot;, endpoint, json=payload)
+```
+
+#### Pull Request Pattern
+```python
+def github_create_pull_request(owner: str, repo: str, title: str, 
+                               head: str, base: str = &quot;main&quot;, 
+                               body: str = &quot;&quot;) -&gt; Dict:
+    &quot;&quot;&quot;Create a new pull request&quot;&quot;&quot;
+    endpoint = f&quot;/repos/{owner}/{repo}/pulls&quot;
+    
+    payload = {
+        &quot;title&quot;: title,
+        &quot;head&quot;: head,
+        &quot;base&quot;: base,
+        &quot;body&quot;: body
+    }
+    
+    return client._request(&quot;POST&quot;, endpoint, json=payload)
+```
+
+#### Pagination Pattern
+```python
+def github_list_commits(owner: str, repo: str, branch: str = &quot;main&quot;, 
+                        per_page: int = 30) -&gt; List[Dict]:
+    &quot;&quot;&quot;List commits with pagination support&quot;&quot;&quot;
+    endpoint = f&quot;/repos/{owner}/{repo}/commits&quot;
+    params = {
+        &quot;sha&quot;: branch,
+        &quot;per_page&quot;: min(per_page, 100),
+        &quot;page&quot;: 1
+    }
+    
+    commits = []
+    while True:
+        response = client._request(&quot;GET&quot;, endpoint, params=params)
+        commits.extend(response)
+        
+        # Check for next page via Link header
+        if &quot;Link&quot; not in client.headers or</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — github-mcp
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/github-mcp/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/github-mcp/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Standard skill improvement via instruction clarity and example quality.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

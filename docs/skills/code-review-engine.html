@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>code-review-engine — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / code-review-engine</div>
+<h1>code-review-engine</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
+name: code-review-engine
+description: &gt;
+  Two-stage code review with spec compliance validation and code quality
+  analysis. Severity-based issue reporting with blocking gates. Use when
+  reviewing code changes, validating implementations against specs, or when
+  &quot;code review&quot;, &quot;review this&quot;, &quot;code-review-engine&quot;, &quot;spec compliance&quot;,
+  &quot;quality check&quot;, or &quot;review PR&quot; is mentioned.
+---
+
+# Code Review Engine
+
+A two-stage code review system that validates spec compliance and analyzes code quality with severity-based blocking gates.
+
+## Overview
+
+This skill implements a professional code review engine with two separate review gates:
+
+1. **Stage 1: Spec Compliance Review** — Validates that implementation matches approved specification
+2. **Stage 2: Code Quality Review** — Analyzes code for correctness, performance, security, and maintainability
+
+Issues are classified by severity (CRITICAL, MAJOR, MINOR, INFO) to determine merge eligibility.
+
+## Stage 1: SPEC COMPLIANCE REVIEW
+
+Compare the implementation against an approved specification or requirement document. This gate ensures the code does what it was supposed to do.
+
+### Compliance Checks
+
+- **Requirements Coverage**: Are all requirements from the spec implemented?
+- **Scope Creep**: Are there unauthorized additions beyond the spec?
+- **Function Signatures**: Do function/method signatures match the specification?
+- **Edge Cases**: Are all edge cases mentioned in the spec handled?
+- **Error Paths**: Are all error scenarios from the spec covered with appropriate handling?
+- **Configuration**: Does the code handle configuration as specified?
+- **Dependencies**: Are external dependencies and integrations as specified?
+
+### Output
+
+- **Compliance Score**: 0-100% indicating requirement coverage
+- **Gap List**: Specific missing or incorrectly implemented requirements with spec section references
+- **Verdict**: PASS or FAIL (must pass to proceed to Stage 2)
+
+## Stage 2: CODE QUALITY REVIEW
+
+Analyze code for defects, inefficiencies, and maintainability issues across five dimensions.
+
+### Correctness
+
+- Logic errors and off-by-one bugs
+- Null/None safety and error handling
+- Resource management and cleanup
+- Boundary condition handling
+- Type mismatches or unsafe operations
+
+### Performance
+
+- Algorithmic complexity (O(n²) where O(n) possible)
+- Unnecessary object allocations or copies
+- N+1 query patterns
+- Inefficient data structure usage
+- Unoptimized loops or iterations
+
+### Security
+
+- SQL injection vulnerabilities
+- Command injection risks
+- Path traversal vulnerabilities
+- Hardcoded secrets or credentials
+- Unsafe deserialization
+- Missing input validation
+
+### Maintainability
+
+- Function length (&gt;50 lines = refactor candidate)
+- Cyclomatic complexity (&gt;10 = too complex)
+- Unclear variable/function naming
+- Missing or unclear documentation
+- Poor module organization
+
+### Style
+
+- Language convention adherence (PEP 8 for Python, etc.)
+- Consistent formatting and indentation
+- Import organization and naming
+- Comment quality and clarity
+- Dead code or unused imports
+
+### Output
+
+- **Issue Count** by severity (CRITICAL, MAJOR, MINOR, INFO)
+- **Detailed Issues**: Each issue with:
+  - Severity level
+  - Location (file, line number)
+  - Problem description
+  - Suggested fix
+  - Category (Correctness, Performance, Security, Maintainability, Style)
+
+## Severity Classification
+
+### CRITICAL (Blocks Merge)
+
+Blocks code from being merged. Must be fixed before proceeding.
+
+- Security vulnerabilities (injection, secrets, unsafe patterns)
+- Data loss risks or corruption potential
+- Spec violations (missing critical requirements)
+- Runtime crashes or unhandled exceptions
+
+### MAJOR (Must Fix Before Merge)
+
+Should be fixed before merge. May allow exceptions in specific cases.
+
+- Logic errors affecting core functionality
+- Performance regressions (e.g., 10x slower)
+- Missing required tests or test coverage gaps
+- Resource leaks or memory issues
+- Missing error handling for specified error cases
+
+### MINOR (Should Fix)
+
+Should be addressed but may be deferred to future PR.
+
+- Code style or formatting issues
+- Unclear naming or documentation
+- Functions exceeding length guidelines
+- Unused imports or variables
+- Suboptimal but functional implementations
+
+### INFO (Optional)
+
+Suggestions and improvements for consideration.
+
+- Alternative approaches or better patterns
+- Code organization suggestions
+- Documentation improvements
+- Future optimization opportunities
+- Library or framework suggestions
+
+## Review Report Format
+
+The review generates a markdown report with this structure:
+
+```markdown
+## Review Summary
+
+- **Spec Compliance**: 87% (2 gaps found)
+- **Code Quality**: 4 issues (0 critical, 1 major, 2 minor, 1 info)
+- **VERDICT**: CHANGES REQUESTED
+
+## Spec Compliance Gaps
+
+1. [MISSING] Error handler for timeout case (spec section 3.2)
+2. [MISSING] Retry logic not implemented (spec section 4.1)
+
+## Code Quality Issues
+
+1. [CRITICAL] SQL injection in user_query() — line 45
+2. [MAJOR] Function exceeds 50 lines — extract helper
+3. [MINOR] Missing docstring on public method
+4. [INFO] Consider using dataclass instead of dict
+
+## Detailed Analysis
+
+[Comprehensive breakdown of each issue with context and suggestions]
+```
+
+## Usage
+
+### Basic Review
+
+Review code against a specification:
+
+```bash
+python3 scripts/review_engine.py review \
+  --spec spec.md \
+  --target src/ \
+  --output review.md
+```
+
+### Parameters
+
+- `--spec`: Path to specification file (markdown format)
+- `--target`: Path to code directory or file to review
+- `--output`: Path to save review report (markdown)
+- `--strict`: Fail on MAJOR issues (default: fail only on CRITICAL)
+
+### Specification Format
+
+Create a markdown specification with requirements clearly marked:
+
+```markdown
+# User Authentication Module
+
+## Requirements
+
+### REQ-1: Login Function
+- Function name: `authenticate_user(email, password)`
+- Must handle invalid email format with ValueError
+- Must handle missing password with ValueError
+- Must check credentials against database
+- Must rate-limit failed attempts (max 5 per minute)
+- Must log all login attempts
+- Should timeout after 5 seconds
+
+### REQ-2: Token Generation
+- Generate JWT tokens valid for 24 hours
+- Must include user ID in token
+- Must include issue timestamp
+- Must not include password or secrets
+```
+
+## Workflow
+
+1. **Prepare Specification**: Define requirements in markdown with clear section markers
+2. **Run Review**: Execute the review engine against your code
+3. **Read Report**: Review the compliance gaps and quality issues
+4. **Stage 1 Decision**: Fix compliance gaps or dispute spec requirements
+5. **Stage 2 Decision**: Address quality issues based on severity
+6. **Merge Decision**: PASS all gates before merging
+
+## Integration
+
+Use this skill when:
+
+- Reviewing pull requests before merge
+- Validating implementations against specifications
+- Ensuring code quality standards across a project
+- Mentoring junior developers with detailed feedback
+- Running automated quality gates in CI/CD pipelines
+
+## See Also
+
+- `references/review-checklist.md` — Detailed checklist for manual review
+- `scripts/review_engine.py` — Implementation details and AST analysis logic
+</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — code-review-engine
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/code-review-engine/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/code-review-engine/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Standard skill improvement via instruction clarity and example quality.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

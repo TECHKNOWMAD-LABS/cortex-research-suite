@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>de-slop — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / de-slop</div>
+<h1>de-slop</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
+name: de-slop
+description: &gt;
+  Detect and flag AI-generated writing patterns in markdown and documentation.
+  Scans for emoji in headers, hyperbolic language, defensive framing, buzzword
+  stacking, motivational fluff, and other telltale signs of LLM-generated
+  content. Use when the user mentions &quot;remove AI slop&quot;, &quot;make this look
+  professional&quot;, &quot;doesn&#x27;t look human-written&quot;, &quot;de-slop&quot;, &quot;clean up AI
+  writing&quot;, &quot;remove AI artifacts&quot;, &quot;make this look like a human wrote it&quot;,
+  &quot;too much AI energy&quot;, &quot;sounds like ChatGPT&quot;, or any request to improve
+  writing quality by removing machine-generated patterns. Also use as a
+  pre-publish quality gate for documentation, READMEs, and technical writing.
+  This skill runs an actual scanner — not just a checklist.
+---
+
+# De-Slop — AI Writing Pattern Scanner
+
+Automated detection of AI-generated writing patterns in markdown files. Runs
+regex and heuristic analysis, produces per-file scores, and flags specific
+lines with suggested fixes.
+
+## When to Use
+
+This skill detects AI writing anti-patterns. It does not enforce brand voice
+(use `brand-voice-enforcement` for that) or compress content (use
+`knowledge-distiller` for that). It answers: &quot;Does this text look like an AI
+wrote it, and where specifically?&quot;
+
+## Workflow
+
+### 1. Identify target files
+
+Scan all markdown files in the target directory:
+```bash
+find &lt;target&gt; -name &quot;*.md&quot; -type f
+```
+
+Also scan: `.txt`, `.rst`, any file the user points to.
+
+### 2. Run the scanner
+
+```bash
+python &lt;skill-path&gt;/scripts/slop_scanner.py --target &lt;directory&gt; --output &lt;report-path&gt;
+```
+
+The scanner checks every line against a curated pattern library and produces a
+per-file score (0–100, where 0 = clean, 100 = pure slop).
+
+### 3. Produce report
+
+Output:
+- `slop-report.json` — machine-readable scores and line-level flags
+- `slop-report.md` — human-readable summary with suggested fixes
+
+Report structure:
+```markdown
+# AI Slop Audit Report
+
+**Target:** /path/to/repo
+**Files scanned:** 12
+**Date:** 2026-03-13
+
+## Summary
+| File | Score | Flags | Verdict |
+|------|-------|-------|---------|
+| README.md | 72 | 14 | FAIL |
+| SKILL.md | 31 | 5 | WARN |
+| docs/guide.md | 8 | 1 | PASS |
+
+## Findings
+
+### README.md (score: 72)
+
+**Line 1:** Emoji in header
+&gt; # 🚀 ViralForge — Social Media Domination Engine
+Suggested: `# ViralForge — Video content pipeline for social media`
+
+**Line 15:** Buzzword stacking
+&gt; Battle-tested, enterprise-grade, production-ready pipeline
+Suggested: Remove redundant qualifiers. Pick one.
+
+**Line 22:** Defensive framing
+&gt; This is not a template collection — it&#x27;s a complete system
+Suggested: Remove. Let the content speak for itself.
+```
+
+### 4. Optionally auto-fix
+
+If the user asks for fixes (not just detection), apply them:
+1. Generate a clean version of each flagged file
+2. Show a diff to the user before applying
+3. Apply only after confirmation
+
+## Pattern Categories
+
+The scanner checks for these categories, each weighted by severity:
+
+### Category 1: Structural Tells (weight: 3)
+- Emoji in headers (`# 🚀 Title`)
+- Excessive bold in lists (`- **Always** do **this** with **every** item`)
+- Headers that are full sentences (`## How This Revolutionary System Works`)
+- Numbered lists where bullets would do
+
+### Category 2: Hyperbolic Language (weight: 2)
+- Power words: revolutionary, game-changing, cutting-edge, world-class,
+  domination, groundbreaking, transformative, unleash, supercharge
+- Superlatives without evidence: &quot;the most&quot;, &quot;the best&quot;, &quot;unparalleled&quot;
+- Marketing language in technical docs: &quot;take it to the next level&quot;
+
+### Category 3: Defensive/Compensatory Framing (weight: 2)
+- &quot;This is not a...&quot; (defensive opening)
+- &quot;Unlike other...&quot; (unprompted comparison)
+- &quot;What sets X apart...&quot; (self-promotional)
+- &quot;Not just another...&quot; (anticipating skepticism)
+
+### Category 4: Buzzword Patterns (weight: 2)
+- Stacking: &quot;enterprise-grade, production-ready, battle-tested&quot;
+- Redundancy: &quot;fully autonomous zero-human-intervention pipeline&quot;
+- Empty modifiers: &quot;robust&quot;, &quot;seamless&quot;, &quot;elegant&quot;, &quot;scalable&quot; (without
+  specifics)
+
+### Category 5: Motivational/Inspirational Tone (weight: 1)
+- &quot;Who refuse to be average&quot;
+- &quot;Dare to dream bigger&quot;
+- &quot;For those who demand excellence&quot;
+- Aspirational statements in technical documentation
+
+### Category 6: Filler Patterns (weight: 1)
+- &quot;In today&#x27;s rapidly evolving landscape...&quot;
+- &quot;As we navigate the complexities of...&quot;
+- &quot;It&#x27;s worth noting that...&quot;
+- &quot;At the end of the day...&quot;
+- &quot;Let&#x27;s dive in&quot; / &quot;Let&#x27;s explore&quot;
+- Starting paragraphs with &quot;So,&quot; or &quot;Now,&quot;
+
+### Category 7: Repetitive Structure (weight: 1)
+- Every list item starts with &quot;Never&quot; or &quot;Always&quot;
+- Identical sentence structures across paragraphs
+- Parallel phrasing that feels templated
+
+## Scoring
+
+```
+file_score = sum(pattern_weight * match_count for each pattern) / total_lines * 100
+```
+
+Thresholds:
+- 0–15: PASS (clean, professional writing)
+- 16–40: WARN (some patterns detected, review suggested)
+- 41+: FAIL (significant AI writing patterns, rewrite recommended)
+
+## Reference Files
+
+- **`scripts/slop_scanner.py`** — Main scanner script. Regex + heuristic
+  analysis, JSON and markdown output. Stdlib only.
+- **`references/anti-patterns.md`** — Full pattern catalog with examples and
+  suggested rewrites for each category.
+</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — de-slop
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/de-slop/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/de-slop/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Better = catches MORE real AI patterns with FEWER false positives.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

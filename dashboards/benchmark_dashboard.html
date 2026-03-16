@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cortex Benchmark Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e0e0e6;
+    --muted: #8b8fa3;
+    --accent: #6c8cff;
+    --green: #4caf50;
+    --red: #ef5350;
+    --orange: #ff9800;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+  .header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header .meta { color: var(--muted); font-size: 13px; }
+  .stats-bar { display: flex; gap: 24px; padding: 16px 32px; border-bottom: 1px solid var(--border); }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-value { font-size: 24px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value.good { color: var(--green); }
+  .stat-value.warn { color: var(--orange); }
+  .stat-value.bad { color: var(--red); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 24px 32px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+  .card-full { grid-column: 1 / -1; }
+  .card h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .skill-select { padding: 6px 12px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-size: 13px; }
+  .controls { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+  .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 40px; text-align: center; color: var(--muted); cursor: pointer; transition: border-color 0.2s; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); }
+  .drop-zone input { display: none; }
+  canvas { max-height: 350px; }
+  .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table th, .table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .table th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-good { background: rgba(76,175,80,0.15); color: var(--green); }
+  .badge-warn { background: rgba(255,152,0,0.15); color: var(--orange); }
+  .badge-bad { background: rgba(239,83,80,0.15); color: var(--red); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Cortex Benchmark Dashboard</h1>
+  <div class="meta">Evaluation Lab &middot; 5-Dimension Rubric Scoring</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-value" id="stat-skills">--</span><span class="stat-label">Skills</span></div>
+  <div class="stat"><span class="stat-value" id="stat-samples">--</span><span class="stat-label">Samples</span></div>
+  <div class="stat"><span class="stat-value" id="stat-overall">--</span><span class="stat-label">Overall Score</span></div>
+  <div class="stat"><span class="stat-value" id="stat-lowest">--</span><span class="stat-label">Lowest Skill</span></div>
+</div>
+
+<div class="grid">
+  <!-- Data loader -->
+  <div class="card card-full" id="loader-card">
+    <h2>Load Benchmark Data</h2>
+    <div class="drop-zone" id="drop-zone">
+      <p>Drop benchmark result JSON files here, or click to browse</p>
+      <p style="margin-top:8px;font-size:12px">Accepts output from eval_judge.py (benchmarks/results/{skill}/*.json)</p>
+      <input type="file" id="file-input" multiple accept=".json">
+    </div>
+    <div style="margin-top:12px;text-align:center">
+      <button onclick="loadDemo()" style="padding:8px 16px;background:var(--accent);color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px">Load Demo Data</button>
+    </div>
+  </div>
+
+  <!-- Radar chart -->
+  <div class="card">
+    <div class="controls">
+      <h2 style="margin-bottom:0">Skill Radar</h2>
+      <select class="skill-select" id="radar-skill" onchange="updateRadar()"></select>
+    </div>
+    <canvas id="radarChart"></canvas>
+  </div>
+
+  <!-- Fitness curve -->
+  <div class="card">
+    <h2>Organism Fitness Curve</h2>
+    <canvas id="fitnessChart"></canvas>
+  </div>
+
+  <!-- Leaderboard -->
+  <div class="card card-full">
+    <h2>Skill Leaderboard</h2>
+    <table class="table" id="leaderboard">
+      <thead><tr><th>Skill</th><th>Accuracy</th><th>Reasoning</th><th>Completeness</th><th>Hallucination Risk</th><th>Coherence</th><th>Overall</th><th>Status</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const DIMS = ['accuracy','reasoning','completeness','hallucination_risk','coherence'];
+let allData = {}; // skill -> BenchmarkResult[]
+let radarChart, fitnessChart;
+
+// -- File loading --
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles(e.dataTransfer.files); });
+fileInput.addEventListener('change', e => handleFiles(e.target.files));
+
+function handleFiles(files) {
+  Array.from(files).forEach(f => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const data = JSON.parse(e.target.result);
+        if (data.skill) {
+          if (!allData[data.skill]) allData[data.skill] = [];
+          allData[data.skill].push(data);
+          allData[data.skill].sort((a,b) => a.timestamp.localeCompare(b.timestamp));
+        }
+      } catch(err) { console.error('Parse error:', err); }
+      render();
+    };
+    reader.readAsText(f);
+  });
+}
+
+function loadDemo() {
+  const skills = ['security-audit','code-review-engine','agent-orchestrator','de-slop','tdd-enforcer','research-workflow'];
+  const rng = (s) => { let h=s*2654435761>>>0; return()=>(h=h*16807%2147483647)/2147483647; };
+  skills.forEach((skill, si) => {
+    allData[skill] = [];
+    for (let gen = 0; gen < 8; gen++) {
+      const r = rng(si * 100 + gen);
+      const base = 2.5 + gen * 0.25;
+      const dimAvgs = {};
+      DIMS.forEach(d => { dimAvgs[d] = Math.min(5, +(base + r() * 1.5).toFixed(2)); });
+      const overall = +(DIMS.reduce((s,d) => s + dimAvgs[d], 0) / 5 / 5).toFixed(4);
+      allData[skill].push({
+        skill, timestamp: `2026030${gen}_120000`, sample_count: 50,
+        overall_average: overall, dimension_averages: dimAvgs, scores: []
+      });
+    }
+  });
+  render();
+}
+
+// -- Rendering --
+function render() {
+  const skills = Object.keys(allData).sort();
+  if (!skills.length) return;
+
+  // Stats
+  let totalSamples = 0, overallSum = 0, overallCount = 0, lowest = {skill:'', score:1};
+  skills.forEach(s => {
+    const latest = allData[s][allData[s].length - 1];
+    totalSamples += latest.sample_count;
+    overallSum += latest.overall_average;
+    overallCount++;
+    if (latest.overall_average < lowest.score) { lowest = {skill: s, score: latest.overall_average}; }
+  });
+  const avgOverall = overallSum / overallCount;
+  document.getElementById('stat-skills').textContent = skills.length;
+  document.getElementById('stat-samples').textContent = totalSamples;
+  const ov = document.getElementById('stat-overall');
+  ov.textContent = (avgOverall * 100).toFixed(1) + '%';
+  ov.className = 'stat-value ' + (avgOverall >= 0.7 ? 'good' : avgOverall >= 0.5 ? 'warn' : 'bad');
+  document.getElementById('stat-lowest').textContent = lowest.skill;
+
+  // Radar skill selector
+  const sel = document.getElementById('radar-skill');
+  const prev = sel.value;
+  sel.innerHTML = skills.map(s => `<option value="${s}" ${s===prev?'selected':''}>${s}</option>`).join('');
+  updateRadar();
+  updateFitness();
+  updateLeaderboard();
+}
+
+function updateRadar() {
+  const skill = document.getElementById('radar-skill').value;
+  if (!skill || !allData[skill]) return;
+  const latest = allData[skill][allData[skill].length - 1];
+  const da = latest.dimension_averages;
+  const data = DIMS.map(d => da[d] || 0);
+  const labels = DIMS.map(d => d.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase()));
+
+  if (radarChart) radarChart.destroy();
+  radarChart = new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels,
+      datasets: [{
+        label: skill,
+        data,
+        backgroundColor: 'rgba(108,140,255,0.2)',
+        borderColor: '#6c8cff',
+        borderWidth: 2,
+        pointBackgroundColor: '#6c8cff'
+      }]
+    },
+    options: {
+      scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, color: '#8b8fa3' }, grid: { color: '#2a2d3a' }, pointLabels: { color: '#e0e0e6', font: { size: 11 } } } },
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function updateFitness() {
+  const skills = Object.keys(allData).sort();
+  const maxGens = Math.max(...skills.map(s => allData[s].length));
+  const labels = Array.from({length: maxGens}, (_, i) => `Gen ${i}`);
+  const colors = ['#6c8cff','#4caf50','#ff9800','#ef5350','#ab47bc','#26c6da','#ffca28','#8d6e63'];
+  const datasets = skills.map((s, i) => ({
+    label: s,
+    data: allData[s].map(d => +(d.overall_average * 100).toFixed(1)),
+    borderColor: colors[i % colors.length],
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    tension: 0.3,
+    pointRadius: 3
+  }));
+
+  if (fitnessChart) fitnessChart.destroy();
+  fitnessChart = new Chart(document.getElementById('fitnessChart'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      scales: {
+        y: { title: { display: true, text: 'Score %', color: '#8b8fa3' }, grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } },
+        x: { grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } }
+      },
+      plugins: { legend: { labels: { color: '#e0e0e6', font: { size: 11 } } } }
+    }
+  });
+}
+
+function updateLeaderboard() {
+  const tbody = document.querySelector('#leaderboard tbody');
+  const skills = Object.keys(allData).sort();
+  tbody.innerHTML = skills.map(s => {
+    const latest = allData[s][allData[s].length - 1];
+    const da = latest.dimension_averages;
+    const overall = latest.overall_average;
+    const badge = overall >= 0.7 ? 'good' : overall >= 0.5 ? 'warn' : 'bad';
+    const statusText = overall >= 0.7 ? 'Passing' : overall >= 0.5 ? 'Warning' : 'Failing';
+    return `<tr>
+      <td><strong>${s}</strong></td>
+      ${DIMS.map(d => `<td>${(da[d]||0).toFixed(1)}</td>`).join('')}
+      <td><strong>${(overall*100).toFixed(1)}%</strong></td>
+      <td><span class="badge badge-${badge}">${statusText}</span></td>
+    </tr>`;
+  }).join('');
+}
+</script>
+
+</body>
+</html>

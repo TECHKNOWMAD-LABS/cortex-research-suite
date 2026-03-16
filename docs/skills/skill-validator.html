@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>skill-validator — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / skill-validator</div>
+<h1>skill-validator</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
+name: skill-validator
+description: &gt;
+  Pre-flight validation for Claude Code skills before packaging. Checks YAML
+  frontmatter schema, directory structure, script integrity, and markdown
+  quality. Use when packaging skills, before creating .skill files, or when
+  &quot;malformed YAML frontmatter&quot; errors occur. Triggers on &quot;validate skill&quot;,
+  &quot;check skill&quot;, &quot;skill-validator&quot;, &quot;pre-flight&quot;, or &quot;package skill&quot;.
+---
+
+# Skill Validator
+
+A comprehensive pre-flight validation tool for Claude Code skills. Use this to verify skill integrity before packaging or when encountering YAML frontmatter errors.
+
+## What It Validates
+
+### Frontmatter Schema
+- SKILL.md file existence and structure
+- YAML delimiters (`---`) present and correctly positioned
+- Only allowed fields: `name` and `description`
+- `name` is a simple kebab-case string
+- `description` is present, non-empty, and properly formatted
+- Detects and flags unknown fields (e.g., `tags`, `version`, `author`)
+- Warns if description is a single long line instead of using block scalar (`&gt;`)
+
+### Directory Structure
+- Required: `SKILL.md` at skill root
+- Optional: `scripts/` directory containing `.py` or `.sh` files
+- Optional: `references/` directory containing `.md` files
+- Flags unexpected top-level files or directories
+- Validates directory organization matches skill guidelines
+
+### Script Integrity
+- Python files syntax validation using `py_compile`
+- Shell scripts must start with shebang (`#!/bin/bash` or `#!/usr/bin/env bash`)
+- File size checks (flags files over 50KB as likely errors)
+- Encoding and readability checks
+
+### Markdown Quality
+- Proper heading hierarchy
+- Code block syntax validation
+- Link integrity checks
+- List formatting consistency
+
+## How to Use
+
+Run the validator against any skill directory:
+
+```bash
+python3 scripts/skill_validator.py --target /path/to/skill/directory
+```
+
+The validator produces:
+1. **JSON report** with detailed pass/fail status for each check
+2. **Human-readable summary** with clear pass/fail indicators
+3. **Exit code** (0 for all pass, 1 if any validation fails)
+
+## Validation Rules
+
+### Frontmatter Checks
+- **PASS**: SKILL.md exists and contains valid YAML frontmatter
+- **FAIL**: SKILL.md missing, malformed YAML, or closing `---` delimiter absent
+- **FAIL**: Unknown fields present (e.g., `tags`, `author`, `version`)
+- **FAIL**: `name` field missing or empty
+- **FAIL**: `description` field missing or empty
+- **WARN**: Description is a single line (should use `&gt;` block scalar for readability)
+
+### Directory Structure Checks
+- **PASS**: Only SKILL.md, optional scripts/, optional references/ at root level
+- **FAIL**: Unexpected files or directories at skill root
+- **FAIL**: scripts/ directory contains non-executable files
+- **FAIL**: references/ directory contains non-markdown files
+
+### Script Validation Checks
+- **PASS**: All Python files have valid syntax
+- **PASS**: All shell scripts have proper shebang
+- **FAIL**: Python syntax errors detected
+- **FAIL**: Shell scripts missing shebang
+- **FAIL**: Any file exceeds 50KB (likely packaging error)
+
+### Markdown Checks
+- **PASS**: Proper heading structure (H1 at top, logical hierarchy)
+- **PASS**: Code blocks properly closed
+- **PASS**: Links use valid markdown syntax
+- **WARN**: Inconsistent list formatting
+
+## Example Output
+
+```
+SKILL VALIDATION REPORT
+=======================
+
+Target: /path/to/skill-validator
+Validation Time: 2026-03-13 14:32:15
+
+FRONTMATTER VALIDATION
+  name field: PASS
+  description field: PASS
+  yaml structure: PASS
+  no unknown fields: PASS
+
+DIRECTORY STRUCTURE
+  required files: PASS
+  no unexpected files: PASS
+  scripts/ validation: PASS
+  references/ validation: PASS
+
+SCRIPT VALIDATION
+  python syntax: PASS (2 files)
+  shell syntax: PASS (1 file)
+  file sizes: PASS (all &lt; 50KB)
+
+MARKDOWN VALIDATION
+  heading structure: PASS
+  code blocks: PASS
+  links: PASS
+
+RESULT: ALL CHECKS PASSED
+Exit Code: 0
+```
+
+## Typical Issues and Fixes
+
+**&quot;YAML structure: FAIL&quot;** - Check that SKILL.md starts and ends with `---` on separate lines.
+
+**&quot;Unknown field detected: tags&quot;** - Remove the `tags:` field from frontmatter. Only `name` and `description` are allowed.
+
+**&quot;description is a single line&quot;** - Use YAML block scalar syntax:
+```yaml
+description: &gt;
+  This is a long description that spans
+  multiple lines for readability.
+```
+
+**&quot;Shell script missing shebang&quot;** - Add `#!/bin/bash` as the first line of your shell scripts.
+
+**&quot;Unexpected file: .gitignore&quot;** - Remove hidden files or place them in a subdirectory (e.g., .git/).
+</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — skill-validator
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/skill-validator/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/skill-validator/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Standard skill improvement via instruction clarity and example quality.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

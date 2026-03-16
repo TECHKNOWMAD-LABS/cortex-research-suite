@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Organism Evolution Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --border: #2a2d3a;
+    --text: #e0e0e6;
+    --muted: #8b8fa3;
+    --accent: #6c8cff;
+    --green: #4caf50;
+    --red: #ef5350;
+    --orange: #ff9800;
+    --purple: #ab47bc;
+    --cyan: #26c6da;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+  .header { padding: 24px 32px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .header h1 { font-size: 20px; font-weight: 600; }
+  .header .meta { color: var(--muted); font-size: 13px; }
+  .stats-bar { display: flex; gap: 24px; padding: 16px 32px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-value { font-size: 24px; font-weight: 700; }
+  .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value.good { color: var(--green); }
+  .stat-value.warn { color: var(--orange); }
+  .stat-value.bad { color: var(--red); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 24px 32px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+  .card-full { grid-column: 1 / -1; }
+  .card h2 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .drop-zone { border: 2px dashed var(--border); border-radius: 8px; padding: 40px; text-align: center; color: var(--muted); cursor: pointer; transition: border-color 0.2s; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); }
+  .drop-zone input { display: none; }
+  canvas { max-height: 350px; }
+  .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .table th, .table td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  .table th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+  .badge-good { background: rgba(76,175,80,0.15); color: var(--green); }
+  .badge-warn { background: rgba(255,152,0,0.15); color: var(--orange); }
+  .badge-bad { background: rgba(239,83,80,0.15); color: var(--red); }
+  .btn { padding: 8px 16px; background: var(--accent); color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 13px; }
+  .btn:hover { opacity: 0.9; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Skill Organism Evolution Dashboard</h1>
+  <div class="meta">Biological Evolution Engine &middot; Fitness Tracking</div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat"><span class="stat-value" id="stat-cycles">--</span><span class="stat-label">Cycles</span></div>
+  <div class="stat"><span class="stat-value" id="stat-active">--</span><span class="stat-label">Active Skills</span></div>
+  <div class="stat"><span class="stat-value" id="stat-extinct">--</span><span class="stat-label">Extinct</span></div>
+  <div class="stat"><span class="stat-value" id="stat-fitness">--</span><span class="stat-label">Mean Fitness</span></div>
+  <div class="stat"><span class="stat-value" id="stat-mutants">--</span><span class="stat-label">Total Mutants</span></div>
+  <div class="stat"><span class="stat-value" id="stat-culled">--</span><span class="stat-label">Total Culled</span></div>
+</div>
+
+<div class="grid">
+  <!-- Data loader -->
+  <div class="card card-full" id="loader-card">
+    <h2>Load Evolution Data</h2>
+    <div class="drop-zone" id="drop-zone">
+      <p>Drop evolution_log.jsonl here, or click to browse</p>
+      <p style="margin-top:8px;font-size:12px">Accepts JSONL output from enterprise_runner.py</p>
+      <input type="file" id="file-input" accept=".jsonl,.json">
+    </div>
+    <div style="margin-top:12px;text-align:center">
+      <button class="btn" onclick="loadDemo()">Load Demo Data</button>
+    </div>
+  </div>
+
+  <!-- Fitness curve -->
+  <div class="card">
+    <h2>Mean Fitness Over Cycles</h2>
+    <canvas id="fitnessChart"></canvas>
+  </div>
+
+  <!-- Population dynamics -->
+  <div class="card">
+    <h2>Population Dynamics</h2>
+    <canvas id="populationChart"></canvas>
+  </div>
+
+  <!-- Per-skill fitness heatmap (line chart) -->
+  <div class="card card-full">
+    <h2>Per-Skill Fitness Trajectories</h2>
+    <canvas id="skillFitnessChart"></canvas>
+  </div>
+
+  <!-- Evolution events -->
+  <div class="card">
+    <h2>Evolution Events Per Cycle</h2>
+    <canvas id="eventsChart"></canvas>
+  </div>
+
+  <!-- Cycle table -->
+  <div class="card">
+    <h2>Recent Cycles</h2>
+    <div style="max-height:350px;overflow-y:auto">
+      <table class="table" id="cycleTable">
+        <thead><tr><th>Cycle</th><th>Fitness</th><th>Active</th><th>Mutants</th><th>Culled</th><th>Time</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let entries = [];
+let fitnessChart, populationChart, skillFitnessChart, eventsChart;
+
+// File loading
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+function handleFile(f) {
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    entries = e.target.result.trim().split('\n').filter(l => l).map(l => {
+      try { return JSON.parse(l); } catch { return null; }
+    }).filter(Boolean);
+    entries.sort((a, b) => (a.timestamp || '').localeCompare(b.timestamp || ''));
+    render();
+  };
+  reader.readAsText(f);
+}
+
+function loadDemo() {
+  const skills = ['security-audit','code-review-engine','agent-orchestrator','de-slop','tdd-enforcer','research-workflow'];
+  const rng = (s) => { let h = s * 2654435761 >>> 0; return () => (h = h * 16807 % 2147483647) / 2147483647; };
+  entries = [];
+  for (let i = 0; i < 20; i++) {
+    const r = rng(i * 37);
+    const sf = {};
+    skills.forEach(s => { sf[s] = Math.min(1, 0.3 + i * 0.03 + r() * 0.2); });
+    entries.push({
+      cycle_id: `2026031${String(i).padStart(2,'0')}_120000`,
+      timestamp: `2026-03-${String(i + 1).padStart(2,'0')}T12:00:00Z`,
+      elapsed_seconds: 1.5 + r() * 3,
+      total_skills: 21,
+      active_skills: Math.max(15, 21 - Math.floor(r() * 3)),
+      extinct_skills: Math.floor(r() * 3),
+      mean_fitness: 0.4 + i * 0.025 + r() * 0.05,
+      anomalies: Math.floor(r() * 3),
+      mutants_created: Math.floor(r() * 4),
+      culled: Math.floor(r() * 2),
+      promoted: Math.floor(r() * 3),
+      offspring: Math.floor(r() * 3),
+      resurrections: r() > 0.8 ? 1 : 0,
+      critical_count: Math.floor(r() * 2),
+      decay_to_extinct: r() > 0.9 ? 1 : 0,
+      collapse_resurrected: 0,
+      skill_fitness: sf,
+    });
+  }
+  render();
+}
+
+function render() {
+  if (!entries.length) return;
+  const latest = entries[entries.length - 1];
+
+  // Stats
+  document.getElementById('stat-cycles').textContent = entries.length;
+  document.getElementById('stat-active').textContent = latest.active_skills || '--';
+  document.getElementById('stat-extinct').textContent = latest.extinct_skills || 0;
+  const fitEl = document.getElementById('stat-fitness');
+  const mf = latest.mean_fitness || 0;
+  fitEl.textContent = (mf * 100).toFixed(1) + '%';
+  fitEl.className = 'stat-value ' + (mf >= 0.7 ? 'good' : mf >= 0.5 ? 'warn' : 'bad');
+  document.getElementById('stat-mutants').textContent = entries.reduce((s, e) => s + (e.mutants_created || 0), 0);
+  document.getElementById('stat-culled').textContent = entries.reduce((s, e) => s + (e.culled || 0), 0);
+
+  renderFitness();
+  renderPopulation();
+  renderSkillFitness();
+  renderEvents();
+  renderTable();
+}
+
+const COLORS = ['#6c8cff','#4caf50','#ff9800','#ef5350','#ab47bc','#26c6da','#ffca28','#8d6e63','#e91e63','#00bcd4'];
+
+function renderFitness() {
+  const labels = entries.map((_, i) => `Cycle ${i}`);
+  const data = entries.map(e => +((e.mean_fitness || 0) * 100).toFixed(1));
+  if (fitnessChart) fitnessChart.destroy();
+  fitnessChart = new Chart(document.getElementById('fitnessChart'), {
+    type: 'line',
+    data: { labels, datasets: [{
+      label: 'Mean Fitness %', data, borderColor: '#6c8cff', backgroundColor: 'rgba(108,140,255,0.1)',
+      fill: true, borderWidth: 2, tension: 0.3, pointRadius: 3
+    }]},
+    options: {
+      scales: {
+        y: { title: { display: true, text: 'Fitness %', color: '#8b8fa3' }, grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } },
+        x: { grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } }
+      },
+      plugins: { legend: { labels: { color: '#e0e0e6' } } }
+    }
+  });
+}
+
+function renderPopulation() {
+  const labels = entries.map((_, i) => `Cycle ${i}`);
+  if (populationChart) populationChart.destroy();
+  populationChart = new Chart(document.getElementById('populationChart'), {
+    type: 'line',
+    data: { labels, datasets: [
+      { label: 'Active', data: entries.map(e => e.active_skills || 0), borderColor: '#4caf50', borderWidth: 2, tension: 0.3 },
+      { label: 'Total', data: entries.map(e => e.total_skills || 0), borderColor: '#6c8cff', borderWidth: 2, tension: 0.3, borderDash: [5, 5] },
+      { label: 'Extinct', data: entries.map(e => e.extinct_skills || 0), borderColor: '#ef5350', borderWidth: 2, tension: 0.3 },
+    ]},
+    options: {
+      scales: {
+        y: { title: { display: true, text: 'Count', color: '#8b8fa3' }, grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } },
+        x: { grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } }
+      },
+      plugins: { legend: { labels: { color: '#e0e0e6', font: { size: 11 } } } }
+    }
+  });
+}
+
+function renderSkillFitness() {
+  // Collect all skill names across all cycles
+  const skillSet = new Set();
+  entries.forEach(e => { if (e.skill_fitness) Object.keys(e.skill_fitness).forEach(s => skillSet.add(s)); });
+  const skills = [...skillSet].sort();
+  const labels = entries.map((_, i) => `Cycle ${i}`);
+  const datasets = skills.map((s, i) => ({
+    label: s,
+    data: entries.map(e => +((e.skill_fitness?.[s] || 0) * 100).toFixed(1)),
+    borderColor: COLORS[i % COLORS.length],
+    backgroundColor: 'transparent',
+    borderWidth: 2, tension: 0.3, pointRadius: 2,
+  }));
+
+  if (skillFitnessChart) skillFitnessChart.destroy();
+  skillFitnessChart = new Chart(document.getElementById('skillFitnessChart'), {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      scales: {
+        y: { title: { display: true, text: 'Fitness %', color: '#8b8fa3' }, grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } },
+        x: { grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } }
+      },
+      plugins: { legend: { position: 'bottom', labels: { color: '#e0e0e6', font: { size: 10 }, boxWidth: 12 } } }
+    }
+  });
+}
+
+function renderEvents() {
+  const labels = entries.map((_, i) => `Cycle ${i}`);
+  if (eventsChart) eventsChart.destroy();
+  eventsChart = new Chart(document.getElementById('eventsChart'), {
+    type: 'bar',
+    data: { labels, datasets: [
+      { label: 'Mutants', data: entries.map(e => e.mutants_created || 0), backgroundColor: 'rgba(108,140,255,0.7)' },
+      { label: 'Culled', data: entries.map(e => e.culled || 0), backgroundColor: 'rgba(239,83,80,0.7)' },
+      { label: 'Promoted', data: entries.map(e => e.promoted || 0), backgroundColor: 'rgba(76,175,80,0.7)' },
+      { label: 'Offspring', data: entries.map(e => e.offspring || 0), backgroundColor: 'rgba(171,71,188,0.7)' },
+    ]},
+    options: {
+      scales: {
+        y: { stacked: true, grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } },
+        x: { stacked: true, grid: { color: '#2a2d3a' }, ticks: { color: '#8b8fa3' } }
+      },
+      plugins: { legend: { labels: { color: '#e0e0e6', font: { size: 11 } } } }
+    }
+  });
+}
+
+function renderTable() {
+  const tbody = document.querySelector('#cycleTable tbody');
+  tbody.innerHTML = entries.slice().reverse().slice(0, 30).map(e => {
+    const f = (e.mean_fitness || 0);
+    const badge = f >= 0.7 ? 'good' : f >= 0.5 ? 'warn' : 'bad';
+    return `<tr>
+      <td>${e.cycle_id || '--'}</td>
+      <td><span class="badge badge-${badge}">${(f*100).toFixed(1)}%</span></td>
+      <td>${e.active_skills || '--'}</td>
+      <td>${e.mutants_created || 0}</td>
+      <td>${e.culled || 0}</td>
+      <td>${(e.elapsed_seconds || 0).toFixed(1)}s</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

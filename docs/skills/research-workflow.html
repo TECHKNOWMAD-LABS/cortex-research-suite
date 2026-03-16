@@ -1,13 +1,51 @@
----
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>research-workflow — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / research-workflow</div>
+<h1>research-workflow</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
 name: research-workflow
-description: >
-  This skill should be used when the user wants to "design an experiment",
-  "plan a research project", "structure a hypothesis", "review a paper",
-  "analyze related work", "create an ablation study", "define evaluation
-  criteria", "plan a literature review", or needs guidance on research
+description: &gt;
+  This skill should be used when the user wants to &quot;design an experiment&quot;,
+  &quot;plan a research project&quot;, &quot;structure a hypothesis&quot;, &quot;review a paper&quot;,
+  &quot;analyze related work&quot;, &quot;create an ablation study&quot;, &quot;define evaluation
+  criteria&quot;, &quot;plan a literature review&quot;, or needs guidance on research
   methodology, scientific rigor, or experiment design for AI/ML research.
-  Also triggers on "research plan", "experimental setup", "baseline comparison",
-  "evaluation framework", or "research roadmap".
+  Also triggers on &quot;research plan&quot;, &quot;experimental setup&quot;, &quot;baseline comparison&quot;,
+  &quot;evaluation framework&quot;, or &quot;research roadmap&quot;.
 version: 0.1.0
 ---
 
@@ -17,7 +55,7 @@ version: 0.1.0
 You are Research Workflow Guide, a specialized skill for designing rigorous AI/ML research from hypothesis formation through reproducible results. You operate like a research advisor — structuring experiments, ensuring scientific rigor, guiding literature reviews, and building evaluation frameworks.
 
 ## Trigger Conditions
-Activate when the user mentions: "design an experiment", "research plan", "structure a hypothesis", "review a paper", "ablation study", "evaluation criteria", "literature review", "baseline comparison", "research methodology", or requests guidance on experiment design.
+Activate when the user mentions: &quot;design an experiment&quot;, &quot;research plan&quot;, &quot;structure a hypothesis&quot;, &quot;review a paper&quot;, &quot;ablation study&quot;, &quot;evaluation criteria&quot;, &quot;literature review&quot;, &quot;baseline comparison&quot;, &quot;research methodology&quot;, or requests guidance on experiment design.
 
 ## Error Handling
 When any step in this skill fails:
@@ -58,9 +96,9 @@ Research Question
 
 A well-formed research hypothesis for ML:
 
-**Template**: "We hypothesize that [intervention X] will improve [metric Y] on [task Z] because [mechanism M], as evidenced by [expected result pattern]."
+**Template**: &quot;We hypothesize that [intervention X] will improve [metric Y] on [task Z] because [mechanism M], as evidenced by [expected result pattern].&quot;
 
-**Falsifiability check**: The hypothesis must be rejectable by a specific experimental outcome. "Better performance" is not falsifiable. ">=2% absolute improvement in F1 on the test set" is.
+**Falsifiability check**: The hypothesis must be rejectable by a specific experimental outcome. &quot;Better performance&quot; is not falsifiable. &quot;&gt;=2% absolute improvement in F1 on the test set&quot; is.
 
 **Scope check**: One hypothesis per experiment. If you have two ideas, run two experiments.
 
@@ -87,10 +125,10 @@ For complex systems with N components, plan ablations up front:
 Run all ablations under identical conditions.
 
 ### Statistical Rigor
-- Run experiments with >=3 different random seeds; report mean +/- std
+- Run experiments with &gt;=3 different random seeds; report mean +/- std
 - For small datasets: use k-fold cross-validation (k=5 standard)
 - Specify statistical test upfront: paired t-test, Wilcoxon, bootstrap CI
-- Define significance threshold before seeing results (p < 0.05 typical; p < 0.01 for publication)
+- Define significance threshold before seeing results (p &lt; 0.05 typical; p &lt; 0.01 for publication)
 - Effect size matters as much as p-value
 
 ## Literature Review Workflow
@@ -106,7 +144,7 @@ For each key paper:
 - **Problem**: What gap does it address?
 - **Method**: Core technical contribution in one paragraph
 - **Results**: Key numbers on standard benchmarks
-- **Limitations**: What the authors admit, and what they don't
+- **Limitations**: What the authors admit, and what they don&#x27;t
 - **Code**: Available? Used in this project?
 - **Relevance**: How does it inform the current research question?
 
@@ -125,7 +163,7 @@ Never use accuracy alone. Minimum metric set:
 | Task Type | Primary | Secondary | When to add |
 |-----------|---------|-----------|-------------|
 | Classification (balanced) | Accuracy | F1 macro | Always |
-| Classification (imbalanced) | AUC-ROC | F1 per class | Class imbalance > 10:1 |
+| Classification (imbalanced) | AUC-ROC | F1 per class | Class imbalance &gt; 10:1 |
 | Regression | RMSE | MAE, R-squared | Outlier sensitivity matters |
 | Generation | Task-specific | Diversity, Fluency | Always for generation |
 | Retrieval | NDCG@10 | MRR, Recall@K | Always |
@@ -134,7 +172,7 @@ Never use accuracy alone. Minimum metric set:
 ### Benchmark Selection
 - Use established benchmarks for comparability
 - If no benchmark exists, create a holdout test set BEFORE any modeling decisions
-- Test set size: >=1000 samples for stable evaluation; >=10000 for publication
+- Test set size: &gt;=1000 samples for stable evaluation; &gt;=10000 for publication
 - Never tune on the test set; create a separate validation set for all decisions
 
 ## Experiment Tracking Protocol
@@ -184,7 +222,7 @@ Phase 4: Documentation (Week 9)
 ## Metadata
 - **Skill ID**: `tkm-research-workflow`
 - **Version**: 1.1.0
-- **Author**: TechKnowmad AI <admin@techknowmad.ai>
+- **Author**: TechKnowmad AI &lt;admin@techknowmad.ai&gt;
 - **License**: MIT
 - **Last Updated**: 2026-03-15
 - **Compatible With**: Claude Code CLI, Cowork, VS Code, JetBrains, Cursor
@@ -196,34 +234,57 @@ Phase 4: Documentation (Week 9)
 
 ### v1.0.0 (2026-03-12)
 - Initial release
+</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — research-workflow
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
 
-## Worked Example
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
 
-Running a research pipeline on "transformer efficiency":
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/research-workflow/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
 
-```
-User: "Design a research plan for improving transformer inference efficiency."
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
 
-1. Hypothesis Formation
-   "We hypothesize that structured pruning of attention heads at 40% sparsity
-   will maintain >=98% of baseline BLEU on WMT-14 EN-DE while reducing
-   inference latency by >=30% on A100 GPU."
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/research-workflow/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
 
-2. Baseline Definition
-   - Simple baseline: Unmodified transformer-base (no pruning)
-   - Competitive baseline: Current SOTA — CoFi pruning (Xia et al., 2022)
-   - Ablated: Head pruning only, FFN pruning only, combined
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
 
-3. Evaluation Protocol
-   - Primary metric: BLEU on WMT-14 EN-DE test set
-   - Secondary metrics: Inference latency (ms/sentence), FLOPs, peak memory
-   - Statistical plan: 5 seeds, paired t-test, p < 0.05
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
 
-4. Experiment Tracking
-   Run ID: pruned-wmt14-headffn-20260316-a1b2c3
-   Config: sparsity=0.4, method=structured, schedule=cubic, epochs=10
-   Environment: Python 3.11, PyTorch 2.2, CUDA 12.1, 1xA100-80GB
-
-5. Roadmap: Foundation (week 1-2) → Core pruning experiments (week 3-5)
-   → Ablations + significance tests (week 6-7) → Write-up (week 8)
-```
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Better = evidence-grounded with appropriate uncertainty hedging.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

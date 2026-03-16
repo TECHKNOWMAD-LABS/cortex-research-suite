@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>skill-test-harness — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / skill-test-harness</div>
+<h1>skill-test-harness</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
+name: skill-test-harness
+description: &gt;
+  Automated test runner for skill scripts with fixtures, assertions, and
+  regression detection. Use when testing skill scripts, validating scanner
+  output, or checking for regressions after modifications. Triggers on
+  &quot;test skill&quot;, &quot;run skill tests&quot;, &quot;skill-test-harness&quot;, &quot;regression check&quot;,
+  or &quot;validate skill output&quot;.
+---
+
+# Skill Test Harness
+
+Automated testing framework for skill scripts with built-in fixture management, comprehensive assertions, and regression detection.
+
+## Overview
+
+The test harness executes skill scripts against a suite of test cases, each with fixtures (input data) and assertions (expected outcomes). Tests run in isolated environments, and a summary report indicates pass/fail status.
+
+## Test Definition Format
+
+Tests are defined in JSON with the following structure:
+
+```json
+{
+  &quot;skill&quot;: &quot;skill-name&quot;,
+  &quot;tests&quot;: [
+    {
+      &quot;name&quot;: &quot;test_case_name&quot;,
+      &quot;command&quot;: &quot;command to execute&quot;,
+      &quot;fixtures_dir&quot;: &quot;path/to/fixtures&quot;,
+      &quot;assertions&quot;: [
+        { &quot;type&quot;: &quot;assertion_type&quot;, ...assertion_params }
+      ]
+    }
+  ]
+}
+```
+
+### Required Fields
+
+- **skill** — Name of the skill being tested
+- **tests** — Array of test case objects
+- **name** (per test) — Unique identifier for the test
+- **command** — Shell command to execute; supports template variables
+- **assertions** — Array of assertion objects to validate the outcome
+
+### Optional Fields
+
+- **fixtures_dir** — Directory containing test input files; defaults to `fixtures/` relative to test file directory
+- **timeout** — Test timeout in seconds (default: 30)
+- **env** — Object of environment variables to pass to the command
+
+## Template Variables
+
+Template variables are expanded in commands at runtime:
+
+| Variable | Expansion |
+|----------|-----------|
+| `{scripts}` | Path to scripts directory (from `--scripts-dir`) |
+| `{fixtures}` | Path to fixtures directory for this test |
+| `{output}` | Isolated temp directory for test outputs |
+
+Example command:
+```bash
+python3 {scripts}/security_scan.py --target {fixtures}/test_input --output {output}/results.json
+```
+
+## Test Fixture Format
+
+Fixtures are organized per test case in the `fixtures_dir`:
+
+```
+fixtures/
+├── eval_test/
+│   ├── suspicious.py
+│   ├── another_file.js
+│   └── requirements.txt
+├── clean_code/
+│   ├── main.py
+│   └── utils.py
+└── malformed_json/
+    └── input.json
+```
+
+Each subdirectory under `fixtures/` corresponds to a test&#x27;s `fixtures_dir` parameter. Files in the fixture directory are available to the test command via the `{fixtures}` variable.
+
+## Assertion Types
+
+### exit_code
+Validates the process exit code.
+
+```json
+{&quot;type&quot;: &quot;exit_code&quot;, &quot;expected&quot;: 0}
+```
+
+Parameters:
+- `expected` (int) — Expected exit code
+
+### file_exists
+Validates that a file was created.
+
+```json
+{&quot;type&quot;: &quot;file_exists&quot;, &quot;path&quot;: &quot;{output}/results.json&quot;}
+```
+
+Parameters:
+- `path` (string) — Path to file (supports `{output}` variable)
+
+### file_not_exists
+Validates that a file was not created.
+
+```json
+{&quot;type&quot;: &quot;file_not_exists&quot;, &quot;path&quot;: &quot;{output}/error.log&quot;}
+```
+
+Parameters:
+- `path` (string) — Path to file (supports `{output}` variable)
+
+### output_contains
+Validates that stdout or stderr contains a substring.
+
+```json
+{&quot;type&quot;: &quot;output_contains&quot;, &quot;text&quot;: &quot;scan completed&quot;}
+```
+
+Parameters:
+- `text` (string) — Substring to find in output
+
+### output_not_contains
+Validates that stdout or stderr does not contain a substring.
+
+```json
+{&quot;type&quot;: &quot;output_not_contains&quot;, &quot;text&quot;: &quot;error occurred&quot;}
+```
+
+Parameters:
+- `text` (string) — Substring that should not appear
+
+### json_field
+Validates a field in a JSON file using comparison operators.
+
+```json
+{&quot;type&quot;: &quot;json_field&quot;, &quot;path&quot;: &quot;{output}/report.json&quot;, &quot;field&quot;: &quot;summary.critical_count&quot;, &quot;operator&quot;: &quot;gte&quot;, &quot;value&quot;: 1}
+```
+
+Parameters:
+- `path` (string) — Path to JSON file (supports `{output}` variable)
+- `field` (string) — Dotted path to field (e.g., `summary.critical_count`, `results[0].status`)
+- `operator` (string) — Comparison operator: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `contains`
+- `value` — Expected value for comparison
+
+### line_count
+Validates the number of lines in an output file.
+
+```json
+{&quot;type&quot;: &quot;line_count&quot;, &quot;path&quot;: &quot;{output}/lines.txt&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: 42}
+```
+
+Parameters:
+- `path` (string) — Path to file (supports `{output}` variable)
+- `operator` (string) — Comparison operator: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`
+- `value` (int) — Expected line count
+
+### regex_match
+Validates that output matches a regular expression.
+
+```json
+{&quot;type&quot;: &quot;regex_match&quot;, &quot;pattern&quot;: &quot;found \\d+ issues&quot;}
+```
+
+Parameters:
+- `pattern` (string) — Regular expression pattern to match in stdout/stderr
+
+## Example Test Definition
+
+```json
+{
+  &quot;skill&quot;: &quot;security-audit&quot;,
+  &quot;tests&quot;: [
+    {
+      &quot;name&quot;: &quot;detects_eval_in_python&quot;,
+      &quot;command&quot;: &quot;python3 {scripts}/security_scan.py --target {fixtures}/eval_test --format json --output {output}/result.json&quot;,
+      &quot;fixtures_dir&quot;: &quot;fixtures/eval_test&quot;,
+      &quot;timeout&quot;: 30,
+      &quot;assertions&quot;: [
+        {&quot;type&quot;: &quot;exit_code&quot;, &quot;expected&quot;: 1},
+        {&quot;type&quot;: &quot;file_exists&quot;, &quot;path&quot;: &quot;{output}/result.json&quot;},
+        {&quot;type&quot;: &quot;json_field&quot;, &quot;path&quot;: &quot;{output}/result.json&quot;, &quot;field&quot;: &quot;summary.critical&quot;, &quot;operator&quot;: &quot;gte&quot;, &quot;value&quot;: 1},
+        {&quot;type&quot;: &quot;output_contains&quot;, &quot;text&quot;: &quot;eval detected&quot;}
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;clean_code_passes&quot;,
+      &quot;command&quot;: &quot;python3 {scripts}/security_scan.py --target {fixtures}/clean_code --format json --output {output}/result.json&quot;,
+      &quot;fixtures_dir&quot;: &quot;fixtures/clean_code&quot;,
+      &quot;assertions&quot;: [
+        {&quot;type&quot;: &quot;exit_code&quot;, &quot;expected&quot;: 0},
+        {&quot;type&quot;: &quot;json_field&quot;, &quot;path&quot;: &quot;{output}/result.json&quot;, &quot;field&quot;: &quot;summary.critical&quot;, &quot;operator&quot;: &quot;eq&quot;, &quot;value&quot;: 0}
+      ]
+    }
+  ]
+}
+```
+
+## Running Tests
+
+### Basic Usage
+
+```bash
+python3 test_runner.py --test-file tests.json --scripts-dir ./scripts
+```
+
+### With Custom Fixtures and Output
+
+```bash
+python3 test_runner.py \
+  --test-file tests.json \
+  --scripts-dir ./scripts \
+  --fixtures-dir /custom/fixtures \
+  --output-dir /tmp/test-output
+```
+
+### Verbose Output
+
+```bash
+python3 test_runner.py --test-file tests.json --scripts-dir ./scripts --verbose
+```
+
+### JSON Report for CI Integration
+
+```bash
+python3 test_runner.py \
+  --test-file tests.json \
+  --scripts-dir ./scripts \
+  --json-report /tmp/results.json
+```
+
+## Test Runner Behavior
+
+- Each test runs in an isolated temporary directory
+- Stdout, stderr, and exit code are captured
+- Template variables are expanded before command execution
+- Assertions are evaluated in order; first failure stops evaluation
+- Test timeout is 30 seconds by default (configurable per test)
+- Exit code: 0 if all tests pass, 1 if any test fails
+
+## Regression Detection Workflow
+
+1. Run baseline tests and capture JSON report:
+   ```bash
+   python3 test_runner.py --test-file tests.json --scripts-dir ./scripts --json-report baseline.json
+   ```
+
+2. Modify skill scripts and run tests again:
+   ```bash
+   python3 test_runner.py --test-file tests.json --scripts-dir ./scripts --json-report current.json
+   ```
+
+3. Compare reports:
+   ```bash
+   diff baseline.json current.json
+   ```
+
+Changes in the current.json report relative to baseline.json indicate regressions or improvements.
+
+## Best Practices
+
+- **Organize fixtures by test case** — Create separate subdirectories under `fixtures/` for each test&#x27;s input
+- **Use fixtures for realistic data** — Include actual files, code samples, and edge cases
+- **Test both success and failure paths** — Include tests for valid and invalid inputs
+- **Keep assertions focused** — Use multiple specific assertions rather than one broad check
+- **Use JSON field assertions for structured output** — Preferred over output parsing
+- **Version control test definitions** — Store tests.json in the skill repository
+- **Run tests in CI/CD pipelines** — Use `--json-report` for integration with CI tools
+
+## Command-Line Options
+
+```
+python3 test_runner.py [</pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — skill-test-harness
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/skill-test-harness/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/skill-test-harness/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Standard skill improvement via instruction clarity and example quality.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>

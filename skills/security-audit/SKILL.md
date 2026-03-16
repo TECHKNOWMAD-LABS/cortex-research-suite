@@ -165,3 +165,34 @@ which tools ran and what was checked.
   only as a fallback.
 - **`references/severity-matrix.md`** — CWE-to-severity mapping and
   remediation priority guide.
+
+## Worked Example
+
+Scanning a Python project and reviewing the severity report:
+
+```bash
+# 1. Run the security scan against a Python project
+python scripts/security_scan.py --target ./my-flask-app --output ./reports/security-report
+
+# 2. Scanner detects languages, runs bandit + secret scanner, produces report
+# Output:
+#   [INFO] Detected languages: Python (47 files)
+#   [INFO] Running bandit...found 5 issues
+#   [INFO] Running secret scanner...found 1 issue
+#   [INFO] Report written to ./reports/security-report.json
+
+# 3. Review the severity summary
+cat ./reports/security-report.md
+# Security Audit Report
+# Target: ./my-flask-app
+# Summary:
+#   Critical: 1  (hardcoded AWS key in config/settings.py:9)
+#   High:     2  (shell=True in deploy.py:33, pickle.loads in utils.py:71)
+#   Medium:   1  (yaml.load without SafeLoader in loader.py:15)
+#   Low:      1  (assert in auth.py:88)
+#   Secrets:  1  (AWS access key AKIA... in config/settings.py:9)
+#
+# Verdict: FAIL — 1 critical finding with secret exposure
+
+# 4. Fix the critical finding first, then re-scan to confirm
+```

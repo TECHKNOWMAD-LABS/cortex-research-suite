@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>agent-output-validator — Cortex Research Suite</title>
+<style>
+:root {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #c9d1d9; --muted: #8b949e; --accent: #58a6ff;
+    --green: #3fb950;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: var(--bg); color: var(--text); line-height: 1.6; }
+.container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+h1 { color: var(--accent); margin-bottom: 0.5rem; }
+h2 { color: var(--green); margin: 1.5rem 0 0.5rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+h3 { color: var(--muted); margin: 1rem 0 0.3rem; }
+pre { background: var(--surface); padding: 1rem; border-radius: 6px;
+       overflow-x: auto; font-size: 0.9rem; margin: 0.5rem 0 1rem; }
+code { font-family: 'SF Mono', Monaco, monospace; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.nav { margin-bottom: 2rem; font-size: 0.9rem; }
+.badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 3px;
+          font-size: 0.8rem; margin-right: 0.5rem; }
+.badge-arena { background: #1f2937; color: var(--green); border: 1px solid var(--green); }
+.badge-trilogy { background: #1f2937; color: #d29922; border: 1px solid #d29922; }
+.content { white-space: pre-wrap; }
+</style>
+</head>
+<body>
+<div class="container">
+<div class="nav"><a href="../index.html">Home</a> / <a href="../index.html#skills">Skills</a> / agent-output-validator</div>
+<h1>agent-output-validator</h1>
+<span class="badge badge-arena">ARENA.md</span>
+<h2>SKILL.md</h2>
+<pre class="content">---
+name: agent-output-validator
+description: &gt;
+  Verify outputs from parallel agent dispatches against expected contracts.
+  Checks file paths, content requirements, and schema compliance after agents
+  complete. Use when launching multiple agents in parallel, after agent
+  completion, or when &quot;agent wrote to wrong path&quot; errors occur. Triggers on
+  &quot;validate agent output&quot;, &quot;check agent results&quot;, &quot;agent-output-validator&quot;,
+  or &quot;verify parallel agents&quot;.
+---
+
+## Overview
+
+The agent-output-validator skill ensures that agents dispatched in parallel produce outputs that match your expected contract. This prevents silent failures where agents write to the wrong location, miss required files, or produce invalid content.
+
+## Contract Definition Format
+
+Define your agent outputs as a JSON contract file specifying what each agent should produce:
+
+```json
+{
+  &quot;agents&quot;: [
+    {
+      &quot;name&quot;: &quot;agent-name&quot;,
+      &quot;expected_files&quot;: [
+        {
+          &quot;path&quot;: &quot;/absolute/path/to/file&quot;,
+          &quot;min_size&quot;: 100,
+          &quot;max_size&quot;: 10000,
+          &quot;contains&quot;: [&quot;required&quot;, &quot;string&quot;, &quot;patterns&quot;],
+          &quot;not_contains&quot;: [&quot;forbidden&quot;, &quot;patterns&quot;],
+          &quot;syntax_check&quot;: &quot;python&quot;,
+          &quot;line_count_min&quot;: 10,
+          &quot;line_count_max&quot;: 500
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Contract Fields
+
+**Agent level:**
+- `name` (required) — Agent identifier, must be unique
+- `expected_files` (required) — Array of file specifications
+
+**File level:**
+- `path` (required) — Absolute file path to validate
+- `min_size` — File must be at least N bytes (optional)
+- `max_size` — File must be at most N bytes (optional)
+- `contains` — List of strings that must all appear in file (optional)
+- `not_contains` — List of strings that must not appear in file (optional)
+- `syntax_check` — One of: &quot;python&quot; (py_compile), &quot;json&quot; (json.loads), &quot;yaml&quot; (YAML parser) (optional)
+- `line_count_min` — Minimum line count (optional)
+- `line_count_max` — Maximum line count (optional)
+
+All checks are AND-ed together. A file passes only if all specified checks pass.
+
+## Validation Workflow
+
+1. **Define Contract** — Create a JSON file describing expected outputs for each agent
+2. **Dispatch Agents** — Launch multiple agents in parallel to produce outputs
+3. **Validate** — Run the validator against the contract
+4. **Inspect Results** — Review the detailed report to identify failures
+
+Example workflow:
+
+```bash
+# 1. Create contract
+cat &gt; contract.json &lt;&lt; &#x27;EOF&#x27;
+{
+  &quot;agents&quot;: [
+    {
+      &quot;name&quot;: &quot;security-audit-builder&quot;,
+      &quot;expected_files&quot;: [
+        {
+          &quot;path&quot;: &quot;/path/to/SKILL.md&quot;,
+          &quot;min_size&quot;: 100,
+          &quot;contains&quot;: [&quot;---&quot;, &quot;name:&quot;, &quot;description:&quot;]
+        },
+        {
+          &quot;path&quot;: &quot;/path/to/scripts/scanner.py&quot;,
+          &quot;min_size&quot;: 500,
+          &quot;syntax_check&quot;: &quot;python&quot;
+        }
+      ]
+    }
+  ]
+}
+EOF
+
+# 2. Dispatch agents (in parallel)
+# Agent 1 writes to /path/to/
+# Agent 2 writes to /path/to/
+
+# 3. Validate outputs
+python3 validate_outputs.py --contract contract.json --format text
+
+# 4. Check exit code and review report
+if [ $? -ne 0 ]; then
+  echo &quot;Agent outputs do not match contract&quot;
+  exit 1
+fi
+```
+
+## Common Failure Modes
+
+### Wrong Path
+Agent writes to `/tmp/output/file.py` but contract expects `/home/user/output/file.py`.
+
+**Diagnosis:** Validator reports &quot;File not found at expected path&quot;
+
+**Resolution:** Verify agent&#x27;s output directory configuration or update contract to match actual path.
+
+### Missing Files
+Agent produces only `SKILL.md` but contract requires both `SKILL.md` and `scripts/helper.py`.
+
+**Diagnosis:** Validator reports file missing for `scripts/helper.py`
+
+**Resolution:** Check agent logs to identify why file was not created. May indicate agent failure or incomplete execution.
+
+### Schema Violations
+Agent&#x27;s Python file has syntax errors, JSON is malformed, or YAML is invalid.
+
+**Diagnosis:** Validator reports syntax check failure with parsing error details
+
+**Resolution:** Agent produced structurally invalid content. Review agent logic for encoding, indentation, or format errors.
+
+### Content Mismatches
+- `contains` check fails: Required string not found in file (typo, missing section)
+- `not_contains` check fails: Forbidden string appears (debug output left in, wrong template used)
+
+**Diagnosis:** Validator reports specific string not found or unexpected string found
+
+**Resolution:** Review agent output and contract expectations. May indicate agent bug or template issue.
+
+### Size Violations
+File too small (incomplete output) or too large (runaway generation).
+
+**Diagnosis:** Validator reports file size out of range: N bytes (expected M-K bytes)
+
+**Resolution:** Check agent output completeness or investigate generator loops. May indicate agent timeout or truncation.
+
+### Line Count Violations
+File has too few or too many lines.
+
+**Diagnosis:** Validator reports line count out of range: N lines (expected M-K lines)
+
+**Resolution:** Verify agent output structure matches expectations. May indicate formatting issues or incomplete generation.
+
+## Usage
+
+Run the validator from command line:
+
+```bash
+python3 scripts/validate_outputs.py --contract /path/to/contract.json
+```
+
+### Options
+
+- `--contract PATH` (required) — Path to JSON contract file
+- `--format json|text` — Output format (default: text)
+- `--strict` — Treat all validation warnings as errors (default: false)
+
+### Output Formats
+
+**Text format (default):**
+```
+VALIDATION REPORT
+================
+
+Agent: security-audit-builder
+  Status: PASS
+  Files: 2/2 passed
+
+Agent: de-slop-builder
+  Status: FAIL
+  Files: 1/2 passed
+
+  security-slop-scanner.py
+    ERROR: File not found at /path/to/scripts/security-slop-scanner.py
+
+SUMMARY
+=======
+Agents passed: 1/2
+Files passed: 3/4
+Exit code: 1
+```
+
+**JSON format:**
+```json
+{
+  &quot;summary&quot;: {
+    &quot;agents_passed&quot;: 1,
+    &quot;agents_total&quot;: 2,
+    &quot;files_passed&quot;: 3,
+    &quot;files_total&quot;: 4,
+    &quot;exit_code&quot;: 1
+  },
+  &quot;agents&quot;: [
+    {
+      &quot;name&quot;: &quot;security-audit-builder&quot;,
+      &quot;passed&quot;: true,
+      &quot;files&quot;: [
+        {
+          &quot;path&quot;: &quot;/path/to/SKILL.md&quot;,
+          &quot;passed&quot;: true,
+          &quot;checks&quot;: []
+        }
+      ]
+    }
+  ]
+}
+```
+
+## Exit Codes
+
+- `0` — All agents and files passed validation
+- `1` — One or more agents or files failed validation
+
+## Requirements
+
+- Python 3.6+
+- Standard library only (no external dependencies)
+- Supports Linux, macOS, Windows
+
+## Examples
+
+### Example 1: Basic Validation
+
+Contract expects two agents to each produce SKILL.md files:
+
+```json
+{
+  &quot;agents&quot;: [
+    {
+      &quot;name&quot;: &quot;agent-a&quot;,
+      &quot;expected_files&quot;: [
+        {
+          &quot;path&quot;: &quot;/output/agent-a/SKILL.md&quot;,
+          &quot;min_size&quot;: 200,
+          &quot;contains&quot;: [&quot;---&quot;, &quot;name:&quot;, &quot;description:&quot;]
+        }
+      ]
+    },
+    {
+      &quot;name&quot;: &quot;agent-b&quot;,
+      &quot;expected_files&quot;: [
+        {
+          &quot;path&quot;: &quot;/output/agent-b/SKILL.md&quot;,
+          &quot;min_size&quot;: 200,
+          &quot;contains&quot;: [&quot;---&quot;, &quot;name:&quot;, &quot;description:&quot;]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Example 2: Python Syntax Validation
+
+Validate that generated Python files are syntactically correct:
+
+```json
+{
+  &quot;agents&quot;: [
+    {
+      &quot;name&quot;: &quot;code-generator&quot;,
+      &quot;expected_files&quot;: [
+        {
+          &quot;path&quot;: &quot;/output/main.py&quot;,
+          &quot;min_size&quot;: 500,
+          &quot;syntax_check&quot;: &quot;python&quot;
+        },
+        {
+          &quot;path&quot;: &quot;/output/utils.py&quot;,
+          &quot;syntax_check&quot;: &quot;python&quot;,
+          &quot;not_contains&quot;: [&quot;TODO&quot;, &quot;FIXME&quot;]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Example 3: Multi-File Agent Output
+
+Validate all files from a complex agent:
+
+```json
+{
+  &quot;agents&quot;: [
+    {
+      &quot;name&quot;: &quot;full-skill-builder&quot;,
+      &quot;expected_files&quot;: [
+        {
+          &quot;path&quot;: &quot;/output/SKILL.md&quot;,
+          &quot;min_size&quot;: 100,
+          &quot;contains&quot;: [&quot;---&quot;, &quot;name:&quot;, &quot;description:&quot;]
+        },
+        {
+          &quot;path&quot;: &quot;/output/scripts/validator.py&quot;,
+          &quot;syntax_check&quot;: &quot;python&quot;,
+          &quot;line_count_min&quot;: 50
+        },
+        {
+          &quot;path&quot;: &quot;/output/tests/test_validator.py&quot;,
+          &quot;syntax_check&quot;: &quot;python&quot;,
+      </pre>
+<h2>ARENA.md</h2>
+<pre class="content"># Arena — agent-output-validator
+# Human edits this. The organism runs experiments against it overnight.
+# Analogous to program.md in Karpathy&#x27;s autoresearch.
+
+## Fitness metric
+primary: composite_score
+formula: &quot;correctness×0.25 + reasoning_depth×0.20 + completeness×0.25 + hallucination_risk×0.20 + coherence×0.10&quot;
+improvement_threshold: 0.05
+regression_threshold: 0.10
+
+## Experiment budget
+eval_budget_seconds: 30
+eval_dataset: &quot;datasets/synthetic/agent-output-validator/shard_000.json&quot;
+eval_n_items: 50
+max_experiments_per_generation: 12
+
+## Mutation strategies
+allowed_mutations:
+  - instruction_clarity
+  - example_replacement
+  - output_schema_tightening
+  - edge_case_handling
+  - reasoning_scaffolding
+
+## Transfer test (Karpathy&#x27;s depth-N insight applied to skill complexity)
+transfer_dataset: &quot;datasets/synthetic/agent-output-validator/shard_001.json&quot;
+transfer_n_items: 30
+transfer_pass_threshold: -0.15
+
+## Browser arena config
+browser_demo_enabled: true
+demo_eval_dimensions: [correctness, reasoning_depth, completeness, hallucination_risk, coherence]
+
+## Trilogy integration
+mindspider_feed_enabled: false
+bettafish_engine_type: null
+mirofish_simulation_enabled: false
+
+## What &quot;better&quot; means
+improvement_requires:
+  - composite_score increases by &gt;= 0.05
+  - hallucination_risk does NOT decrease
+  - transfer_test passes
+notes: &quot;Standard skill improvement via instruction clarity and example quality.&quot;
+</pre>
+<p style="margin-top:2rem;color:var(--muted);font-size:0.8rem;">
+Generated by Cortex Research Suite docs pipeline.
+<a href="https://github.com/TECHKNOWMAD-LABS/cortex-research-suite">GitHub</a>
+</p>
+</div>
+</body>
+</html>
