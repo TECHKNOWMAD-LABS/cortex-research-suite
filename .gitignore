@@ -26,7 +26,9 @@ htmlcov/
 # Logs and metrics
 logs/
 *.log
+*.db
 metrics.db
+skill_telemetry.db
 
 # Session memory (contains experiment state — do not commit)
 skill-organism/.session_memory/
