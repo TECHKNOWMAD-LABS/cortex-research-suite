@@ -1,0 +1,51 @@
+graph:
+  name: research_pipeline
+  description: >
+    Full research pipeline: parallel literature review and data gathering,
+    followed by critical analysis, strategy formation, and final synthesis.
+
+  metadata:
+    version: "1.0"
+    author: TECHKNOWMAD LABS
+
+  nodes:
+    - name: literature_review
+      agent_role: researcher
+      prompt: >
+        Conduct a comprehensive literature review on: {input}.
+        Identify key papers, findings, and gaps in current research.
+
+    - name: data_gathering
+      agent_role: data_engineer
+      prompt: >
+        Identify and catalogue available datasets and empirical evidence
+        relevant to: {input}. Assess data quality and coverage.
+
+    - name: critical_analysis
+      agent_role: critic
+      depends_on: [literature_review, data_gathering]
+      prompt: >
+        Critically evaluate the research findings and data:
+        Literature: {literature_review}
+        Data: {data_gathering}
+        Identify methodological weaknesses and evidence gaps.
+
+    - name: strategy
+      agent_role: strategist
+      depends_on: [critical_analysis]
+      prompt: >
+        Based on the critical analysis, develop strategic recommendations:
+        {critical_analysis}
+        Propose actionable next steps with priorities.
+
+    - name: synthesis
+      agent_role: synthesizer
+      depends_on: [literature_review, critical_analysis, strategy]
+      prompt: >
+        Synthesize all findings into a final research report:
+        Literature: {literature_review}
+        Critique: {critical_analysis}
+        Strategy: {strategy}
+        Produce an executive summary with confidence levels.
+
+  output_node: synthesis

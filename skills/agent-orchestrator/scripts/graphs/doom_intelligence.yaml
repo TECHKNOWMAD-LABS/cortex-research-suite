@@ -1,0 +1,59 @@
+graph:
+  name: doom_intelligence
+  description: >
+    Intelligence analysis pipeline for worst-case scenario assessment.
+    Parallel threat identification, vulnerability analysis, and impact
+    assessment, followed by synthesis and countermeasure planning.
+
+  metadata:
+    version: "1.0"
+    author: TECHKNOWMAD LABS
+    scenario_type: worst_case
+
+  nodes:
+    - name: threat_identification
+      agent_role: researcher
+      prompt: >
+        Identify all potential threats and adversarial scenarios for: {input}.
+        Consider technical, operational, and strategic threat vectors.
+
+    - name: vulnerability_analysis
+      agent_role: critic
+      prompt: >
+        Analyze vulnerabilities and weak points related to: {input}.
+        Map attack surfaces and identify single points of failure.
+
+    - name: impact_assessment
+      agent_role: strategist
+      prompt: >
+        Assess worst-case impact scenarios for: {input}.
+        Quantify potential damage across financial, operational, and reputational dimensions.
+
+    - name: threat_synthesis
+      agent_role: synthesizer
+      depends_on: [threat_identification, vulnerability_analysis, impact_assessment]
+      prompt: >
+        Synthesize threat intelligence:
+        Threats: {threat_identification}
+        Vulnerabilities: {vulnerability_analysis}
+        Impact: {impact_assessment}
+        Produce a unified threat landscape assessment.
+
+    - name: countermeasures
+      agent_role: strategist
+      depends_on: [threat_synthesis]
+      prompt: >
+        Based on the threat assessment: {threat_synthesis}
+        Design defensive countermeasures with priorities, cost estimates,
+        and implementation timelines.
+
+    - name: readiness_report
+      agent_role: validator
+      depends_on: [threat_synthesis, countermeasures]
+      prompt: >
+        Validate the readiness plan:
+        Threats: {threat_synthesis}
+        Countermeasures: {countermeasures}
+        Issue a readiness rating: RED/AMBER/GREEN with justification.
+
+  output_node: readiness_report

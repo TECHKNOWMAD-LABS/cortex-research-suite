@@ -1,0 +1,59 @@
+graph:
+  name: mlops_pipeline
+  description: >
+    MLOps evaluation pipeline: parallel model evaluation and data validation,
+    followed by risk assessment, deployment planning, and final approval.
+
+  metadata:
+    version: "1.0"
+    author: TECHKNOWMAD LABS
+
+  nodes:
+    - name: model_evaluation
+      agent_role: researcher
+      prompt: >
+        Evaluate the model performance for: {input}.
+        Report accuracy, precision, recall, F1, and fairness metrics.
+        Compare against baseline and identify regressions.
+
+    - name: data_validation
+      agent_role: data_engineer
+      prompt: >
+        Validate the training and evaluation data pipeline for: {input}.
+        Check for drift, leakage, missing values, and distribution shifts.
+
+    - name: security_scan
+      agent_role: critic
+      prompt: >
+        Perform security analysis on the model artifacts for: {input}.
+        Check for adversarial vulnerabilities, data poisoning risks,
+        and compliance with security policies.
+
+    - name: risk_assessment
+      agent_role: critic
+      depends_on: [model_evaluation, data_validation, security_scan]
+      prompt: >
+        Assess deployment risk based on:
+        Model eval: {model_evaluation}
+        Data validation: {data_validation}
+        Security: {security_scan}
+        Rate risk as LOW/MEDIUM/HIGH with justification.
+
+    - name: deployment_plan
+      agent_role: deployer
+      depends_on: [risk_assessment]
+      prompt: >
+        Create a deployment plan based on risk assessment:
+        {risk_assessment}
+        Include canary strategy, rollback triggers, and monitoring plan.
+
+    - name: approval_gate
+      agent_role: validator
+      depends_on: [risk_assessment, deployment_plan]
+      prompt: >
+        Review the deployment readiness:
+        Risk: {risk_assessment}
+        Plan: {deployment_plan}
+        Issue GO/NO-GO decision with conditions.
+
+  output_node: approval_gate

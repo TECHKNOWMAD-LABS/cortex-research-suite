@@ -1,0 +1,11 @@
+{
+  "stage_latencies": {
+    "hypothesis_ms": 0.0,
+    "evidence_ms": 0.01,
+    "analysis_ms": 0.01,
+    "report_ms": 0.02
+  },
+  "total_latency_ms": 0.19,
+  "evidence_count": 7,
+  "offline_mode": true
+}
