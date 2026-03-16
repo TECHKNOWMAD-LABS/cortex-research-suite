@@ -28,6 +28,13 @@ Open-source AI agent tools for code quality, security, memory, orchestration, an
 - **mlops-standards**: ML operations best practices enforcement with reproducibility patterns
 - **prompt-architect**: Prompt engineering and optimization with structured prompt templates
 
+### Intelligence & Data (Trilogy Integration)
+- **mindspider-connector**: Live social listening feed connector with demo/MySQL modes
+- **intelligence-query**: Multi-source intelligence analysis with topic correlation and trend detection
+- **multimodal-analyst**: Cross-modal content analysis (text, image, video) with hallucination warnings
+- **forum-intelligence**: Forum thread analysis with coordination detection and minority viewpoint extraction
+- **scenario-simulator**: MiroFish-inspired swarm scenario simulation with counterfactual injection
+
 ### Skill Development
 - **meta-skill-evolver**: Automated skill analysis, metrics collection, and iterative self-improvement
 - **skill-validator**: Structure and frontmatter validation against canonical skill spec

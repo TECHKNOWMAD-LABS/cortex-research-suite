@@ -6,13 +6,19 @@
 [![Python 3.10-3.12](https://img.shields.io/badge/python-3.10--3.12-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg)](https://github.com/astral-sh/ruff)
+[![Skills: 26](https://img.shields.io/badge/skills-26-blueviolet.svg)](skills/)
 
-21 autonomous skills + a Python evaluation framework for AI/ML research and development. Covers research workflows, MLOps enforcement, security auditing, agent orchestration, quality assurance, and developer tooling. Works natively with Claude Code and integrates with LangChain, CrewAI, and OpenAI via MCP adapters.
+**AI Research Operating System** — 26 autonomous skills, self-evolving Skill Organism, browser-based experiment arena, and a Python evaluation framework. Covers research workflows, MLOps enforcement, security auditing, agent orchestration, intelligence analysis, and developer tooling. Works natively with Claude Code and integrates with LangChain, CrewAI, and OpenAI via MCP adapters.
 
-## Quickstart in 60 Seconds
+## Quickstart — 3 entry points
+
+### 1. Browser (zero install)
+
+Open `dashboards/skill_arena_demo.html` in any browser. Paste your Anthropic API key. Pick a skill. Click **Run Experiment**. Watch the organism evolve in real time.
+
+### 2. Terminal
 
 ```bash
-# Clone and install
 git clone https://github.com/TECHKNOWMAD-LABS/cortex-research-suite.git
 cd cortex-research-suite
 pip install -e ".[dev]"
@@ -20,17 +26,22 @@ pip install -e ".[dev]"
 # Run the test suite
 pytest
 
-# Generate a synthetic dataset (50 prompts, seeded for reproducibility)
-cortex-generate --count 50 --seed 42 --output ./datasets
+# Generate evaluation datasets for all 26 skills
+python datasets/generators/skill_dataset_generator.py --all-skills --n 50
 
-# Run a benchmark evaluation
-cortex-benchmark --suite reasoning --output ./results
+# Run evaluation on any skill
+python skills/skill-test-harness/scripts/eval_judge.py \
+  --skill security-audit --dataset datasets/synthetic/security-audit/shard_000.json
 
-# Use any skill directly
-cd skills/security-audit   # Each skill has a SKILL.md with instructions
+# Run the multi-agent debate engine
+python skills/agent-orchestrator/scripts/debate_engine.py \
+  --topic "AI safety in healthcare" --rounds 3
+
+# Start overnight evolution (runs in background)
+python skill-organism/enterprise_runner.py --overnight --generations 10
 ```
 
-### Use as a Python Library
+### 3. Python API
 
 ```python
 from cortex.synthetic.reasoning_generator import ReasoningGenerator
@@ -51,37 +62,50 @@ score = judge.score(prompt="...", response=result.final_output)
 print(f"Quality: {score.normalized:.0%}")  # e.g., Quality: 87%
 ```
 
-## Skills
+## Cortex in the intelligence ecosystem
+
+| Layer | Component | What it does | Integration |
+|-------|-----------|-------------|-------------|
+| **5. Simulation** | MiroFish-inspired scenario simulator | Swarm-based what-if analysis with counterfactual injection | `skills/scenario-simulator/` |
+| **4. Intelligence** | BettaFish-inspired analysis engine | Multi-source intelligence queries, forum analysis, multimodal | `skills/intelligence-query/`, `skills/forum-intelligence/`, `skills/multimodal-analyst/` |
+| **3. Data** | MindSpider connector | Live topic feeds from social listening deployments | `skills/mindspider-connector/` |
+| **2. Evolution** | Skill Organism + ARENA.md | Autonomous overnight evolution with fitness tracking | `skill-organism/`, `skills/*/ARENA.md` |
+| **1. Foundation** | 21 core skills + evaluation lab | Research, security, MLOps, orchestration, quality | `skills/`, `cortex/` |
+
+## Skills (26)
 
 | Skill | Category | Description |
 |-------|----------|-------------|
-| `agent-orchestrator` | Agents | Multi-agent coordination and task dispatch |
+| `agent-orchestrator` | Agents | Multi-agent coordination with DAG task graphs |
 | `agent-output-validator` | Validation | Automated validation of agent outputs against quality gates |
 | `code-review-engine` | Engineering | Automated code review with security checks |
-| `context-engineer` | Engineering | Context window optimization and prompt context management |
+| `context-engineer` | Engineering | Context window optimization and prompt management |
 | `de-slop` | Quality | AI-generated writing pattern detection and removal |
 | `design-system-forge` | Design | Design system generation and component library scaffolding |
 | `dev-lifecycle-engine` | DevOps | Development lifecycle management |
 | `diff-generator` | Engineering | Structured diff generation for code and document changes |
+| `forum-intelligence` | Intelligence | Forum thread analysis with coordination detection |
 | `github-mcp` | Integration | GitHub API via Model Context Protocol |
+| `intelligence-query` | Intelligence | Multi-source intelligence analysis engine |
 | `meta-skill-evolver` | Meta | Evolutionary skill improvement and mutation engine |
+| `mindspider-connector` | Data | Live social listening feed connector |
 | `mlops-standards` | MLOps | ML operations best practices enforcement |
+| `multimodal-analyst` | Intelligence | Cross-modal content analysis (text + image + video) |
 | `persistent-memory` | Infrastructure | SQLite-backed memory with FTS5 search |
 | `pre-package-pipeline` | Packaging | Skill validation and packaging pipeline |
 | `prompt-architect` | Engineering | Prompt engineering and optimization |
-| `repo-publisher` | DevOps | Pre-publish pipeline with security scanning and quality gates |
+| `repo-publisher` | DevOps | Pre-publish pipeline with security scanning |
 | `research-workflow` | Research | Experiment design and methodology |
+| `scenario-simulator` | Simulation | MiroFish-inspired swarm scenario simulation |
 | `security-audit` | Security | Bandit + semgrep + secret scanning pipeline |
-| `session-memory` | Infrastructure | Session-scoped memory persistence across conversations |
-| `skill-test-harness` | Testing | Automated skill testing framework |
+| `session-memory` | Infrastructure | Session-scoped memory persistence |
+| `skill-test-harness` | Testing | Automated skill testing framework with LLM-as-Judge |
 | `skill-validator` | Validation | Skill structure and manifest validation |
-| `tdd-enforcer` | Testing | Test-driven development enforcement with coverage tracking |
+| `tdd-enforcer` | Testing | Test-driven development enforcement |
 
 See [AGENTS.md](AGENTS.md) for the full agent manifest with platform-specific integration guides.
 
 ## Cortex Python Framework
-
-The `cortex/` package is an installable Python library providing:
 
 | Module | Purpose |
 |--------|---------|
@@ -96,82 +120,47 @@ The `cortex/` package is an installable Python library providing:
 
 ## Skill Organism
 
-The `skill-organism/` directory contains the evolution engine. Skills are automatically tested and scored. Underperformers get modified via mutation, top performers get replicated via crossbreeding, and the system recovers from population loss by restoring previously successful versions. Generation 0-1 skills are preserved indefinitely.
+The `skill-organism/` directory contains the evolution engine. Skills are automatically tested and scored. Underperformers get modified via mutation, top performers get replicated via crossbreeding, and the system recovers from population loss by restoring previously successful versions.
 
-The enterprise runner (`enterprise_runner.py`) enforces SHA-256 integrity checks on the skill registry, supports atomic rollback on failure, and returns CI/CD-compatible exit codes.
+Key features:
+- **ARENA.md** per skill — the "program.md" from Karpathy's autoresearch pattern
+- **ArenaConfig** parser with trilogy integration fields
+- **EvalBudget** context manager for time-bounded evaluation
+- **Git-per-experiment** branching (branch, mutate, evaluate, merge or discard)
+- **Overnight runner** with `asyncio.Semaphore(4)` parallel generations
+- **Crash-safe JSONL** evolution log for dashboard consumption
+
+See [OVERNIGHT_USAGE.md](OVERNIGHT_USAGE.md) for autonomous evolution setup.
 
 ## Cross-Platform Support
 
-The `cross-platform/` directory contains generated adapters for each platform.
-
-| Platform | Adapter Type | Directory | Status |
-|----------|-------------|-----------|--------|
-| Claude Code | Native Skills | `skills/` | Primary |
-| MCP (Model Context Protocol) | FastMCP Servers | `cross-platform/generated/mcp/` | Generated |
-| LangChain | Tool Classes | `cross-platform/generated/langchain/` | Generated |
-| CrewAI | Tool Wrappers | `cross-platform/generated/crewai/` | Generated |
-| OpenAI GPT Actions | Action Schemas | `cross-platform/generated/openai/` | Generated |
-| AGENTS.md | Agent Definitions | `cross-platform/generated/agents/` | Generated |
-| VS Code | MCP via Extension | `cross-platform/generated/mcp/` | Compatible |
-| JetBrains IDEs | MCP via Plugin | `cross-platform/generated/mcp/` | Compatible |
-| GitHub Copilot | MCP via Extension | `cross-platform/generated/mcp/` | Compatible |
-| Cursor | MCP via Settings | `cross-platform/generated/mcp/` | Compatible |
-| Windsurf | MCP via Config | `cross-platform/generated/mcp/` | Compatible |
-
-### Using with MCP
-
-Each MCP adapter is a standalone FastMCP server:
-
-```bash
-cd cross-platform/generated/mcp/<skill-name>/
-pip install -e .
-python -m <skill_module>
-```
-
-### Using with LangChain
-
-```python
-from langchain_cortex import SecurityAuditTool
-
-tool = SecurityAuditTool()
-result = tool.run({"target": "./my-project"})
-```
-
-### Using with CrewAI
-
-```python
-from crewai_cortex import SecurityAuditTool
-
-agent = Agent(
-    role="Security Analyst",
-    tools=[SecurityAuditTool()]
-)
-```
-
-### Universal Skill Manifest
-
-Each skill has a platform-agnostic manifest at `cross-platform/manifests/<skill>.json` describing inputs, outputs, dependencies, and platform-specific configuration.
+| Platform | Adapter Type | Status |
+|----------|-------------|--------|
+| Claude Code | Native Skills | Primary |
+| MCP (Model Context Protocol) | FastMCP Servers | Generated |
+| LangChain | Tool Classes | Generated |
+| CrewAI | Tool Wrappers | Generated |
+| OpenAI GPT Actions | Action Schemas | Generated |
+| VS Code / Copilot / Cursor / Windsurf / JetBrains | MCP via Extension | Compatible |
 
 ## Project Structure
 
 ```
 cortex-research-suite/
 ├── cortex/                    # Python framework (pip install -e .)
-│   ├── agents/                # Multi-agent runtime (orchestrator, debate, task graph)
-│   ├── evaluation/            # LLM judge, benchmarks, regression detection
-│   ├── synthetic/             # Dataset generators (reasoning, research, strategy, adversarial)
-│   ├── models/                # Model providers (Anthropic SDK + CLI fallback)
-│   ├── telemetry/             # Logging and metrics
-│   ├── config/                # Settings with YAML + env var support
-│   ├── pipelines/             # Skill runner, dataset pipeline
-│   └── utils/                 # I/O, security, sanitization
-├── skills/                    # 21 autonomous skills (SKILL.md + scripts/)
+├── skills/                    # 26 autonomous skills (SKILL.md + ARENA.md + scripts/)
 ├── skill-organism/            # Skill evolution engine
+├── knowledge/                 # Knowledge store (FTS5 + GraphRAG)
+├── experiments/               # Experiment tracker (SQLite)
+├── datasets/                  # Synthetic datasets + MindSpider feed
+├── benchmarks/                # Baselines for all skills
+├── dashboards/                # Browser dashboards (evolution, benchmark, arena)
 ├── cross-platform/            # Generated adapters (MCP, LangChain, CrewAI, OpenAI)
-├── tests/                     # 127 tests, 80%+ coverage
-├── scripts/                   # CLI entry points
+├── packages/                  # Standalone packages (de-slop-cli)
 ├── docs/                      # Documentation site (GitHub Pages)
-└── .github/workflows/         # CI/CD (lint, test, security, release)
+├── scripts/                   # CLI entry points and utilities
+├── tests/                     # Test suite
+└── .github/workflows/         # CI/CD (lint, test, security, eval, release)
 ```
 
 ## Security
@@ -184,12 +173,17 @@ All code passes automated security scanning on every push:
 - Dependabot automated dependency updates
 - Prompt injection detection (7 compiled regex patterns)
 - Path traversal protection across all I/O operations
+- Browser arena: CSP, sessionStorage key isolation, rate limiting, input sanitization
 
 Report vulnerabilities to admin@techknowmad.ai. See [SECURITY.md](SECURITY.md).
 
+## Legal
+
+Cortex Research Suite is MIT licensed. Trilogy integration skills are inspired by the architectural patterns of MindSpider, BettaFish, and MiroFish. No code has been copied. See [LEGAL_NOTES.md](LEGAL_NOTES.md).
+
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide. All PRs require:
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide including how to add new skills. All PRs require:
 
 - Passing CI checks (bandit, lint, tests)
 - One approving review

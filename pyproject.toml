@@ -68,6 +68,9 @@ cortex-research = "scripts.run_research:main"
 [tool.setuptools.packages.find]
 include = ["cortex*"]
 
+[tool.setuptools.package-data]
+"*" = ["ARENA.md", "SKILL.md", "*.yaml", "*.json", "*.html"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
