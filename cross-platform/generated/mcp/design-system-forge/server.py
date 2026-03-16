@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = FastMCP(name="design-system-forge", version="1.0.0")
+mcp = FastMCP(name="design-system-forge", version="1.1.0")
 
 @mcp.tool()
 async def generate_design_system(

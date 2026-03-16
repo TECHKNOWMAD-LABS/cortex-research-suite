@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = FastMCP(name="mlops-standards", version="1.0.0")
+mcp = FastMCP(name="mlops-standards", version="1.1.0")
 
 @mcp.tool()
 async def audit_mlops(

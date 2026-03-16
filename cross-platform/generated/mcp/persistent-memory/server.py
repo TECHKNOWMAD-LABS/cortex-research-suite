@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = FastMCP(name="persistent-memory", version="1.0.0")
+mcp = FastMCP(name="persistent-memory", version="1.1.0")
 
 @mcp.tool()
 async def memory_operation(

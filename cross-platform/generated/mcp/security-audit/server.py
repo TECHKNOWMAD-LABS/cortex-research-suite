@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = FastMCP(name="security-audit", version="1.0.0")
+mcp = FastMCP(name="security-audit", version="1.1.0")
 
 @mcp.tool()
 async def security_scan(

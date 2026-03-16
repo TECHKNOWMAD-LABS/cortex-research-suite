@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = FastMCP(name="code-review-engine", version="1.0.0")
+mcp = FastMCP(name="code-review-engine", version="1.1.0")
 
 @mcp.tool()
 async def review_code(

@@ -13,7 +13,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-mcp = FastMCP(name="research-workflow", version="1.0.0")
+mcp = FastMCP(name="research-workflow", version="1.1.0")
 
 @mcp.tool()
 async def design_experiment(

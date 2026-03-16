@@ -119,6 +119,7 @@
 <script>
 let entries = [];
 let fitnessChart, populationChart, skillFitnessChart, eventsChart;
+function escHtml(s){const d=document.createElement('div');d.textContent=String(s);return d.innerHTML;}
 
 // File loading
 const dropZone = document.getElementById('drop-zone');
@@ -292,9 +293,9 @@ function renderTable() {
     const f = (e.mean_fitness || 0);
     const badge = f >= 0.7 ? 'good' : f >= 0.5 ? 'warn' : 'bad';
     return `<tr>
-      <td>${e.cycle_id || '--'}</td>
-      <td><span class="badge badge-${badge}">${(f*100).toFixed(1)}%</span></td>
-      <td>${e.active_skills || '--'}</td>
+      <td>${escHtml(e.cycle_id || '--')}</td>
+      <td><span class="badge badge-${escHtml(badge)}">${(f*100).toFixed(1)}%</span></td>
+      <td>${escHtml(e.active_skills || '--')}</td>
       <td>${e.mutants_created || 0}</td>
       <td>${e.culled || 0}</td>
       <td>${(e.elapsed_seconds || 0).toFixed(1)}s</td>

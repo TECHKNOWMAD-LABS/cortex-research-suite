@@ -105,6 +105,7 @@
 const DIMS = ['accuracy','reasoning','completeness','hallucination_risk','coherence'];
 let allData = {}; // skill -> BenchmarkResult[]
 let radarChart, fitnessChart;
+function escHtml(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}
 
 // -- File loading --
 const dropZone = document.getElementById('drop-zone');
@@ -178,7 +179,7 @@ function render() {
   // Radar skill selector
   const sel = document.getElementById('radar-skill');
   const prev = sel.value;
-  sel.innerHTML = skills.map(s => `<option value="${s}" ${s===prev?'selected':''}>${s}</option>`).join('');
+  sel.innerHTML = skills.map(s => `<option value="${escHtml(s)}" ${s===prev?'selected':''}>${escHtml(s)}</option>`).join('');
   updateRadar();
   updateFitness();
   updateLeaderboard();
@@ -252,10 +253,10 @@ function updateLeaderboard() {
     const badge = overall >= 0.7 ? 'good' : overall >= 0.5 ? 'warn' : 'bad';
     const statusText = overall >= 0.7 ? 'Passing' : overall >= 0.5 ? 'Warning' : 'Failing';
     return `<tr>
-      <td><strong>${s}</strong></td>
+      <td><strong>${escHtml(s)}</strong></td>
       ${DIMS.map(d => `<td>${(da[d]||0).toFixed(1)}</td>`).join('')}
       <td><strong>${(overall*100).toFixed(1)}%</strong></td>
-      <td><span class="badge badge-${badge}">${statusText}</span></td>
+      <td><span class="badge badge-${escHtml(badge)}">${escHtml(statusText)}</span></td>
     </tr>`;
   }).join('');
 }
