@@ -3,7 +3,7 @@
 Multi-agent workflow orchestration with dependency resolution, parallel execution, and fault-tolerant task routing. Coordinates complex pipelines where multiple agents collaborate on compound tasks.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: agent-orchestrator v1.0.0
+Skill: agent-orchestrator v1.2.0
 """
 
 import os

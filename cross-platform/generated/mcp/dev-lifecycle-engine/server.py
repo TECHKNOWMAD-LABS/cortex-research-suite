@@ -3,7 +3,7 @@
 Manages the full software development lifecycle from planning through deployment. Tracks phases, gates, artifacts, and provides automated status reporting across the entire pipeline.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: dev-lifecycle-engine v1.0.0
+Skill: dev-lifecycle-engine v1.2.0
 """
 
 import os

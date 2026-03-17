@@ -1,6 +1,6 @@
 [project]
 name = "security-audit-mcp"
-version = "1.0.0"
+version = "1.2.0"
 description = "Automated security scanning for code repositories. Runs bandit (Python SAST), semgrep (multi-language static analysis), and secret detection to produce machine-readable reports."
 requires-python = ">=3.12"
 dependencies = ["fastmcp~=3.1.0", "python-dotenv~=1.0.0", "bandit~=1.7.0"]

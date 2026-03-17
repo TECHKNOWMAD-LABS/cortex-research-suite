@@ -3,7 +3,7 @@
 Live web scraping with Scrapling for social signals, academic evidence, and forum analysis.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: web-intelligence v1.0.0
+Skill: web-intelligence v1.2.0
 """
 
 import os

@@ -3,7 +3,7 @@
 Pre-packaging validation pipeline for Claude Code skills. Validates structure, checks references, verifies scripts, and ensures packaging readiness before .skill file creation.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: pre-package-pipeline v1.0.0
+Skill: pre-package-pipeline v1.2.0
 """
 
 import os

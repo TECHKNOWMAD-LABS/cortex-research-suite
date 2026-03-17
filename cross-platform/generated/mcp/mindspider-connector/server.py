@@ -3,7 +3,7 @@
 Live social listening feed connector. Pulls trending topics from social platforms with sentiment analysis.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: mindspider-connector v1.0.0
+Skill: mindspider-connector v1.2.0
 """
 
 import os

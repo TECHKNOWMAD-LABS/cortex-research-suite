@@ -12,7 +12,7 @@ Resolution: 1920x1080
 
 **Narration:**
 
-"Cortex Research Suite is a Python framework with 26 research skills that evolve autonomously. Let me show you what that means in practice."
+"Cortex Research Suite is a Python framework with 27 research skills that evolve autonomously. Let me show you what that means in practice."
 
 **Action:**
 

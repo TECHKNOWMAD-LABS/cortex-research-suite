@@ -24,7 +24,7 @@ Works with Claude Code natively. Also supports LangChain, CrewAI, and OpenAI via
 
 - **Skills are the unit of evolution, not prompts.** A skill includes its prompt, its tool chain, its evaluation criteria, and its mutation rules. Evolution operates on all of these simultaneously.
 - **The evaluation lab is deterministic and auditable.** Every skill run produces a scored trace. You can diff two skill versions the way you diff code.
-- **It is a research tool, not a chatbot wrapper.** The 26 base skills cover specific research workflows: systematic literature review, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
+- **It is a research tool, not a chatbot wrapper.** The 27 base skills cover specific research workflows: systematic literature review, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
 
 ## Technical Details
 

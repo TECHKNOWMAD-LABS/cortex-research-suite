@@ -3,7 +3,7 @@
 AI-generated writing pattern detection and removal. Scans for emoji in headers, hyperbolic language, buzzword stacking, and other LLM artifacts.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: de-slop v1.0.0
+Skill: de-slop v1.2.0
 """
 
 import os

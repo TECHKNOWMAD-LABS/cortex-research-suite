@@ -3,7 +3,7 @@
 Context window optimization and prompt context management for efficient LLM usage.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: context-engineer v1.0.0
+Skill: context-engineer v1.2.0
 """
 
 import os

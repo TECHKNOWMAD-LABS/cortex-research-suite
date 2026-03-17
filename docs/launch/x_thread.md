@@ -22,7 +22,7 @@ But research quality degrades. Sources change. Domains shift. Your "good enough"
 
 **Tweet 3 (Layer 1 -- Foundation)**
 
-Layer 1: 26 core research skills + an evaluation lab.
+Layer 1: 27 core research skills + an evaluation lab.
 
 Literature review, patent analysis, competitive intelligence, PESTEL, stakeholder mapping -- each skill is scored on accuracy, depth, and relevance after every run.
 

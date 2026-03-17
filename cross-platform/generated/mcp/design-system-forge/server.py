@@ -3,7 +3,7 @@
 Design system generation and component library scaffolding with tokens, themes, and documentation.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: design-system-forge v1.0.0
+Skill: design-system-forge v1.2.0
 """
 
 import os

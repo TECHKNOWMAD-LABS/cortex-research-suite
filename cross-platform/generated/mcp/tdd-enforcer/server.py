@@ -3,7 +3,7 @@
 Enforces test-driven development workflow. Validates that tests exist before implementation, checks coverage thresholds, detects test anti-patterns, and blocks commits without adequate test coverage.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: tdd-enforcer v1.0.0
+Skill: tdd-enforcer v1.2.0
 """
 
 import os

@@ -3,7 +3,7 @@
 Experiment design and research methodology for AI/ML research projects with hypothesis generation and evaluation frameworks.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: research-workflow v1.0.0
+Skill: research-workflow v1.2.0
 """
 
 import os

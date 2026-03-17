@@ -8,7 +8,7 @@ tags: python, ai, opensource, machinelearning
 
 Most AI agent frameworks treat skills as static artifacts. You write a prompt, test it, ship it, and revisit it when something breaks. But research is not static. Sources change. Domains shift. The competitive intelligence skill you tuned last month is silently degrading today.
 
-We built Cortex Research Suite to address this. It is a Python framework with 26 research skills that autonomously evolve through a competition-based arena system. The core insight comes from Karpathy's autoresearch pattern: treat skills as organisms, let them compete, and let the best variants survive.
+We built Cortex Research Suite to address this. It is a Python framework with 27 research skills that autonomously evolve through a competition-based arena system. The core insight comes from Karpathy's autoresearch pattern: treat skills as organisms, let them compete, and let the best variants survive.
 
 The project is open source under MIT license, built by TECHKNOWMAD LABS.
 
@@ -20,7 +20,7 @@ The architecture is organized into five layers, each building on the one below.
 
 ### Layer 1: Foundation -- Core Skills and Evaluation Lab
 
-The base layer provides 26 research skills covering specific workflows: systematic literature review, patent landscape analysis, competitive intelligence, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
+The base layer provides 27 research skills covering specific workflows: systematic literature review, patent landscape analysis, competitive intelligence, PESTEL analysis, technology readiness assessment, stakeholder mapping, and more.
 
 Every skill execution passes through an evaluation lab that scores outputs on three dimensions: accuracy, depth, and relevance. These scores are deterministic and produce JSON traces that can be diffed like code.
 

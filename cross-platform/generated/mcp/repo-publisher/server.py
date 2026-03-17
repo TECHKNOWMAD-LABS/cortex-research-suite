@@ -3,7 +3,7 @@
 Pre-publish pipeline for GitHub repositories. Chains security scanning, AI slop detection, structure validation, and repo metadata updates into a single workflow.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: repo-publisher v1.0.0
+Skill: repo-publisher v1.2.0
 """
 
 import os

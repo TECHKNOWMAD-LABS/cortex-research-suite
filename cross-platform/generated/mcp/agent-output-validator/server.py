@@ -3,7 +3,7 @@
 Validates AI agent outputs against schema contracts, quality thresholds, and safety constraints. Catches hallucinations, schema violations, and drift before outputs reach production.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: agent-output-validator v1.0.0
+Skill: agent-output-validator v1.2.0
 """
 
 import os

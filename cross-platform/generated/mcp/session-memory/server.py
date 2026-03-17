@@ -3,7 +3,7 @@
 Lightweight session-scoped memory with checkpoint and restore. Captures working state snapshots that persist across context window resets within a single session.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: session-memory v1.0.0
+Skill: session-memory v1.2.0
 """
 
 import os

@@ -3,7 +3,7 @@
 Test framework for Claude Code skills. Runs structured test suites against skills, validates outputs, measures performance, and generates coverage reports.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: skill-test-harness v1.0.0
+Skill: skill-test-harness v1.2.0
 """
 
 import os

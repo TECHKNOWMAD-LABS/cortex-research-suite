@@ -3,7 +3,7 @@
 Creates snapshot-based diffs of file system state. Captures before/after snapshots and generates structured change reports showing additions, deletions, and modifications.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: diff-generator v1.0.0
+Skill: diff-generator v1.2.0
 """
 
 import os

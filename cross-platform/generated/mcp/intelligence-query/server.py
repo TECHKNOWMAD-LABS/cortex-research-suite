@@ -3,7 +3,7 @@
 Multi-source intelligence analysis engine. Queries knowledge base for evidence, cross-references sources, and flags contradictions.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: intelligence-query v1.0.0
+Skill: intelligence-query v1.2.0
 """
 
 import os

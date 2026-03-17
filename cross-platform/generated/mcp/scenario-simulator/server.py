@@ -3,7 +3,7 @@
 Swarm-based what-if scenario simulation. Runs multi-persona scenario simulations with counterfactual analysis.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: scenario-simulator v1.0.0
+Skill: scenario-simulator v1.2.0
 """
 
 import os

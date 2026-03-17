@@ -3,7 +3,7 @@
 ML operations best practices enforcement covering experiment tracking, model versioning, CI/CD for ML, and deployment standards.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: mlops-standards v1.0.0
+Skill: mlops-standards v1.2.0
 """
 
 import os

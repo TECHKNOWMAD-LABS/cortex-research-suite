@@ -3,7 +3,7 @@
 Prompt engineering and optimization. Analyzes, improves, and tests prompts for AI/ML tasks and agent systems.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: prompt-architect v1.0.0
+Skill: prompt-architect v1.2.0
 """
 
 import os

@@ -3,7 +3,7 @@
 Cross-modal content analysis for text, image, and video. Detects content types and synthesizes findings across modalities.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: multimodal-analyst v1.0.0
+Skill: multimodal-analyst v1.2.0
 """
 
 import os

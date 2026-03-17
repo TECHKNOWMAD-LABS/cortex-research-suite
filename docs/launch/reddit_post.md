@@ -10,7 +10,7 @@
 
 **Body:**
 
-Sharing a project we have been working on. Cortex Research Suite is a Python framework with 26 research skills (literature review, patent analysis, competitive intelligence, PESTEL, stakeholder mapping, etc.) that can autonomously evolve through a competition-based arena system.
+Sharing a project we have been working on. Cortex Research Suite is a Python framework with 27 research skills (literature review, patent analysis, competitive intelligence, PESTEL, stakeholder mapping, etc.) that can autonomously evolve through a competition-based arena system.
 
 **The core idea:**
 

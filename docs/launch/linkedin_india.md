@@ -12,7 +12,7 @@ Research skills that do not stay static. They compete in an evaluation arena, mu
 
 **The 5-layer architecture:**
 
-- Foundation: 26 core research skills + deterministic evaluation lab
+- Foundation: 27 core research skills + deterministic evaluation lab
 - Evolution: Skill Organism with arena-based competition (ARENA.md)
 - Data: MindSpider connector for live data ingestion and social listening
 - Intelligence: Multi-source cross-referencing with contradiction detection

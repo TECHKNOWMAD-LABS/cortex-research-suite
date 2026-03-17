@@ -115,7 +115,7 @@ From actual evolution run on 27-skill ecosystem (v1.2.0, includes 5 trilogy inte
 
 ```
 EVOLUTION CYCLE COMPLETE — 0.03s
-  Skills observed: 26
+  Skills observed: 27
   Culled: 7
   Promoted: 1
   Offspring: 2

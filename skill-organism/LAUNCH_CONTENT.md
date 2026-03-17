@@ -14,7 +14,7 @@ Every invocation is natural selection. Weak implementations die. Strong ones bre
 (265 chars)
 
 ### Tweet 3 (Technical Specifics)
-26 autonomous skills organized across 7 categories. Each one has a fitness score. The system runs eval cycles every 0.03 seconds. You don't manage skills. Evolution does. 5 new trilogy integration skills just landed.
+27 autonomous skills organized across 7 categories. Each one has a fitness score. The system runs eval cycles every 0.03 seconds. You don't manage skills. Evolution does. 5 new trilogy integration skills just landed.
 
 Skills that work survive. Skills that fail get replaced by mutated variants.
 (263 chars)
@@ -120,7 +120,7 @@ Built and deployed a genetic algorithm system for managing autonomous skills. It
 Stop versioning skills manually. Let them evolve. You write the skill definition and fitness function. The system handles mutation, selection, and reproduction.
 
 **What you get:**
-- 26 pre-built skills across 7 categories (CLI, data processing, orchestration, error handling, trilogy integration, etc.)
+- 27 pre-built skills across 7 categories (CLI, data processing, orchestration, error handling, trilogy integration, etc.)
 - Genetic algorithm lifecycle: evaluate → mutate → select → reproduce → heal
 - 1040+ production invocations logged with measurable fitness convergence
 - 0.03s cycle time for skill evaluation and evolution

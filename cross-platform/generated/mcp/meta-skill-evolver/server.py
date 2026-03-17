@@ -3,7 +3,7 @@
 Analyzes, improves, and evolves Claude Code skills through automated metrics collection, A/B testing, and iterative refinement. Skills that improve themselves.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: meta-skill-evolver v1.0.0
+Skill: meta-skill-evolver v1.2.0
 """
 
 import os

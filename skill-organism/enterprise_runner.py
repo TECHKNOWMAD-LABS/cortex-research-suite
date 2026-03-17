@@ -30,7 +30,7 @@ sys.path.insert(0, str(SCRIPT_DIR))
 from organism import SkillOrganism, setup_logging  # noqa: E402
 
 # ─── Constants ───────────────────────────────────────────────────
-VERSION = "1.0.0"
+VERSION = "1.2.0"
 LOCKFILE = SCRIPT_DIR / ".evolution.lock"
 BACKUP_DIR = SCRIPT_DIR / "backups"
 LOG_DIR = SCRIPT_DIR / "logs"

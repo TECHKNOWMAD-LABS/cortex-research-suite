@@ -8,7 +8,7 @@ Example:
     >>> organism.evolve()
 """
 
-__version__ = "1.0.0"
+__version__ = "1.2.0"
 __author__ = "TechKnowmad AI"
 __email__ = "admin@techknowmad.ai"
 __license__ = "MIT"

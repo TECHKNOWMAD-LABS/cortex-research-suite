@@ -3,7 +3,7 @@
 GitHub API integration via MCP. Manages repositories, files, branches, pull requests, issues, and releases programmatically without browser automation.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: github-mcp v1.0.0
+Skill: github-mcp v1.2.0
 """
 
 import os

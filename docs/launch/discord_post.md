@@ -10,7 +10,7 @@ Hey everyone,
 
 We just open-sourced Cortex Research Suite and wanted to share it here since it touches a few things this community cares about: skill evolution, evaluation frameworks, and MCP integration.
 
-**What it is:** A Python framework with 26 research skills (literature review, patent analysis, competitive intelligence, PESTEL, etc.) that can autonomously evolve and improve through a competition-based arena system.
+**What it is:** A Python framework with 27 research skills (literature review, patent analysis, competitive intelligence, PESTEL, etc.) that can autonomously evolve and improve through a competition-based arena system.
 
 **The interesting part:** Skills are not static. We implemented an autoresearch pattern (inspired by Karpathy's work) where skills fork, mutate their prompts and tool configurations, compete head-to-head in an evaluation arena, and the best variants survive. You can set this running overnight and come back to measurably improved skill performance.
 

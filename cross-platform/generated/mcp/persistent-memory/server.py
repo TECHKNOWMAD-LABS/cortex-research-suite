@@ -3,7 +3,7 @@
 SQLite-backed persistent memory with FTS5 full-text search for cross-session knowledge retention.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: persistent-memory v1.0.0
+Skill: persistent-memory v1.2.0
 """
 
 import os

@@ -3,7 +3,7 @@
 Automated code review with multi-dimensional analysis: correctness, security, performance, maintainability, and style. Produces structured findings with severity, location, and suggested fixes.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: code-review-engine v1.0.0
+Skill: code-review-engine v1.2.0
 """
 
 import os

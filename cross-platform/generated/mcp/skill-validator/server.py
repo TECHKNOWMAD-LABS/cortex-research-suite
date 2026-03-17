@@ -3,7 +3,7 @@
 Validates Claude Code skill structure, frontmatter, scripts, and references against the canonical skill specification. Catches errors before packaging.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: skill-validator v1.0.0
+Skill: skill-validator v1.2.0
 """
 
 import os

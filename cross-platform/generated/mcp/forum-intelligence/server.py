@@ -3,7 +3,7 @@
 Forum thread analysis with coordination detection. Analyzes forum threads for viewpoints, coordination patterns, and emerging consensus.
 
 Auto-generated MCP server from TECHKNOWMAD Universal Skill Manifest.
-Skill: forum-intelligence v1.0.0
+Skill: forum-intelligence v1.2.0
 """
 
 import os
