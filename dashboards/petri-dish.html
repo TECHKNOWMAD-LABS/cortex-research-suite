@@ -127,12 +127,113 @@ function pP(){if(aOk)try{syn.p?.triggerAttackRelease("C2","2n")}catch(e){}}
 const mkP=(x,y,col,life=50)=>({x,y,col,vx:(Math.random()-0.5)*3.5,vy:(Math.random()-0.5)*3.5,life,ml:life,r:1.5+Math.random()*3});
 function drawP(ctx,p){p.x+=p.vx;p.y+=p.vy;p.vx*=0.96;p.vy*=0.96;p.life--;const a=p.life/p.ml;ctx.beginPath();ctx.arc(p.x,p.y,p.r*a,0,6.283);ctx.fillStyle=p.col.replace(/[\d.]+\)$/,a+")");ctx.fill()}
 
-// CLAUDE API
-async function judge(fd){
+// ═══ JUDGE SYSTEM — Multi-provider + Synthetic ═══
+const JUDGE_PROVIDERS={
+  synthetic:{name:"Synthetic",needsKey:false},
+  anthropic:{name:"Claude (Anthropic)",needsKey:true,keyLabel:"Anthropic API Key",keyPrefix:"sk-ant-"},
+  openai:{name:"GPT (OpenAI)",needsKey:true,keyLabel:"OpenAI API Key",keyPrefix:"sk-"},
+  custom:{name:"Custom API",needsKey:true,keyLabel:"API Key",keyPrefix:""}
+};
+
+function buildJudgePrompt(fd){
   const t5=[...fd.sk].sort((a,b)=>b.f-a.f).slice(0,5);
   const b3=[...fd.sk].sort((a,b)=>a.f-b.f).slice(0,3);
-  const pr=`Evaluate AI skill evolution at generation ${fd.g}. Mean=${fd.mn}, Max=${fd.mx}, Min=${fd.mi}. Top: ${t5.map((s,i)=>`${i+1}.${s.id}(${s.f.toFixed(3)})`).join(" ")}. Bottom: ${b3.map(s=>`${s.id}(${s.f.toFixed(3)})`).join(" ")}. Events: ${fd.ev.length}. Rate ecosystem health 0-1. JSON only: {"score":0.XX,"note":"max 12 words"}`;
-  try{const resp=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:80,messages:[{role:"user",content:pr}]})});const d=await resp.json();const t=(d.content?.[0]?.text||"").trim();return t.startsWith("{")?JSON.parse(t):{score:0.5,note:"Parse failed"}}catch(e){return{score:0.5,note:"API unavailable"}}
+  return `Evaluate AI skill evolution at generation ${fd.g}. Mean=${fd.mn}, Max=${fd.mx}, Min=${fd.mi}. Top: ${t5.map((s,i)=>`${i+1}.${s.id}(${s.f.toFixed(3)})`).join(" ")}. Bottom: ${b3.map(s=>`${s.id}(${s.f.toFixed(3)})`).join(" ")}. Events: ${fd.ev.length}. Rate ecosystem health 0-1. Respond with ONLY valid JSON, no markdown: {"score":0.XX,"note":"max 12 words"}`;
+}
+
+function extractJSON(text){
+  if(!text)return null;
+  text=text.trim();
+  // Strip markdown code fences
+  const fenced=text.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if(fenced)text=fenced[1].trim();
+  // Find first balanced { ... } block (handles nested braces)
+  const si=text.indexOf("{");if(si===-1)return null;
+  let depth=0,ei=-1;for(let i=si;i<text.length;i++){if(text[i]==="{")depth++;if(text[i]==="}")depth--;if(depth===0){ei=i;break}}
+  if(ei===-1)return null;const m=[text.slice(si,ei+1)];
+  try{
+    const obj=JSON.parse(m[0]);
+    if(typeof obj.score==="number")return obj;
+    // Normalize alternate key names
+    if(typeof obj.health_score==="number")return{score:obj.health_score,note:obj.assessment||obj.note||""};
+    return null;
+  }catch(e){return null}
+}
+
+function syntheticJudge(fd){
+  const fits=fd.sk.map(s=>s.f);
+  const mean=fits.reduce((a,b)=>a+b)/fits.length;
+  const std=Math.sqrt(fits.reduce((a,v)=>a+(v-mean)**2,0)/fits.length);
+  const diversity=std/Math.max(mean,0.01);
+  const spread=fd.mx-fd.mi;
+  const convergence=1-spread;
+  // Healthy ecosystem: moderate mean, good diversity, not fully converged
+  const health=Math.min(0.95,Math.max(0.1,mean*0.5+diversity*1.2+(1-convergence)*0.3));
+  const notes=[
+    diversity>0.15?"High diversity":"Low diversity",
+    mean>0.6?"Strong mean fitness":"Moderate fitness",
+    spread>0.3?"Wide spread":"Tight cluster",
+    fd.ev.some(e=>e.t==="paradigm")?"Post-paradigm shift":"Stable landscape",
+    fd.ev.some(e=>e.t==="ext")?"Post-extinction recovery":"No recent extinction"
+  ];
+  const note=notes.filter((_,i)=>i<2).join(". ");
+  return{score:+health.toFixed(3),note};
+}
+
+async function judgeAnthropic(fd,key){
+  const pr=buildJudgePrompt(fd);
+  const resp=await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:120,messages:[{role:"user",content:pr}]})
+  });
+  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${resp.status}`)}
+  const d=await resp.json();
+  const text=(d.content?.[0]?.text||"").trim();
+  const parsed=extractJSON(text);
+  if(parsed)return parsed;
+  return{score:0.5,note:"Parse failed: "+text.slice(0,40)};
+}
+
+async function judgeOpenAI(fd,key){
+  const pr=buildJudgePrompt(fd);
+  const resp=await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:"gpt-4o-mini",max_tokens:120,response_format:{type:"json_object"},messages:[{role:"system",content:"Respond with valid JSON only."},{role:"user",content:pr}]})
+  });
+  if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${resp.status}`)}
+  const d=await resp.json();
+  const text=(d.choices?.[0]?.message?.content||"").trim();
+  const parsed=extractJSON(text);
+  if(parsed)return parsed;
+  return{score:0.5,note:"Parse failed: "+text.slice(0,40)};
+}
+
+async function judgeCustom(fd,key,endpoint){
+  const pr=buildJudgePrompt(fd);
+  const resp=await fetch(endpoint,{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+    body:JSON.stringify({model:"default",max_tokens:120,messages:[{role:"system",content:"Respond with valid JSON only."},{role:"user",content:pr}]})
+  });
+  if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
+  const d=await resp.json();
+  // Try OpenAI-compatible format first, then Anthropic
+  const text=(d.choices?.[0]?.message?.content||d.content?.[0]?.text||"").trim();
+  const parsed=extractJSON(text);
+  if(parsed)return parsed;
+  return{score:0.5,note:"Parse failed: "+text.slice(0,40)};
+}
+
+async function judge(fd,provider,apiKey,customEndpoint){
+  try{
+    if(provider==="synthetic")return syntheticJudge(fd);
+    if(provider==="anthropic")return await judgeAnthropic(fd,apiKey);
+    if(provider==="openai")return await judgeOpenAI(fd,apiKey);
+    if(provider==="custom")return await judgeCustom(fd,apiKey,customEndpoint);
+    return syntheticJudge(fd);
+  }catch(e){return{score:0.5,note:e.message?.slice(0,50)||"Judge error"}}
 }
 
 // MAIN COMPONENT
@@ -143,7 +244,15 @@ function CortexPetriDish(){
   const [sel,setSel]=useState(null),[mR,setMR]=useState(0.3),[sP,setSP]=useState(0.2),[cF,setCF]=useState(25);
   const [cfg,setCfg]=useState(false),[evts,setEvts]=useState([]),[err,setErr]=useState(null);
   const [llm,setLlm]=useState(null),[llmL,setLlmL]=useState(false),[lb,setLb]=useState([]);
+  const [jProv,setJProv]=useState(()=>localStorage.getItem("cpd_judge_provider")||"synthetic");
+  const [jKey,setJKey]=useState(()=>localStorage.getItem("cpd_judge_key")||"");
+  const [jEndpoint,setJEndpoint]=useState(()=>localStorage.getItem("cpd_judge_endpoint")||"");
+  const [jPanel,setJPanel]=useState(false);
   const fIdxR=useRef(0);
+  // Persist judge settings
+  useEffect(()=>{localStorage.setItem("cpd_judge_provider",jProv)},[jProv]);
+  useEffect(()=>{jKey?localStorage.setItem("cpd_judge_key",jKey):localStorage.removeItem("cpd_judge_key")},[jKey]);
+  useEffect(()=>{jEndpoint?localStorage.setItem("cpd_judge_endpoint",jEndpoint):localStorage.removeItem("cpd_judge_endpoint")},[jEndpoint]);
 
   useEffect(()=>{spR.current=speed},[speed]);
 
@@ -153,9 +262,10 @@ function CortexPetriDish(){
 
   const runJ=useCallback(async()=>{
     const log=logR.current;if(!log)return;
+    if(JUDGE_PROVIDERS[jProv]?.needsKey&&!jKey){setJPanel(true);return}
     const cur=gR.current;const frame=log.reduce((b,f)=>Math.abs(f.g-cur)<Math.abs(b.g-cur)?f:b,log[0]);
-    setLlmL(true);const r=await judge(frame);setLlm({gen:frame.g,...r});setLlmL(false);
-  },[]);
+    setLlmL(true);const r=await judge(frame,jProv,jKey,jEndpoint);setLlm({gen:frame.g,provider:jProv,...r});setLlmL(false);
+  },[jProv,jKey,jEndpoint]);
 
   // ANIMATION LOOP (H3 FIX: single persistent loop, ref-only control)
   useEffect(()=>{
@@ -265,7 +375,7 @@ function CortexPetriDish(){
           </div>
           {sel.pA&&<div style={{fontSize:7,color:"#A855F7",marginTop:4}}>Lineage: {sel.pA.split("-")[0]} x {sel.pB.split("-")[0]}</div>}
         </div>}
-        {llm&&<div style={{position:"absolute",top:8,left:"50%",transform:"translateX(-50%)",background:"rgba(8,8,20,0.92)",border:"1px solid #FFD700",borderRadius:7,padding:"5px 12px",fontSize:9,color:"#FFD700",backdropFilter:"blur(8px)"}}>Claude Judge @ Gen {llm.gen.toLocaleString()}: <span style={{fontWeight:700}}>{llm.score}</span> — {llm.note}</div>}
+        {llm&&<div style={{position:"absolute",top:8,left:"50%",transform:"translateX(-50%)",background:"rgba(8,8,20,0.92)",border:`1px solid ${llm.provider==="synthetic"?"#A855F7":"#FFD700"}`,borderRadius:7,padding:"5px 12px",fontSize:9,color:llm.provider==="synthetic"?"#A855F7":"#FFD700",backdropFilter:"blur(8px)",maxWidth:"80%"}}>{JUDGE_PROVIDERS[llm.provider]?.name||"Judge"} @ Gen {llm.gen.toLocaleString()}: <span style={{fontWeight:700}}>{llm.score}</span> — {llm.note}</div>}
       </div>
       <div style={{height:48,background:"rgba(6,6,18,0.96)",borderTop:"1px solid #151525",display:"flex",alignItems:"center",padding:"0 10px",gap:8,flexShrink:0,zIndex:10}}>
         {!started?<>
@@ -278,7 +388,8 @@ function CortexPetriDish(){
           <button onClick={()=>{const n=!playing;setPlaying(n);pR.current=n}} style={{background:playing?"#1a1a2a":"linear-gradient(135deg,#A855F7,#EC4899)",color:"#fff",border:"none",borderRadius:4,padding:"5px 14px",fontSize:9,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>{playing?"PAUSE":"PLAY"}</button>
           <div style={{display:"flex",alignItems:"center",gap:4,fontSize:8}}><span style={{color:"#444"}}>SPEED</span><input type="range" min={1} max={80} value={speed} onChange={e=>{setSpeed(+e.target.value);spR.current=+e.target.value}} style={{width:60,accentColor:"#A855F7"}}/><span style={{color:"#A855F7",fontWeight:600,width:22,fontSize:7}}>{speed}x</span></div>
           <button onClick={()=>{const c=cvs.current;if(c){for(let i=0;i<80;i++)parts.current.push(mkP(c.width/2,c.height/2,"rgba(255,40,40,1)",55))}pE()}} style={{background:"#180808",border:"1px solid rgba(244,63,94,0.2)",borderRadius:4,padding:"4px 8px",fontSize:8,color:"#F43F5E",cursor:"pointer",fontFamily:"inherit"}}>CATACLYSM</button>
-          <button onClick={runJ} disabled={llmL} style={{background:"#080818",border:"1px solid rgba(255,215,0,0.25)",borderRadius:4,padding:"4px 8px",fontSize:8,color:llmL?"#444":"#FFD700",cursor:llmL?"wait":"pointer",fontFamily:"inherit"}}>{llmL?"Judging...":"Claude Judge"}</button>
+          <button onClick={runJ} disabled={llmL} style={{background:"#080818",border:"1px solid rgba(255,215,0,0.25)",borderRadius:"4px 0 0 4px",padding:"4px 8px",fontSize:8,color:llmL?"#444":"#FFD700",cursor:llmL?"wait":"pointer",fontFamily:"inherit"}}>{llmL?"Judging...":(jProv==="synthetic"?"Synthetic Judge":JUDGE_PROVIDERS[jProv]?.name||"Judge")}</button>
+          <button onClick={()=>setJPanel(!jPanel)} style={{background:"#080818",border:"1px solid rgba(255,215,0,0.25)",borderLeft:"none",borderRadius:"0 4px 4px 0",padding:"4px 5px",fontSize:8,color:"#FFD700",cursor:"pointer",fontFamily:"inherit"}}>{jPanel?"\u25B2":"\u25BC"}</button>
           <div style={{marginLeft:"auto",fontSize:8,color:"#444"}}><span style={{color:"#A855F7",fontWeight:600}}>{gen.toLocaleString()}</span>/{total.toLocaleString()}</div>
           <button onClick={()=>{setStarted(false);setPlaying(false);pR.current=false;logR.current=null;evtR.current=[];parts.current=[];gR.current=0;fIdxR.current=0;setGen(0);setEvts([]);setSel(null);setLlm(null);setLb([])}} style={{background:"#0b0b1a",border:"1px solid #1e1e30",borderRadius:4,padding:"4px 8px",fontSize:8,color:"#555",cursor:"pointer",fontFamily:"inherit"}}>RESET</button>
         </>}
@@ -290,6 +401,31 @@ function CortexPetriDish(){
           <div><div style={{display:"flex",justifyContent:"space-between",color:"#555"}}><span>Catastrophe Every</span><span style={{color:"#fff"}}>{cF} gens</span></div><input type="range" min={10} max={200} step={5} value={cF} onChange={e=>setCF(+e.target.value)} style={{width:"100%",accentColor:"#F43F5E"}}/></div>
         </div>
         <div style={{fontSize:6,color:"#333",marginTop:6}}>Red Queen decay prevents convergence. Paradigm shifts reset landscape every 800-2000 gens. 2% innovation burst chance.</div>
+      </div>}
+      {jPanel&&started&&<div style={{position:"absolute",bottom:52,left:"50%",transform:"translateX(-50%)",background:"rgba(6,6,18,0.96)",border:"1px solid rgba(255,215,0,0.2)",borderRadius:7,padding:12,width:320,backdropFilter:"blur(10px)",zIndex:25}}>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}><span style={{fontSize:9,color:"#FFD700",fontWeight:700,letterSpacing:1}}>JUDGE SETTINGS</span><span onClick={()=>setJPanel(false)} style={{cursor:"pointer",color:"#444",fontSize:10}}>x</span></div>
+        <div style={{display:"grid",gap:8,fontSize:8}}>
+          <div>
+            <div style={{color:"#555",marginBottom:3}}>Provider</div>
+            <div style={{display:"flex",gap:4,flexWrap:"wrap"}}>
+              {Object.entries(JUDGE_PROVIDERS).map(([k,v])=><button key={k} onClick={()=>setJProv(k)} style={{background:jProv===k?"rgba(255,215,0,0.15)":"#080818",border:`1px solid ${jProv===k?"#FFD700":"#1e1e30"}`,borderRadius:4,padding:"3px 8px",fontSize:7,color:jProv===k?"#FFD700":"#555",cursor:"pointer",fontFamily:"inherit"}}>{v.name}</button>)}
+            </div>
+          </div>
+          {JUDGE_PROVIDERS[jProv]?.needsKey&&<div>
+            <div style={{color:"#555",marginBottom:3}}>{JUDGE_PROVIDERS[jProv].keyLabel}</div>
+            <input type="password" value={jKey} onChange={e=>setJKey(e.target.value)} placeholder={JUDGE_PROVIDERS[jProv].keyPrefix+"..."} style={{width:"100%",background:"#080818",border:"1px solid #1e1e30",borderRadius:3,color:"#fff",padding:"4px 6px",fontSize:8,fontFamily:"inherit"}}/>
+            <div style={{fontSize:6,color:"#333",marginTop:2}}>Stored in localStorage. Never sent to our servers.</div>
+          </div>}
+          {jProv==="custom"&&<div>
+            <div style={{color:"#555",marginBottom:3}}>API Endpoint (OpenAI-compatible)</div>
+            <input type="text" value={jEndpoint} onChange={e=>setJEndpoint(e.target.value)} placeholder="https://your-api.com/v1/chat/completions" style={{width:"100%",background:"#080818",border:"1px solid #1e1e30",borderRadius:3,color:"#fff",padding:"4px 6px",fontSize:8,fontFamily:"inherit"}}/>
+          </div>}
+          <div style={{fontSize:6,color:"#333",borderTop:"1px solid #151525",paddingTop:5}}>
+            <b style={{color:"#555"}}>Synthetic</b> — Free, instant, algorithmic scoring based on population statistics. No API needed.<br/>
+            <b style={{color:"#555"}}>Claude / GPT</b> — Real LLM evaluation. Requires API key. ~$0.001/judgment.<br/>
+            <b style={{color:"#555"}}>Custom</b> — Any OpenAI-compatible endpoint (Ollama, LM Studio, vLLM, etc).
+          </div>
+        </div>
       </div>}
       {!started&&<div style={{position:"absolute",top:8,right:8,background:"rgba(6,6,18,0.85)",border:"1px solid #151525",borderRadius:7,padding:7,width:180,backdropFilter:"blur(6px)"}}>
         <div style={{fontSize:7,color:"#444",letterSpacing:1,marginBottom:4}}>NOTABLE SEEDS</div>
