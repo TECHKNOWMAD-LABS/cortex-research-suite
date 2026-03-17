@@ -30,7 +30,7 @@ except ImportError:
 # Constants
 # ---------------------------------------------------------------------------
 
-USER_AGENT = "cortex-research-suite/1.2.0"
+USER_AGENT = "cortex-research-suite/1.3.0"
 SCHOLAR_TIMEOUT = 15
 API_TIMEOUT = 15
 SCHOLAR_RATE_LIMIT = 3.0

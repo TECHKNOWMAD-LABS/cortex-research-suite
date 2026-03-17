@@ -183,7 +183,7 @@ Phase 4: Documentation (Week 9)
 
 ## Metadata
 - **Skill ID**: `tkm-research-workflow`
-- **Version**: 1.2.0
+- **Version**: 1.3.0
 - **Author**: TechKnowmad AI <admin@techknowmad.ai>
 - **License**: MIT
 - **Last Updated**: 2026-03-15

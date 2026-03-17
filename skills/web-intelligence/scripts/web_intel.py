@@ -42,7 +42,7 @@ except ImportError:
 # Constants
 # ---------------------------------------------------------------------------
 
-USER_AGENT = "cortex-research-suite/1.2.0"
+USER_AGENT = "cortex-research-suite/1.3.0"
 DEFAULT_TIMEOUT = 15
 MAX_PAGE_SIZE = 50 * 1024  # 50KB
 MAX_PAGES_DEFAULT = 10

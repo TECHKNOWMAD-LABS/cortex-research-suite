@@ -151,7 +151,7 @@ For prompts used in pipelines (high frequency, cost-sensitive):
 
 ## Metadata
 - **Skill ID**: `tkm-prompt-architect`
-- **Version**: 1.2.0
+- **Version**: 1.3.0
 - **Author**: TechKnowmad AI <admin@techknowmad.ai>
 - **License**: MIT
 - **Last Updated**: 2026-03-15

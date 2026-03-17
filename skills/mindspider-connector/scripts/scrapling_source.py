@@ -27,7 +27,7 @@ except ImportError:
 # Constants
 # ---------------------------------------------------------------------------
 
-USER_AGENT = "cortex-research-suite/1.2.0"
+USER_AGENT = "cortex-research-suite/1.3.0"
 REQUEST_TIMEOUT = 10
 RATE_LIMIT_SECONDS = 1.0
 

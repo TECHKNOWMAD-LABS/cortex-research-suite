@@ -223,7 +223,7 @@ Tag release
 
 ## Metadata
 - **Skill ID**: `tkm-mlops-standards`
-- **Version**: 1.2.0
+- **Version**: 1.3.0
 - **Author**: TechKnowmad AI <admin@techknowmad.ai>
 - **License**: MIT
 - **Last Updated**: 2026-03-15

@@ -111,7 +111,7 @@ python enterprise_runner.py  # Production mode
 
 ## Live Results
 
-From actual evolution run on 27-skill ecosystem (v1.2.0, includes 5 trilogy integration skills + web-intelligence):
+From actual evolution run on 27-skill ecosystem (v1.3.0, includes 5 trilogy integration skills + web-intelligence):
 
 ```
 EVOLUTION CYCLE COMPLETE — 0.03s
