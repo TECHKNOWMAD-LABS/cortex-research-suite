@@ -199,7 +199,7 @@ See [OVERNIGHT_USAGE.md](OVERNIGHT_USAGE.md) for autonomous evolution setup.
 ```
 cortex-research-suite/
 ├── cortex/                    # Python framework (pip install -e .)
-├── skills/                    # 26 autonomous skills (SKILL.md + ARENA.md + scripts/)
+├── skills/                    # 27 autonomous skills (SKILL.md + ARENA.md + scripts/)
 ├── skill-organism/            # Skill evolution engine
 ├── knowledge/                 # Knowledge store (FTS5 + GraphRAG)
 ├── experiments/               # Experiment tracker (SQLite)

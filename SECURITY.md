@@ -43,7 +43,7 @@ We follow a coordinated disclosure approach. Please allow 90 days from initial r
 - Vulnerabilities in third-party services
 - Issues already publicly disclosed
 
-## Trilogy integration security (v1.2.0)
+## Trilogy integration security (v1.3.0)
 
 ### mindspider-connector
 - SQL queries use parameterised placeholders (pymysql %s) — never f-strings or string concatenation

@@ -96,7 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `datasets/mindspider/DATA_NOTICE.md`: Data handling policy with GDPR/DPDP Act 2023 awareness
 - `SECURITY.md`: 7 new subsections for trilogy skills and browser arena
 - `CONTRIBUTING.md`: Skill creation guide with directory structure, ARENA.md setup, eval/evolution commands
-- `docs/SKILL_REGISTRY.md`: Full registry of 26 skills with trilogy integration guide
+- `docs/SKILL_REGISTRY.md`: Full registry of 27 skills with trilogy integration guide
 - `docs/launch/`: 7 launch content files (Show HN, X thread, Discord, Dev.to, LinkedIn India, Reddit, demo script)
 - `OVERNIGHT_USAGE.md`: Autonomous evolution setup documentation
 

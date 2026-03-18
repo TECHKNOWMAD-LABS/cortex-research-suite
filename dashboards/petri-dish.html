@@ -21,9 +21,10 @@
 const { useState, useEffect, useRef, useCallback } = React;
 
 /* ═══════════════════════════════════════════════════════════════
-   CORTEX PETRI DISH v2.0 — Enterprise Grade
+   CORTEX PETRI DISH v2.1 — Enterprise Grade, Cross-Platform
    27 AI skills × 10,000 generations × Darwinian evolution
-   All 12 v1 bugs fixed. Claude API for LLM-as-Judge.
+   8 judge providers: Synthetic, Claude, GPT, Groq, Together,
+   Ollama, LM Studio, Custom. Robust parse with fallback.
    ═══════════════════════════════════════════════════════════════ */
 
 // SEEDED PRNG (Mulberry32 — deterministic per seed)
@@ -127,37 +128,87 @@ function pP(){if(aOk)try{syn.p?.triggerAttackRelease("C2","2n")}catch(e){}}
 const mkP=(x,y,col,life=50)=>({x,y,col,vx:(Math.random()-0.5)*3.5,vy:(Math.random()-0.5)*3.5,life,ml:life,r:1.5+Math.random()*3});
 function drawP(ctx,p){p.x+=p.vx;p.y+=p.vy;p.vx*=0.96;p.vy*=0.96;p.life--;const a=p.life/p.ml;ctx.beginPath();ctx.arc(p.x,p.y,p.r*a,0,6.283);ctx.fillStyle=p.col.replace(/[\d.]+\)$/,a+")");ctx.fill()}
 
-// ═══ JUDGE SYSTEM — Multi-provider + Synthetic ═══
+// ═══ JUDGE SYSTEM — Multi-provider + Cross-Platform ═══
 const JUDGE_PROVIDERS={
   synthetic:{name:"Synthetic",needsKey:false},
   anthropic:{name:"Claude (Anthropic)",needsKey:true,keyLabel:"Anthropic API Key",keyPrefix:"sk-ant-"},
   openai:{name:"GPT (OpenAI)",needsKey:true,keyLabel:"OpenAI API Key",keyPrefix:"sk-"},
+  ollama:{name:"Ollama (Local)",needsKey:false,keyLabel:"",keyPrefix:""},
+  lmstudio:{name:"LM Studio",needsKey:false,keyLabel:"",keyPrefix:""},
+  groq:{name:"Groq",needsKey:true,keyLabel:"Groq API Key",keyPrefix:"gsk_"},
+  together:{name:"Together AI",needsKey:true,keyLabel:"Together API Key",keyPrefix:""},
   custom:{name:"Custom API",needsKey:true,keyLabel:"API Key",keyPrefix:""}
 };
 
 function buildJudgePrompt(fd){
   const t5=[...fd.sk].sort((a,b)=>b.f-a.f).slice(0,5);
   const b3=[...fd.sk].sort((a,b)=>a.f-b.f).slice(0,3);
-  return `Evaluate AI skill evolution at generation ${fd.g}. Mean=${fd.mn}, Max=${fd.mx}, Min=${fd.mi}. Top: ${t5.map((s,i)=>`${i+1}.${s.id}(${s.f.toFixed(3)})`).join(" ")}. Bottom: ${b3.map(s=>`${s.id}(${s.f.toFixed(3)})`).join(" ")}. Events: ${fd.ev.length}. Rate ecosystem health 0-1. Respond with ONLY valid JSON, no markdown: {"score":0.XX,"note":"max 12 words"}`;
+  return `You are an AI evolution judge. Evaluate this skill ecosystem snapshot.
+
+Generation: ${fd.g}
+Mean fitness: ${fd.mn}, Max: ${fd.mx}, Min: ${fd.mi}
+Top 5: ${t5.map((s,i)=>`${i+1}. ${s.id} (${s.f.toFixed(3)})`).join(", ")}
+Bottom 3: ${b3.map(s=>`${s.id} (${s.f.toFixed(3)})`).join(", ")}
+Events this generation: ${fd.ev.length}
+
+Rate ecosystem health from 0.0 to 1.0. Respond with ONLY this exact JSON format, nothing else:
+{"score": 0.XX, "note": "brief assessment max 12 words"}`;
 }
 
 function extractJSON(text){
   if(!text)return null;
   text=text.trim();
-  // Strip markdown code fences
+  // Strip markdown code fences (```json ... ``` or ``` ... ```)
   const fenced=text.match(/```(?:json)?\s*([\s\S]*?)```/);
   if(fenced)text=fenced[1].trim();
+  // Strip leading/trailing prose around JSON
+  text=text.replace(/^[^{]*(?={)/, '').replace(/}[^}]*$/, '}');
   // Find first balanced { ... } block (handles nested braces)
-  const si=text.indexOf("{");if(si===-1)return null;
+  const si=text.indexOf("{");if(si===-1)return tryRegexFallback(text);
   let depth=0,ei=-1;for(let i=si;i<text.length;i++){if(text[i]==="{")depth++;if(text[i]==="}")depth--;if(depth===0){ei=i;break}}
-  if(ei===-1)return null;const m=[text.slice(si,ei+1)];
-  try{
-    const obj=JSON.parse(m[0]);
-    if(typeof obj.score==="number")return obj;
-    // Normalize alternate key names
-    if(typeof obj.health_score==="number")return{score:obj.health_score,note:obj.assessment||obj.note||""};
-    return null;
-  }catch(e){return null}
+  if(ei===-1)return tryRegexFallback(text);
+  const raw=text.slice(si,ei+1);
+  // Try parsing, with fallback for common LLM quirks
+  const candidates=[
+    raw,
+    raw.replace(/,\s*}/g,'}').replace(/,\s*]/g,']'), // trailing commas
+    raw.replace(/'/g,'"'), // single quotes
+    raw.replace(/(\w+)\s*:/g,'"$1":'), // unquoted keys
+  ];
+  for(const c of candidates){
+    try{
+      const obj=JSON.parse(c);
+      return normalizeJudgeResult(obj);
+    }catch(e){}
+  }
+  return tryRegexFallback(text);
+}
+
+function normalizeJudgeResult(obj){
+  // Direct score field
+  if(typeof obj.score==="number")return{score:Math.max(0,Math.min(1,obj.score)),note:String(obj.note||obj.assessment||obj.comment||obj.explanation||"").slice(0,120)};
+  // String score (LLMs sometimes quote numbers)
+  if(typeof obj.score==="string"&&!isNaN(+obj.score))return{score:Math.max(0,Math.min(1,+obj.score)),note:String(obj.note||obj.assessment||"").slice(0,120)};
+  // Alternate key names from various LLMs
+  const altKeys=["health_score","health","rating","ecosystem_health","fitness","ecosystem_score","overall_score","evaluation"];
+  for(const k of altKeys){
+    const v=obj[k];
+    if(typeof v==="number")return{score:Math.max(0,Math.min(1,v)),note:String(obj.note||obj.assessment||obj.comment||obj.explanation||obj.summary||"").slice(0,120)};
+    if(typeof v==="string"&&!isNaN(+v))return{score:Math.max(0,Math.min(1,+v)),note:String(obj.note||obj.assessment||"").slice(0,120)};
+  }
+  return null;
+}
+
+function tryRegexFallback(text){
+  // Last resort: extract score from unstructured text like "Score: 0.75" or "health: 0.8"
+  const m=text.match(/(?:score|health|rating|fitness)\s*[:=]\s*(0?\.\d+|1\.0|[01])/i);
+  if(m){
+    const score=Math.max(0,Math.min(1,parseFloat(m[1])));
+    // Try to extract a note from remaining text
+    const noteM=text.match(/(?:note|assessment|comment)\s*[:=]\s*"?([^"}\n]{3,60})"?/i);
+    return{score,note:noteM?noteM[1].trim():"LLM response (regex-extracted)"};
+  }
+  return null;
 }
 
 function syntheticJudge(fd){
@@ -180,60 +231,74 @@ function syntheticJudge(fd){
   return{score:+health.toFixed(3),note};
 }
 
+// Anthropic Claude API
 async function judgeAnthropic(fd,key){
   const pr=buildJudgePrompt(fd);
   const resp=await fetch("https://api.anthropic.com/v1/messages",{
     method:"POST",
     headers:{"Content-Type":"application/json","x-api-key":key,"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},
-    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:120,messages:[{role:"user",content:pr}]})
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:200,messages:[{role:"user",content:pr}]})
   });
   if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${resp.status}`)}
   const d=await resp.json();
-  const text=(d.content?.[0]?.text||"").trim();
-  const parsed=extractJSON(text);
-  if(parsed)return parsed;
-  return{score:0.5,note:"Parse failed: "+text.slice(0,40)};
+  return(d.content?.[0]?.text||"").trim();
 }
 
-async function judgeOpenAI(fd,key){
+// OpenAI-compatible API (GPT, Groq, Together, LM Studio, Ollama, custom)
+async function judgeOpenAICompat(fd,key,endpoint,model,extraHeaders={}){
   const pr=buildJudgePrompt(fd);
-  const resp=await fetch("https://api.openai.com/v1/chat/completions",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:"gpt-4o-mini",max_tokens:120,response_format:{type:"json_object"},messages:[{role:"system",content:"Respond with valid JSON only."},{role:"user",content:pr}]})
-  });
+  const headers={"Content-Type":"application/json",...extraHeaders};
+  if(key)headers["Authorization"]="Bearer "+key;
+  const body={model,max_tokens:200,messages:[{role:"system",content:"You are an AI evolution judge. Respond with ONLY valid JSON: {\"score\": 0.XX, \"note\": \"brief text\"}"},{role:"user",content:pr}]};
+  // Add json response format for providers that support it
+  if(endpoint.includes("openai.com")||endpoint.includes("groq.com")||endpoint.includes("together.xyz"))body.response_format={type:"json_object"};
+  const resp=await fetch(endpoint,{method:"POST",headers,body:JSON.stringify(body)});
   if(!resp.ok){const e=await resp.json().catch(()=>({}));throw new Error(e.error?.message||`HTTP ${resp.status}`)}
   const d=await resp.json();
-  const text=(d.choices?.[0]?.message?.content||"").trim();
-  const parsed=extractJSON(text);
-  if(parsed)return parsed;
-  return{score:0.5,note:"Parse failed: "+text.slice(0,40)};
+  return(d.choices?.[0]?.message?.content||d.content?.[0]?.text||"").trim();
 }
 
-async function judgeCustom(fd,key,endpoint){
-  const pr=buildJudgePrompt(fd);
-  const resp=await fetch(endpoint,{
-    method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
-    body:JSON.stringify({model:"default",max_tokens:120,messages:[{role:"system",content:"Respond with valid JSON only."},{role:"user",content:pr}]})
-  });
-  if(!resp.ok)throw new Error(`HTTP ${resp.status}`);
-  const d=await resp.json();
-  // Try OpenAI-compatible format first, then Anthropic
-  const text=(d.choices?.[0]?.message?.content||d.content?.[0]?.text||"").trim();
-  const parsed=extractJSON(text);
-  if(parsed)return parsed;
-  return{score:0.5,note:"Parse failed: "+text.slice(0,40)};
-}
+// Provider endpoint configs
+const PROVIDER_CONFIGS={
+  openai:{endpoint:"https://api.openai.com/v1/chat/completions",model:"gpt-4o-mini"},
+  groq:{endpoint:"https://api.groq.com/openai/v1/chat/completions",model:"llama-3.3-70b-versatile"},
+  together:{endpoint:"https://api.together.xyz/v1/chat/completions",model:"meta-llama/Llama-3.3-70B-Instruct-Turbo"},
+  ollama:{endpoint:"http://localhost:11434/v1/chat/completions",model:"llama3.2"},
+  lmstudio:{endpoint:"http://localhost:1234/v1/chat/completions",model:"default"},
+};
 
 async function judge(fd,provider,apiKey,customEndpoint){
   try{
     if(provider==="synthetic")return syntheticJudge(fd);
-    if(provider==="anthropic")return await judgeAnthropic(fd,apiKey);
-    if(provider==="openai")return await judgeOpenAI(fd,apiKey);
-    if(provider==="custom")return await judgeCustom(fd,apiKey,customEndpoint);
-    return syntheticJudge(fd);
-  }catch(e){return{score:0.5,note:e.message?.slice(0,50)||"Judge error"}}
+
+    let rawText="";
+    if(provider==="anthropic"){
+      rawText=await judgeAnthropic(fd,apiKey);
+    }else if(PROVIDER_CONFIGS[provider]){
+      const cfg=PROVIDER_CONFIGS[provider];
+      const ep=(provider==="ollama"||provider==="lmstudio")&&customEndpoint?customEndpoint:cfg.endpoint;
+      rawText=await judgeOpenAICompat(fd,apiKey,ep,cfg.model);
+    }else if(provider==="custom"){
+      rawText=await judgeOpenAICompat(fd,apiKey,customEndpoint||"http://localhost:11434/v1/chat/completions","default");
+    }else{
+      return syntheticJudge(fd);
+    }
+
+    // Parse with robust extractor
+    const parsed=extractJSON(rawText);
+    if(parsed)return parsed;
+
+    // Fallback: synthetic score + LLM note excerpt (never show "Parse failed")
+    const syn=syntheticJudge(fd);
+    const snippet=rawText.replace(/[{}"]/g,'').slice(0,50).trim();
+    return{score:syn.score,note:snippet||syn.note,_fallback:true};
+  }catch(e){
+    // Network/API errors: fall back to synthetic with error context
+    const syn=syntheticJudge(fd);
+    const msg=e.message||"Unknown error";
+    if(msg.includes("Failed to fetch")||msg.includes("NetworkError"))return{score:syn.score,note:"Offline — "+syn.note,_fallback:true};
+    return{score:syn.score,note:msg.slice(0,50),_fallback:true};
+  }
 }
 
 // MAIN COMPONENT
@@ -288,7 +353,7 @@ function CortexPetriDish(){
         ctx.fillText("CORTEX PETRI DISH",w/2,h*0.36);
         ctx.font=`${w*0.012}px "JetBrains Mono",monospace`;ctx.fillStyle="#666";
         ctx.fillText("27 AI skills \u00B7 10,000 generations \u00B7 genetic evolution",w/2,h*0.43);
-        ctx.fillText("Red Queen \u00B7 paradigm shifts \u00B7 innovation bursts \u00B7 Claude judge",w/2,h*0.47);
+        ctx.fillText("Red Queen \u00B7 paradigm shifts \u00B7 8 judge providers \u00B7 cross-platform",w/2,h*0.47);
         ctx.font=`${w*0.01}px "JetBrains Mono",monospace`;ctx.fillStyle="#444";
         ctx.fillText("Press EVOLVE to begin. Click organisms for genetic history.",w/2,h*0.53);
         SK.forEach((sk,i)=>{const a=(i/SK.length)*6.283;const rad=Math.min(w,h)*0.2;const ox=w/2+Math.cos(a)*rad,oy=h*0.5+Math.sin(a)*rad;const rr=3+Math.sin(frm.current*0.018+i)*1.5;const col=CC[sk.c]||"#888";ctx.beginPath();ctx.arc(ox,oy,rr,0,6.283);ctx.fillStyle=col+"30";ctx.fill();ctx.strokeStyle=col+"55";ctx.lineWidth=0.5;ctx.stroke()});
@@ -375,7 +440,7 @@ function CortexPetriDish(){
           </div>
           {sel.pA&&<div style={{fontSize:7,color:"#A855F7",marginTop:4}}>Lineage: {sel.pA.split("-")[0]} x {sel.pB.split("-")[0]}</div>}
         </div>}
-        {llm&&<div style={{position:"absolute",top:8,left:"50%",transform:"translateX(-50%)",background:"rgba(8,8,20,0.92)",border:`1px solid ${llm.provider==="synthetic"?"#A855F7":"#FFD700"}`,borderRadius:7,padding:"5px 12px",fontSize:9,color:llm.provider==="synthetic"?"#A855F7":"#FFD700",backdropFilter:"blur(8px)",maxWidth:"80%"}}>{JUDGE_PROVIDERS[llm.provider]?.name||"Judge"} @ Gen {llm.gen.toLocaleString()}: <span style={{fontWeight:700}}>{llm.score}</span> — {llm.note}</div>}
+        {llm&&<div style={{position:"absolute",top:8,left:"50%",transform:"translateX(-50%)",background:"rgba(8,8,20,0.92)",border:`1px solid ${llm._fallback?"#F59E0B":llm.provider==="synthetic"?"#A855F7":"#FFD700"}`,borderRadius:7,padding:"5px 12px",fontSize:9,color:llm._fallback?"#F59E0B":llm.provider==="synthetic"?"#A855F7":"#FFD700",backdropFilter:"blur(8px)",maxWidth:"80%"}}>{JUDGE_PROVIDERS[llm.provider]?.name||"Judge"}{llm._fallback?" (synthetic fallback)":""} @ Gen {llm.gen.toLocaleString()}: <span style={{fontWeight:700}}>{llm.score}</span> — {llm.note}</div>}
       </div>
       <div style={{height:48,background:"rgba(6,6,18,0.96)",borderTop:"1px solid #151525",display:"flex",alignItems:"center",padding:"0 10px",gap:8,flexShrink:0,zIndex:10}}>
         {!started?<>
@@ -416,14 +481,18 @@ function CortexPetriDish(){
             <input type="password" value={jKey} onChange={e=>setJKey(e.target.value)} placeholder={JUDGE_PROVIDERS[jProv].keyPrefix+"..."} style={{width:"100%",background:"#080818",border:"1px solid #1e1e30",borderRadius:3,color:"#fff",padding:"4px 6px",fontSize:8,fontFamily:"inherit"}}/>
             <div style={{fontSize:6,color:"#333",marginTop:2}}>Stored in localStorage. Never sent to our servers.</div>
           </div>}
-          {jProv==="custom"&&<div>
-            <div style={{color:"#555",marginBottom:3}}>API Endpoint (OpenAI-compatible)</div>
-            <input type="text" value={jEndpoint} onChange={e=>setJEndpoint(e.target.value)} placeholder="https://your-api.com/v1/chat/completions" style={{width:"100%",background:"#080818",border:"1px solid #1e1e30",borderRadius:3,color:"#fff",padding:"4px 6px",fontSize:8,fontFamily:"inherit"}}/>
+          {(jProv==="custom"||jProv==="ollama"||jProv==="lmstudio")&&<div>
+            <div style={{color:"#555",marginBottom:3}}>{jProv==="custom"?"API Endpoint (OpenAI-compatible)":jProv==="ollama"?"Ollama Endpoint":"LM Studio Endpoint"}</div>
+            <input type="text" value={jEndpoint} onChange={e=>setJEndpoint(e.target.value)} placeholder={jProv==="ollama"?"http://localhost:11434/v1/chat/completions":jProv==="lmstudio"?"http://localhost:1234/v1/chat/completions":"https://your-api.com/v1/chat/completions"} style={{width:"100%",background:"#080818",border:"1px solid #1e1e30",borderRadius:3,color:"#fff",padding:"4px 6px",fontSize:8,fontFamily:"inherit"}}/>
+            <div style={{fontSize:6,color:"#333",marginTop:2}}>Leave blank for default. Override only if using a non-standard port.</div>
           </div>}
           <div style={{fontSize:6,color:"#333",borderTop:"1px solid #151525",paddingTop:5}}>
-            <b style={{color:"#555"}}>Synthetic</b> — Free, instant, algorithmic scoring based on population statistics. No API needed.<br/>
-            <b style={{color:"#555"}}>Claude / GPT</b> — Real LLM evaluation. Requires API key. ~$0.001/judgment.<br/>
-            <b style={{color:"#555"}}>Custom</b> — Any OpenAI-compatible endpoint (Ollama, LM Studio, vLLM, etc).
+            <b style={{color:"#555"}}>Synthetic</b> — Free, instant, algorithmic scoring. No API needed.<br/>
+            <b style={{color:"#555"}}>Claude / GPT</b> — Real LLM evaluation via API. ~$0.001/judgment.<br/>
+            <b style={{color:"#555"}}>Groq / Together</b> — Fast inference APIs (Llama 3.3 70B). Requires API key.<br/>
+            <b style={{color:"#555"}}>Ollama / LM Studio</b> — Local LLM. Free, private, no API key needed.<br/>
+            <b style={{color:"#555"}}>Custom</b> — Any OpenAI-compatible endpoint (vLLM, text-gen-webui, etc).<br/>
+            <span style={{color:"#444",marginTop:2,display:"block"}}>All providers gracefully fall back to synthetic scoring if parse fails.</span>
           </div>
         </div>
       </div>}
