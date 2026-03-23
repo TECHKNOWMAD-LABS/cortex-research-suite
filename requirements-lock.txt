@@ -13,7 +13,7 @@ anthropic==0.84.0
 PyYAML==6.0.2
 
 # CLI (de-slop-cli package)
-click==8.1.8
+click==8.3.1
 
 # Dev tools
 pytest==8.3.5
